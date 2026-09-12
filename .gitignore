@@ -200,4 +200,29 @@ marimo/_lsp/
 __marimo__/
 
 # Streamlit
-.streamlit/secrets.toml
+.streamlit/secrets.toml.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+
+# Datasets and local data
+objectDetection/data/
+objectDetection/datasets/
+
+# Training runs / temporary files
+objectDetection/runs/
+objectDetection/tmp/
+
+# Local test images
+*.tif
+*.tiff

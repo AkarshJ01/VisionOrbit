@@ -1,0 +1,496 @@
+{
+  "source_image": "/Users/shashanksekhar/1095.tif",
+  "filename": "1095.tif",
+  "image_dimensions": {
+    "width": 1000,
+    "height": 1000,
+    "channels": 3
+  },
+  "georeferencing": {
+    "is_georeferenced": true,
+    "crs": "EPSG:32650",
+    "bounds": {
+      "left": 676162.0800000001,
+      "bottom": 3511313.5500000003,
+      "right": 676972.0800000001,
+      "top": 3512123.5500000003
+    }
+  },
+  "detection_count": 8,
+  "reference_point": null,
+  "distance_measurement_note": "Distances represent 2D geographic surface geodesic distance on Earth's ellipsoid (WGS84), distinct from 3D sensor-to-object altitude.",
+  "detections": [
+    {
+      "id": 1,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.4296,
+      "latitude": 31.730506,
+      "longitude": 118.864814,
+      "obb": {
+        "center_px": [
+          625.3,
+          56.6
+        ],
+        "width_px": 48.1,
+        "height_px": 42.7,
+        "angle_degrees": -150.81,
+        "bbox_xywh_px": [
+          593.9,
+          26.3,
+          62.8,
+          60.7
+        ],
+        "polygon_corners_px": [
+          [
+            635.9,
+            87.0
+          ],
+          [
+            656.7,
+            49.7
+          ],
+          [
+            614.7,
+            26.3
+          ],
+          [
+            593.9,
+            63.5
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.730282,
+            118.8649
+          ],
+          [
+            31.730552,
+            118.865083
+          ],
+          [
+            31.730729,
+            118.864728
+          ],
+          [
+            31.730459,
+            118.864545
+          ]
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.4224,
+      "latitude": 31.726766,
+      "longitude": 118.86558,
+      "obb": {
+        "center_px": [
+          723.6,
+          566.9
+        ],
+        "width_px": 46.2,
+        "height_px": 42.3,
+        "angle_degrees": -126.48,
+        "bbox_xywh_px": [
+          692.9,
+          535.7,
+          61.5,
+          62.3
+        ],
+        "polygon_corners_px": [
+          [
+            720.3,
+            598.0
+          ],
+          [
+            754.4,
+            572.8
+          ],
+          [
+            726.9,
+            535.7
+          ],
+          [
+            692.9,
+            560.9
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.726539,
+            118.865547
+          ],
+          [
+            31.726719,
+            118.865842
+          ],
+          [
+            31.726993,
+            118.865613
+          ],
+          [
+            31.726814,
+            118.865318
+          ]
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.3502,
+      "latitude": 31.728197,
+      "longitude": 118.866574,
+      "obb": {
+        "center_px": [
+          836.5,
+          369.1
+        ],
+        "width_px": 50.6,
+        "height_px": 45.8,
+        "angle_degrees": -128.64,
+        "bbox_xywh_px": [
+          802.8,
+          335.0,
+          67.4,
+          68.1
+        ],
+        "polygon_corners_px": [
+          [
+            834.4,
+            403.1
+          ],
+          [
+            870.2,
+            374.6
+          ],
+          [
+            838.6,
+            335.0
+          ],
+          [
+            802.8,
+            363.6
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.727948,
+            118.866551
+          ],
+          [
+            31.728153,
+            118.86686
+          ],
+          [
+            31.728445,
+            118.866596
+          ],
+          [
+            31.728241,
+            118.866287
+          ]
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.3249,
+      "latitude": 31.72781,
+      "longitude": 118.867511,
+      "obb": {
+        "center_px": [
+          947.1,
+          420.2
+        ],
+        "width_px": 48.0,
+        "height_px": 45.8,
+        "angle_degrees": -41.73,
+        "bbox_xywh_px": [
+          913.9,
+          387.2,
+          66.3,
+          66.1
+        ],
+        "polygon_corners_px": [
+          [
+            944.5,
+            453.3
+          ],
+          [
+            980.3,
+            421.4
+          ],
+          [
+            949.7,
+            387.2
+          ],
+          [
+            913.9,
+            419.1
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.727568,
+            118.867484
+          ],
+          [
+            31.727797,
+            118.867794
+          ],
+          [
+            31.728051,
+            118.867539
+          ],
+          [
+            31.727822,
+            118.867228
+          ]
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.3099,
+      "latitude": 31.728406,
+      "longitude": 118.866966,
+      "obb": {
+        "center_px": [
+          881.9,
+          339.7
+        ],
+        "width_px": 44.0,
+        "height_px": 38.5,
+        "angle_degrees": -128.87,
+        "bbox_xywh_px": [
+          853.1,
+          310.5,
+          57.6,
+          58.4
+        ],
+        "polygon_corners_px": [
+          [
+            880.7,
+            368.9
+          ],
+          [
+            910.7,
+            344.7
+          ],
+          [
+            883.0,
+            310.5
+          ],
+          [
+            853.1,
+            334.6
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.728193,
+            118.866951
+          ],
+          [
+            31.728365,
+            118.867211
+          ],
+          [
+            31.728619,
+            118.86698
+          ],
+          [
+            31.728447,
+            118.86672
+          ]
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.2882,
+      "latitude": 31.730771,
+      "longitude": 118.867868,
+      "obb": {
+        "center_px": [
+          981.9,
+          14.1
+        ],
+        "width_px": 48.5,
+        "height_px": 46.9,
+        "angle_degrees": -39.71,
+        "bbox_xywh_px": [
+          948.3,
+          -19.4,
+          67.3,
+          67.0
+        ],
+        "polygon_corners_px": [
+          [
+            978.2,
+            47.6
+          ],
+          [
+            1015.5,
+            16.6
+          ],
+          [
+            985.6,
+            -19.4
+          ],
+          [
+            948.3,
+            11.6
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.730527,
+            118.867832
+          ],
+          [
+            31.730749,
+            118.868155
+          ],
+          [
+            31.731016,
+            118.867904
+          ],
+          [
+            31.730794,
+            118.867581
+          ]
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "class_id": 14,
+      "class_name": "Boeing737",
+      "confidence": 0.2808,
+      "latitude": 31.729837,
+      "longitude": 118.864809,
+      "obb": {
+        "center_px": [
+          626.2,
+          148.2
+        ],
+        "width_px": 47.3,
+        "height_px": 42.5,
+        "angle_degrees": -128.69,
+        "bbox_xywh_px": [
+          594.9,
+          116.4,
+          62.7,
+          63.4
+        ],
+        "polygon_corners_px": [
+          [
+            624.4,
+            179.9
+          ],
+          [
+            657.6,
+            153.3
+          ],
+          [
+            628.0,
+            116.4
+          ],
+          [
+            594.9,
+            143.0
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.729605,
+            118.864789
+          ],
+          [
+            31.729795,
+            118.865076
+          ],
+          [
+            31.730068,
+            118.864829
+          ],
+          [
+            31.729879,
+            118.864542
+          ]
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "class_id": 10,
+      "class_name": "other-airplane",
+      "confidence": 0.2295,
+      "latitude": 31.727835,
+      "longitude": 118.867519,
+      "obb": {
+        "center_px": [
+          948.0,
+          416.7
+        ],
+        "width_px": 48.8,
+        "height_px": 45.9,
+        "angle_degrees": -129.97,
+        "bbox_xywh_px": [
+          914.7,
+          383.2,
+          66.5,
+          66.9
+        ],
+        "polygon_corners_px": [
+          [
+            946.1,
+            450.1
+          ],
+          [
+            981.2,
+            420.7
+          ],
+          [
+            949.9,
+            383.2
+          ],
+          [
+            914.7,
+            412.7
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            31.727591,
+            118.867498
+          ],
+          [
+            31.727802,
+            118.867803
+          ],
+          [
+            31.728079,
+            118.86754
+          ],
+          [
+            31.727869,
+            118.867236
+          ]
+        ]
+      }
+    }
+  ]
+}
