@@ -136,31 +136,69 @@ Trained on Apple Silicon (`MPS`) for 25 epochs:
 
 ---
 
+## Dataset Setup & Portability for New Users
+
+### 1. Where Does the Data Go?
+The codebase includes dynamic path discovery and will automatically locate the data in any of the following locations:
+1. Custom path specified via CLI: `--data-dir /path/to/SpaceNet6`
+2. Environment variable: `export SPACENET_DATA_DIR=/path/to/SpaceNet6`
+3. Internal directory: `VisionOrbit/data/SpaceNet6/`
+4. Parent directory: `../data/SpaceNet6/`
+
+### 2. Generating the 7-Channel Patches
+If starting from the raw SpaceNet 6 Rotterdam archive (`SN6_buildings_AOI_11_Rotterdam_train_sample.tar.gz`):
+```bash
+# 1. Extract raw data
+cd ../data/SpaceNet6
+tar -xzf SN6_buildings_AOI_11_Rotterdam_train_sample.tar.gz -C raw/
+
+# 2. Run preprocessing (matches RGB+SAR, normalizes, rasterizes GeoJSON, and extracts 256x256 patches)
+python preprocess.py
+```
+This produces the 90 processed `.npy` patches in `processed/images/` and `processed/masks/`.
+
+### 3. Running Without the Full Dataset
+* **Hardware & Pipeline Smoke Test**: You can run `python test_model.py` even if you have not downloaded the dataset yet! It will automatically generate a synthetic 7-channel test batch to verify MPS/CUDA acceleration, the U-Net forward pass, and backpropagation.
+* **Single-File Inference**: You can run predictions on any individual `.npy` patch without needing the entire training dataset:
+  ```bash
+  python predict.py --checkpoint checkpoints/best_model.pth --input /path/to/sample_patch.npy
+  ```
+
+---
+
 ## Quickstart & Usage
 
 ### 1. Environment Setup
-Activate the project's virtual environment:
+Activate the virtual environment:
 ```bash
-cd /Users/.../Ignite26/VisionOrbit
+# From the repository root
 source .venv/bin/activate
+
+# Or if located in the parent directory
+source ../.venv/bin/activate
 ```
 
 ### 2. Integration Smoke Test
-Verify dataset loading, model forward pass, device compatibility, and loss backpropagation:
+Verify model forward pass, device compatibility (MPS/CUDA), and loss backpropagation:
 ```bash
 python test_model.py
 ```
 
 ### 3. Training the Model
-Run the full training pipeline with spatial augmentations and Cosine Annealing:
+Run the training pipeline with spatial augmentations and Cosine Annealing (optionally passing `--data-dir` if stored in a custom path):
 ```bash
 python train.py --epochs 25 --batch-size 4 --lr 1e-4 --save-dir checkpoints
 ```
 
 ### 4. Running Inference & Generating Deliverables
-Run predictions on unseen test tiles and export all output formats:
+Run predictions on unseen test tiles or custom inputs and export all output formats:
 ```bash
+# On default test tiles
 python predict.py --checkpoint checkpoints/best_model.pth --threshold 0.5
+
+# On custom data directory or single file
+python predict.py --checkpoint checkpoints/best_model.pth --data-dir /path/to/data
+python predict.py --checkpoint checkpoints/best_model.pth --input /path/to/tile_patch.npy
 ```
 
 ---

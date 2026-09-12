@@ -9,7 +9,7 @@ import rasterio.features
 from shapely.geometry import shape, mapping
 import torch
 
-from dataset import SpaceNetDataset, IMAGE_DIR, MASK_DIR
+from dataset import SpaceNetDataset, resolve_data_root, IMAGE_DIR, MASK_DIR
 from model import UNet
 
 
@@ -127,7 +127,9 @@ def run_predictions(
     output_dir="predictions",
     threshold=0.5,
     min_area=10,
-    test_tiles=None
+    test_tiles=None,
+    data_dir=None,
+    input_path=None
 ):
     if test_tiles is None:
         test_tiles = [7218]  # Default unseen test tile
@@ -140,14 +142,22 @@ def run_predictions(
     else:
         device = torch.device("cpu")
 
+    data_root = resolve_data_root(data_dir)
+    image_dir = data_root / "processed" / "images"
+    mask_dir = data_root / "processed" / "masks"
+
     print("=" * 65)
     print("VISIONORBIT: MULTI-SENSOR PREDICTION & EXPORT PIPELINE")
     print("=" * 65)
-    print(f"Device:           {device}")
-    print(f"Checkpoint:       {checkpoint_path}")
+    print(f"Device:             {device}")
+    print(f"Checkpoint:         {checkpoint_path}")
     print(f"Decision Threshold: {threshold}")
     print(f"Min Building Area:  {min_area} pixels")
-    print(f"Test Tiles:       {test_tiles}")
+    if input_path:
+        print(f"Input Target:       {input_path}")
+    else:
+        print(f"Data Root:          {data_root.resolve()}")
+        print(f"Test Tiles:         {test_tiles}")
     print("=" * 65)
 
     # Setup output directories
@@ -174,9 +184,20 @@ def run_predictions(
 
     model.eval()
 
-    # Load Test Dataset
-    dataset = SpaceNetDataset(IMAGE_DIR, MASK_DIR, test_tiles)
-    print(f"Found {len(dataset)} test patches to predict.\n")
+    # Load items to predict
+    samples = []
+    if input_path:
+        inp = Path(input_path)
+        if inp.is_file():
+            samples.append((inp, None))
+        elif inp.is_dir():
+            for f in sorted(inp.glob("*.npy")):
+                samples.append((f, None))
+        print(f"Found {len(samples)} input file(s) to predict.\n")
+    else:
+        dataset = SpaceNetDataset(image_dir, mask_dir, test_tiles)
+        samples = dataset.samples
+        print(f"Found {len(samples)} test patches to predict.\n")
 
     summary_records = []
     total_buildings = 0
@@ -186,10 +207,18 @@ def run_predictions(
     print("-" * 65)
 
     with torch.no_grad():
-        for idx in range(len(dataset)):
-            image_tensor, mask_tensor = dataset[idx]
-            image_path, mask_path = dataset.samples[idx]
+        for image_path, mask_path in samples:
             stem = image_path.stem
+
+            # Load image
+            image_np = np.load(image_path).astype(np.float32)
+            image_tensor = torch.from_numpy(image_np)
+
+            # Load mask if present
+            if mask_path and Path(mask_path).exists():
+                gt_mask = np.load(mask_path).astype(np.uint8)
+            else:
+                gt_mask = None
 
             # Forward pass
             inputs = image_tensor.unsqueeze(0).to(device)
@@ -198,10 +227,14 @@ def run_predictions(
 
             # Binary threshold
             pred_mask = (probs > threshold).astype(np.uint8)
-            gt_mask = mask_tensor.squeeze().cpu().numpy().astype(np.uint8)
 
-            # Compute metrics
-            iou, dice = calculate_patch_metrics(pred_mask, gt_mask)
+            # Compute metrics if GT exists
+            if gt_mask is not None:
+                iou, dice = calculate_patch_metrics(pred_mask, gt_mask)
+                gt_pixels = int(gt_mask.sum())
+            else:
+                iou, dice = 0.0, 0.0
+                gt_pixels = 0
 
             # 1. Save Binary Mask Image (PNG, 0 or 255)
             mask_png_path = masks_dir / f"{stem}_mask.png"
@@ -225,22 +258,23 @@ def run_predictions(
             total_buildings += num_buildings
 
             # 4. Save 4-Panel Visualization Plot (PNG)
-            image_np = image_tensor.numpy()
             rgb = image_np[:3]
             sar = image_np[3:7]
             viz_path = viz_dir / f"{stem}_eval.png"
-            save_visual_comparison(rgb, sar, gt_mask, pred_mask, probs, iou, dice, viz_path)
+            display_gt = gt_mask if gt_mask is not None else np.zeros_like(pred_mask)
+            save_visual_comparison(rgb, sar, display_gt, pred_mask, probs, iou, dice, viz_path)
 
             summary_records.append({
                 "patch": stem,
                 "buildings_detected": num_buildings,
                 "iou": round(iou, 4),
                 "dice": round(dice, 4),
-                "ground_truth_pixels": int(gt_mask.sum()),
+                "ground_truth_pixels": gt_pixels,
                 "predicted_pixels": int(pred_mask.sum())
             })
 
-            print(f"{stem:<22} | {num_buildings:<10d} | {iou:<8.4f} | {dice:<8.4f} | Saved")
+            status_str = f"IoU: {iou:.4f}" if gt_mask is not None else "Inferred"
+            print(f"{stem:<22} | {num_buildings:<10d} | {iou:<8.4f} | {dice:<8.4f} | {status_str}")
 
     # Save combined GeoJSON with all detected buildings
     combined_geojson = {
@@ -255,7 +289,7 @@ def run_predictions(
     mean_dice = float(np.mean([r["dice"] for r in summary_records]))
 
     final_summary = {
-        "total_test_patches": len(dataset),
+        "total_test_patches": len(samples),
         "mean_test_iou": round(mean_iou, 4),
         "mean_test_dice": round(mean_dice, 4),
         "total_buildings_detected": total_buildings,
@@ -290,6 +324,8 @@ def main():
     parser.add_argument("--threshold", type=float, default=0.5, help="Probability threshold for building mask (default: 0.5)")
     parser.add_argument("--min-area", type=int, default=10, help="Minimum pixel area for polygon filtering (default: 10)")
     parser.add_argument("--tiles", nargs="+", type=int, default=[7218], help="List of tile IDs to evaluate")
+    parser.add_argument("--data-dir", type=str, default=None, help="Path to SpaceNet6 data directory (default: auto-detected)")
+    parser.add_argument("--input", type=str, default=None, help="Path to a single .npy file or directory of .npy files to predict on")
     args = parser.parse_args()
 
     run_predictions(
@@ -297,7 +333,9 @@ def main():
         output_dir=args.output_dir,
         threshold=args.threshold,
         min_area=args.min_area,
-        test_tiles=args.tiles
+        test_tiles=args.tiles,
+        data_dir=args.data_dir,
+        input_path=args.input
     )
 
 

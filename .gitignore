@@ -206,6 +206,3 @@ checkpoints/
 
 # Generated predictions
 predictions/
-
-# Temporary testing script
-test_model.py

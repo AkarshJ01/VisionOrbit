@@ -5,13 +5,49 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 
+import os
+
 # --------------------------------------------------
-# Paths
+# Paths & Dynamic Data Discovery
 # --------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_ROOT = PROJECT_ROOT.parent / "data" / "SpaceNet6"
 
+def resolve_data_root(custom_path=None):
+    """
+    Dynamically finds the SpaceNet6 data directory:
+    1. Custom path if explicitly provided
+    2. SPACENET_DATA_DIR environment variable
+    3. VisionOrbit/data/SpaceNet6 (internal data directory)
+    4. ../data/SpaceNet6 (parent workspace directory)
+    """
+    if custom_path:
+        p = Path(custom_path)
+        if (p / "processed" / "images").exists():
+            return p
+        elif (p / "images").exists():
+            return p.parent
+        return p
+
+    env_dir = os.environ.get("SPACENET_DATA_DIR")
+    if env_dir:
+        return Path(env_dir)
+
+    # Check local repo data
+    local_data = PROJECT_ROOT / "data" / "SpaceNet6"
+    if (local_data / "processed" / "images").exists():
+        return local_data
+
+    # Check parent workspace data
+    parent_data = PROJECT_ROOT.parent / "data" / "SpaceNet6"
+    if (parent_data / "processed" / "images").exists():
+        return parent_data
+
+    # Fallback default
+    return parent_data
+
+
+DATA_ROOT = resolve_data_root()
 IMAGE_DIR = DATA_ROOT / "processed" / "images"
 MASK_DIR = DATA_ROOT / "processed" / "masks"
 
@@ -22,13 +58,27 @@ MASK_DIR = DATA_ROOT / "processed" / "masks"
 
 class SpaceNetDataset(Dataset):
 
-    def __init__(self, image_dir, mask_dir, tile_ids):
+    def __init__(self, image_dir=None, mask_dir=None, tile_ids=None):
+
+        if image_dir is None:
+            image_dir = IMAGE_DIR
+        if mask_dir is None:
+            mask_dir = MASK_DIR
 
         self.image_dir = Path(image_dir)
         self.mask_dir = Path(mask_dir)
 
-        # Store tile IDs as strings
-        self.tile_ids = set(str(tile) for tile in tile_ids)
+        if not self.image_dir.exists():
+            raise FileNotFoundError(
+                f"\n[ERROR] SpaceNet6 images directory not found at: '{self.image_dir.resolve()}'\n"
+                f"How to resolve this:\n"
+                f"1. If data is stored elsewhere, pass image_dir or set SPACENET_DATA_DIR environment variable.\n"
+                f"2. If you have raw SpaceNet 6 data, run 'python preprocess.py' from data/SpaceNet6/ to generate patches.\n"
+                f"3. See README.md for instructions on downloading the SpaceNet 6 sample."
+            )
+
+        # Store tile IDs as strings (None means load all tiles found)
+        self.tile_ids = set(str(tile) for tile in tile_ids) if tile_ids is not None else None
 
         self.samples = []
 
@@ -41,9 +91,9 @@ class SpaceNetDataset(Dataset):
             parts = filename.stem.split("_")
 
             # parts = ["tile", "108", "y0", "x0"]
-            tile_id = parts[1]
+            tile_id = parts[1] if len(parts) > 1 else "unknown"
 
-            if tile_id in self.tile_ids:
+            if self.tile_ids is None or tile_id in self.tile_ids:
 
                 mask_path = self.mask_dir / filename.name
 
@@ -52,7 +102,8 @@ class SpaceNetDataset(Dataset):
                         (filename, mask_path)
                     )
 
-        print(f"Tiles: {sorted(self.tile_ids)}")
+        if self.tile_ids:
+            print(f"Tiles: {sorted(self.tile_ids)}")
         print(f"Samples: {len(self.samples)}")
 
     def __len__(self):

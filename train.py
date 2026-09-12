@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from dataset import SpaceNetDataset, IMAGE_DIR, MASK_DIR
+from dataset import SpaceNetDataset, resolve_data_root, IMAGE_DIR, MASK_DIR
 from model import UNet
 
 
@@ -179,6 +179,7 @@ def main():
     parser.add_argument("--weight-decay", type=float, default=1e-4, help="AdamW weight decay")
     parser.add_argument("--no-augment", action="store_true", help="Disable spatial data augmentation")
     parser.add_argument("--save-dir", type=str, default="checkpoints", help="Directory to save model checkpoints")
+    parser.add_argument("--data-dir", type=str, default=None, help="Path to SpaceNet6 data directory (default: auto-detected)")
     args = parser.parse_args()
 
     # Hardware acceleration
@@ -189,10 +190,15 @@ def main():
     else:
         device = torch.device("cpu")
 
+    data_root = resolve_data_root(args.data_dir)
+    image_dir = data_root / "processed" / "images"
+    mask_dir = data_root / "processed" / "masks"
+
     print("=" * 65)
     print("VISIONORBIT: MULTI-SENSOR U-NET TRAINING")
     print("=" * 65)
     print(f"Device:            {device}")
+    print(f"Data Root:         {data_root.resolve()}")
     print(f"Epochs:            {args.epochs}")
     print(f"Batch Size:        {args.batch_size}")
     print(f"Initial LR:        {args.lr}")
@@ -206,8 +212,8 @@ def main():
     train_tiles = [55, 69, 783, 8137, 4164, 108, 442]
     val_tiles = [7924, 2317]
 
-    train_dataset = SpaceNetDataset(IMAGE_DIR, MASK_DIR, train_tiles)
-    val_dataset = SpaceNetDataset(IMAGE_DIR, MASK_DIR, val_tiles)
+    train_dataset = SpaceNetDataset(image_dir, mask_dir, train_tiles)
+    val_dataset = SpaceNetDataset(image_dir, mask_dir, val_tiles)
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
