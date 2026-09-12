@@ -13,12 +13,18 @@ class ChatRequest(BaseModel):
     images: Optional[List[str]] = Field(default=[], description="List of base64 images or image URLs")
     history: Optional[List[ChatMessage]] = Field(default=[], description="Prior conversation context")
     provider: Optional[str] = Field(default="auto", description="'openai', 'ollama', 'builtin', or 'auto'")
-    model: Optional[str] = Field(default="gpt-4o", description="Target model name")
+    model: Optional[str] = Field(default="gpt-oss:20b", description="Target model name")
     apiKey: Optional[str] = Field(default=None, description="Client-provided OpenAI API Key (optional)")
     ollamaBaseUrl: Optional[str] = Field(default=None, description="Client-provided Ollama Base URL (optional)")
     tavilyApiKey: Optional[str] = Field(default=None, description="Client-provided Tavily API Key (optional)")
     useWebSearch: Optional[bool] = Field(default=False, description="Whether to enrich with Tavily web search")
+    useRag: Optional[bool] = Field(default=True, description="Whether to retrieve context from Pinecone Knowledge Base")
     systemPrompt: Optional[str] = Field(default=None, description="Custom system instruction")
+
+class RagRequest(BaseModel):
+    query: str = Field(..., description="Search query or question for Pinecone RAG")
+    model: Optional[str] = Field(default="gpt-oss:20b", description="Target Ollama model name")
+    k: Optional[int] = Field(default=3, description="Number of document chunks to retrieve")
 
 class ImageAnalysisRequest(BaseModel):
     image: str = Field(..., description="Base64 image data URL")
@@ -32,4 +38,5 @@ class ChatResponse(BaseModel):
     model_used: str
     image_metadata: Optional[List[Dict[str, Any]]] = []
     search_sources: Optional[List[Dict[str, Any]]] = []
+    rag_sources: Optional[List[Dict[str, Any]]] = []
     timestamp: float = Field(default_factory=time.time)

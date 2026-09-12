@@ -1,6 +1,6 @@
 /**
  * VisionOrbit - Client Application Logic
- * Modern OpenAI-style Multimodal Prompting & Vision Intelligence Engine
+ * Modern OpenAI-style Multimodal Prompting & Pinecone RAG Intelligence Engine
  */
 
 (function () {
@@ -13,6 +13,7 @@
     stagedImages: [], // Array of base64 data URLs
     isGenerating: false,
     useWebSearch: false,
+    useRag: true, // Pinecone RAG enabled by default
     theme: localStorage.getItem('visionorbit_theme') || 'dark',
     settings: {
       openaiKey: localStorage.getItem('visionorbit_openai_key') || '',
@@ -20,7 +21,7 @@
       tavilyKey: localStorage.getItem('visionorbit_tavily_key') || '',
       systemPrompt: localStorage.getItem('visionorbit_sys_prompt') || ''
     },
-    currentModel: 'builtin:visionorbit-core',
+    currentModel: 'ollama:gpt-oss:20b',
     lightboxScale: 1
   };
 
@@ -40,6 +41,7 @@
     themeIconLight: document.getElementById('themeIconLight'),
     
     modelSelector: document.getElementById('modelSelector'),
+    ragToggle: document.getElementById('ragToggle'),
     webSearchToggle: document.getElementById('webSearchToggle'),
     exportChatBtn: document.getElementById('exportChatBtn'),
     clearChatBtn: document.getElementById('clearChatBtn'),
@@ -109,7 +111,6 @@
     setupEventListeners();
     fetchModelCapabilities();
 
-    // Auto-focus input on startup
     if (elements.promptInput) {
       elements.promptInput.focus();
     }
@@ -196,6 +197,8 @@
 
     if (currentVal && elements.modelSelector.querySelector(`option[value="${currentVal}"]`)) {
       elements.modelSelector.value = currentVal;
+    } else if (elements.modelSelector.querySelector('option[value="ollama:gpt-oss:20b"]')) {
+      elements.modelSelector.value = 'ollama:gpt-oss:20b';
     } else {
       elements.modelSelector.value = 'builtin:visionorbit-core';
     }
@@ -207,13 +210,13 @@
     state.currentModel = val;
     const [provider, model] = val.split(':');
     
-    if (provider === 'openai') {
-      elements.currentProviderLabel.textContent = `OpenAI (${model})`;
-      elements.providerSubText.textContent = state.settings.openaiKey ? 'Live Multimodal Inference' : 'Using Server/Demo Key';
-      elements.providerDot.className = 'provider-dot active';
-    } else if (provider === 'ollama') {
+    if (provider === 'ollama') {
       elements.currentProviderLabel.textContent = `Ollama (${model})`;
-      elements.providerSubText.textContent = 'Local On-Device Vision';
+      elements.providerSubText.textContent = state.useRag ? 'Pinecone RAG Active' : 'Local LLM Inference';
+      elements.providerDot.className = 'provider-dot active';
+    } else if (provider === 'openai') {
+      elements.currentProviderLabel.textContent = `OpenAI (${model})`;
+      elements.providerSubText.textContent = state.settings.openaiKey ? 'Live Multimodal Inference' : 'Using Server/Env Key';
       elements.providerDot.className = 'provider-dot active';
     } else {
       elements.currentProviderLabel.textContent = 'VisionOrbit Smart Core';
@@ -250,7 +253,7 @@
   function startNewChat() {
     const newChat = {
       id: 'chat_' + Date.now(),
-      title: 'New Visual Inquiry',
+      title: 'New Inquiry',
       messages: [],
       createdAt: Date.now()
     };
@@ -296,7 +299,7 @@
 
       const titleSpan = document.createElement('span');
       titleSpan.className = 'history-item-title';
-      titleSpan.textContent = chat.title || 'New Visual Inquiry';
+      titleSpan.textContent = chat.title || 'New Inquiry';
 
       const delBtn = document.createElement('button');
       delBtn.className = 'history-item-delete';
@@ -399,7 +402,7 @@
   }
 
   /* ==========================================================================
-     Chat Submission & Multimodal Response Generation
+     Chat Submission & Multimodal / Pinecone RAG Generation
      ========================================================================== */
 
   async function handleChatSubmit(e) {
@@ -410,11 +413,10 @@
     const images = [...state.stagedImages];
 
     if (!prompt && images.length === 0) {
-      showToast('Please enter a prompt or attach an image.', 'error');
+      showToast('Please enter a query or attach an image.', 'error');
       return;
     }
 
-    // Reset input and staged images
     elements.promptInput.value = '';
     elements.promptInput.style.height = 'auto';
     state.stagedImages = [];
@@ -423,7 +425,6 @@
     const chat = getCurrentChat();
     if (!chat) return;
 
-    // Create user message
     const userMsg = {
       id: 'msg_' + Date.now(),
       role: 'user',
@@ -432,9 +433,8 @@
       timestamp: Date.now()
     };
 
-    // Update conversation title if first message
     if (chat.messages.length === 0) {
-      const autoTitle = prompt ? (prompt.length > 32 ? prompt.substring(0, 32) + '...' : prompt) : 'Visual Image Inspection';
+      const autoTitle = prompt ? (prompt.length > 32 ? prompt.substring(0, 32) + '...' : prompt) : 'Visual & Knowledge Inquiry';
       chat.title = autoTitle;
       saveConversations();
     }
@@ -447,7 +447,6 @@
     appendMessageToDOM(userMsg);
     scrollChatToBottom();
 
-    // Trigger Assistant response
     await generateAssistantResponse(prompt, images);
   }
 
@@ -455,15 +454,14 @@
     state.isGenerating = true;
     updateSendButtonState();
     elements.analysisIndicator.classList.remove('hidden');
-    elements.analyzingText.textContent = images.length > 0 
-      ? 'Analyzing multimodal image telemetry and neural features...' 
-      : 'Thinking and generating response...';
+    elements.analyzingText.textContent = state.useRag && images.length === 0
+      ? 'Retrieving from Pinecone knowledge base & thinking...'
+      : (images.length > 0 ? 'Analyzing multimodal image features & telemetry...' : 'Generating response...');
     scrollChatToBottom();
 
     const [provider, model] = state.currentModel.split(':');
     const chat = getCurrentChat();
 
-    // Prepare history
     const historyPayload = chat.messages.slice(0, -1).map(m => ({
       role: m.role,
       content: m.content
@@ -480,6 +478,7 @@
         ollamaBaseUrl: state.settings.ollamaUrl || null,
         tavilyApiKey: state.settings.tavilyKey || null,
         useWebSearch: state.useWebSearch,
+        useRag: state.useRag,
         systemPrompt: state.settings.systemPrompt || null
       };
 
@@ -504,6 +503,7 @@
         model_used: data.model_used,
         image_metadata: data.image_metadata || [],
         search_sources: data.search_sources || [],
+        rag_sources: data.rag_sources || [],
         timestamp: Date.now()
       };
 
@@ -520,7 +520,7 @@
       const errorMsg = {
         id: 'msg_' + Date.now(),
         role: 'assistant',
-        content: `⚠️ **An error occurred during analysis:**\n\n\`${err.message}\`\n\n*Please verify your API key or model settings in the ⚙️ Settings dialog.*`,
+        content: `⚠️ **An error occurred during generation:**\n\n\`${err.message}\`\n\n*Please verify your Pinecone index or model settings in the ⚙️ Settings dialog.*`,
         provider_used: 'Error Handler',
         timestamp: Date.now()
       };
@@ -546,14 +546,13 @@
   }
 
   /* ==========================================================================
-     DOM Message Rendering & Streaming Effects
+     DOM Message Rendering & RAG Sources Display
      ========================================================================== */
 
   function formatMarkdown(rawText) {
     if (window.marked) {
       return marked.parse(rawText);
     }
-    // Simple fallback if marked is unavailable
     return rawText
       .replace(/\n\n/g, '<p></p>')
       .replace(/\n/g, '<br>')
@@ -561,12 +560,53 @@
       .replace(/\*(.*?)\*/g, '<em>$1</em>');
   }
 
+  function renderRagSources(sources) {
+    if (!sources || sources.length === 0) return null;
+
+    const container = document.createElement('div');
+    container.className = 'rag-sources-card';
+
+    const header = document.createElement('div');
+    header.className = 'rag-sources-header';
+    header.innerHTML = `
+      <span>📚 Pinecone Knowledge Sources (${sources.length} chunks retrieved)</span>
+      <span class="accordion-toggle">▾</span>
+    `;
+
+    const list = document.createElement('div');
+    list.className = 'rag-sources-list';
+
+    sources.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'rag-source-item';
+      item.innerHTML = `
+        <div class="rag-source-meta">
+          <span class="rag-source-filename">📄 ${s.filename}</span>
+          <span class="rag-source-page">Page ${s.page}</span>
+        </div>
+        <div class="rag-source-snippet">${s.snippet}</div>
+      `;
+      list.appendChild(item);
+    });
+
+    header.onclick = () => {
+      list.classList.toggle('hidden');
+      const toggleIcon = header.querySelector('.accordion-toggle');
+      if (toggleIcon) {
+        toggleIcon.textContent = list.classList.contains('hidden') ? '▸' : '▾';
+      }
+    };
+
+    container.appendChild(header);
+    container.appendChild(list);
+    return container;
+  }
+
   function appendMessageToDOM(msg) {
     const item = document.createElement('div');
     item.className = `message-item ${msg.role}`;
     item.id = msg.id;
 
-    // Avatar
     const avatar = document.createElement('div');
     avatar.className = 'msg-avatar';
     if (msg.role === 'user') {
@@ -578,7 +618,6 @@
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
 
-    // Image attachments if user message
     if (msg.images && msg.images.length > 0) {
       const imgStrip = document.createElement('div');
       imgStrip.className = 'msg-images-strip';
@@ -589,7 +628,7 @@
 
         const img = document.createElement('img');
         img.src = imgData;
-        img.alt = `Uploaded image ${i + 1}`;
+        img.alt = `Uploaded visual ${i + 1}`;
 
         const badge = document.createElement('span');
         badge.className = 'thumb-zoom-badge';
@@ -602,22 +641,22 @@
       bubble.appendChild(imgStrip);
     }
 
-    // Text Card
     const textCard = document.createElement('div');
     textCard.className = 'msg-text-card markdown-body';
     textCard.innerHTML = formatMarkdown(msg.content);
-
-    // Add Copy code buttons to pre blocks
     enhanceCodeBlocks(textCard);
-
     bubble.appendChild(textCard);
 
-    // Assistant Action Bar
+    // Render RAG sources if present
+    if (msg.rag_sources && msg.rag_sources.length > 0) {
+      const ragCard = renderRagSources(msg.rag_sources);
+      if (ragCard) bubble.appendChild(ragCard);
+    }
+
     if (msg.role === 'assistant') {
       const actionsBar = document.createElement('div');
       actionsBar.className = 'msg-actions-bar';
 
-      // Copy response button
       const copyBtn = document.createElement('button');
       copyBtn.className = 'action-pill-btn';
       copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy</span>`;
@@ -626,7 +665,6 @@
         showToast('Copied response to clipboard', 'success');
       };
 
-      // Speak response button (TTS)
       const speakBtn = document.createElement('button');
       speakBtn.className = 'action-pill-btn';
       speakBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> <span>Listen</span>`;
@@ -678,13 +716,18 @@
       currentIdx += chunkLength;
       textCard.innerHTML = formatMarkdown(fullText.substring(0, currentIdx));
       scrollChatToBottom();
-      await new Promise(r => setTimeout(r, 12));
+      await new Promise(r => setTimeout(r, 10));
     }
 
     textCard.innerHTML = formatMarkdown(fullText);
     enhanceCodeBlocks(textCard);
 
-    // Append action bar after streaming completes
+    // Render RAG sources if present
+    if (msg.rag_sources && msg.rag_sources.length > 0) {
+      const ragCard = renderRagSources(msg.rag_sources);
+      if (ragCard) bubble.appendChild(ragCard);
+    }
+
     const actionsBar = document.createElement('div');
     actionsBar.className = 'msg-actions-bar';
 
@@ -810,10 +853,8 @@
      ========================================================================== */
 
   function setupEventListeners() {
-    // Theme Toggle
     elements.themeToggleBtn.addEventListener('click', toggleTheme);
 
-    // Sidebar Toggle
     elements.sidebarToggleBtn.addEventListener('click', () => {
       elements.sidebar.classList.toggle('collapsed');
     });
@@ -821,10 +862,8 @@
       elements.sidebar.classList.add('collapsed');
     });
 
-    // New Chat
     elements.newChatBtn.addEventListener('click', startNewChat);
 
-    // Keyboard Shortcut (⌘K / Ctrl+K)
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -832,8 +871,17 @@
       }
     });
 
-    // Model Change
     elements.modelSelector.addEventListener('change', handleModelChange);
+
+    // Pinecone RAG Toggle
+    if (elements.ragToggle) {
+      elements.ragToggle.addEventListener('click', () => {
+        state.useRag = !state.useRag;
+        elements.ragToggle.classList.toggle('active', state.useRag);
+        handleModelChange();
+        showToast(`Pinecone RAG ${state.useRag ? 'enabled' : 'disabled'}`, 'info');
+      });
+    }
 
     // Web Search Toggle
     elements.webSearchToggle.addEventListener('click', () => {
@@ -887,10 +935,8 @@
       }
     });
 
-    // Chat Form Submit
     elements.chatForm.addEventListener('submit', handleChatSubmit);
 
-    // File Upload via Button
     elements.uploadBtn.addEventListener('click', () => {
       elements.imageFileInput.click();
     });
@@ -900,12 +946,10 @@
       elements.imageFileInput.value = '';
     });
 
-    // Hero Dropzone Click
     elements.heroDropzone.addEventListener('click', () => {
       elements.imageFileInput.click();
     });
 
-    // Suggestion Cards Click
     document.querySelectorAll('.suggestion-card').forEach(card => {
       card.addEventListener('click', () => {
         const promptText = card.getAttribute('data-prompt');
@@ -915,7 +959,6 @@
       });
     });
 
-    // Global Clipboard Paste (Cmd+V / Ctrl+V)
     window.addEventListener('paste', (e) => {
       const items = e.clipboardData ? e.clipboardData.items : [];
       for (let i = 0; i < items.length; i++) {
@@ -927,7 +970,6 @@
       }
     });
 
-    // Full Window Drag & Drop Overlay
     let dragCounter = 0;
     window.addEventListener('dragenter', (e) => {
       e.preventDefault();
@@ -957,7 +999,6 @@
       }
     });
 
-    // Voice Input (SpeechRecognition)
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
@@ -996,20 +1037,17 @@
       elements.voiceInputBtn.style.opacity = '0.5';
     }
 
-    // Settings Modal Open/Close
     elements.openSettingsBtn.addEventListener('click', () => openModal(elements.settingsModal));
     elements.closeSettingsModalBtn.addEventListener('click', () => closeModal(elements.settingsModal));
     elements.settingsModal.querySelector('.modal-backdrop').addEventListener('click', () => closeModal(elements.settingsModal));
     elements.saveSettingsBtn.addEventListener('click', saveSettings);
     elements.resetSettingsBtn.addEventListener('click', resetSettings);
 
-    // Toggle API Key Visibility
     elements.toggleKeyVisibility.addEventListener('click', () => {
       const isPass = elements.openaiKeyInput.type === 'password';
       elements.openaiKeyInput.type = isPass ? 'text' : 'password';
     });
 
-    // Lightbox Controls
     elements.lightboxCloseBtn.addEventListener('click', closeLightbox);
     elements.imageLightboxModal.querySelector('.lightbox-backdrop').addEventListener('click', closeLightbox);
     elements.lightboxZoomIn.addEventListener('click', () => {
@@ -1021,7 +1059,6 @@
       elements.lightboxImage.style.transform = `scale(${state.lightboxScale})`;
     });
 
-    // Scroll Detection for Floating Scroll-To-Bottom Button
     elements.chatContainer.addEventListener('scroll', () => {
       const scrollPos = elements.chatContainer.scrollTop;
       const scrollHeight = elements.chatContainer.scrollHeight;
@@ -1036,7 +1073,6 @@
     elements.scrollToBottomBtn.addEventListener('click', scrollChatToBottom);
   }
 
-  // Run on DOM Ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
   } else {
