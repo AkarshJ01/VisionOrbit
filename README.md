@@ -141,8 +141,8 @@ Trained on Apple Silicon (`MPS`) for 25 epochs:
 ### 1. Environment Setup
 Activate the project's virtual environment:
 ```bash
-cd /Users/mehekdurgam/Ignite26/VisionOrbit
-source ../.venv/bin/activate
+cd /Users/.../Ignite26/VisionOrbit
+source .venv/bin/activate
 ```
 
 ### 2. Integration Smoke Test
