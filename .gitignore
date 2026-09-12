@@ -201,3 +201,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# Model checkpoints
+checkpoints/
+
+# Generated predictions
+predictions/
+
+# Temporary testing script
+test_model.py
