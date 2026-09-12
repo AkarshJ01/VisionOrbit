@@ -1,0 +1,156 @@
+{
+    "aoi": "L15-0487E-1246N_1950_3207_13",
+    "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+    },
+    "change_type": "likely new building / urban development",
+    "model": "SpaceNet 7 U-Net",
+    "threshold": 0.3,
+    "patch_index": 0,
+    "patch_size_pixels": 256,
+    "patch_offset_pixels": {
+        "x": 0,
+        "y": 0
+    },
+    "source_crs": "EPSG:3857",
+    "output_crs": "EPSG:4326",
+    "pixel_area_m2": 22.8227,
+    "total_predicted_pixels": 539,
+    "total_predicted_area_m2": 12301.45,
+    "detected_regions": [
+        {
+            "id": 1,
+            "pixels": 8,
+            "area_m2": 182.58,
+            "bounding_box_pixels": {
+                "x_min": 1,
+                "y_min": 39,
+                "x_max": 4,
+                "y_max": 41
+            },
+            "centroid_pixels": {
+                "x": 2.38,
+                "y": 39.75
+            },
+            "centroid_latitude": 36.349136,
+            "centroid_longitude": -94.306517,
+            "mean_confidence": 0.6923,
+            "max_confidence": 0.8901
+        },
+        {
+            "id": 2,
+            "pixels": 21,
+            "area_m2": 479.28,
+            "bounding_box_pixels": {
+                "x_min": 35,
+                "y_min": 65,
+                "x_max": 40,
+                "y_max": 69
+            },
+            "centroid_pixels": {
+                "x": 37.43,
+                "y": 66.81
+            },
+            "centroid_latitude": 36.3482,
+            "centroid_longitude": -94.305013,
+            "mean_confidence": 0.8227,
+            "max_confidence": 0.9957
+        },
+        {
+            "id": 3,
+            "pixels": 12,
+            "area_m2": 273.87,
+            "bounding_box_pixels": {
+                "x_min": 98,
+                "y_min": 84,
+                "x_max": 102,
+                "y_max": 87
+            },
+            "centroid_pixels": {
+                "x": 99.83,
+                "y": 85.58
+            },
+            "centroid_latitude": 36.347552,
+            "centroid_longitude": -94.302335,
+            "mean_confidence": 0.7083,
+            "max_confidence": 0.9514
+        },
+        {
+            "id": 4,
+            "pixels": 308,
+            "area_m2": 7029.4,
+            "bounding_box_pixels": {
+                "x_min": 107,
+                "y_min": 94,
+                "x_max": 129,
+                "y_max": 116
+            },
+            "centroid_pixels": {
+                "x": 115.45,
+                "y": 105.65
+            },
+            "centroid_latitude": 36.346858,
+            "centroid_longitude": -94.301664,
+            "mean_confidence": 0.8729,
+            "max_confidence": 0.9999
+        },
+        {
+            "id": 5,
+            "pixels": 101,
+            "area_m2": 2305.1,
+            "bounding_box_pixels": {
+                "x_min": 107,
+                "y_min": 118,
+                "x_max": 128,
+                "y_max": 128
+            },
+            "centroid_pixels": {
+                "x": 116.35,
+                "y": 121.85
+            },
+            "centroid_latitude": 36.346298,
+            "centroid_longitude": -94.301626,
+            "mean_confidence": 0.7766,
+            "max_confidence": 0.9879
+        },
+        {
+            "id": 6,
+            "pixels": 75,
+            "area_m2": 1711.7,
+            "bounding_box_pixels": {
+                "x_min": 110,
+                "y_min": 127,
+                "x_max": 127,
+                "y_max": 133
+            },
+            "centroid_pixels": {
+                "x": 119.23,
+                "y": 130.25
+            },
+            "centroid_latitude": 36.346007,
+            "centroid_longitude": -94.301503,
+            "mean_confidence": 0.8258,
+            "max_confidence": 0.9897
+        },
+        {
+            "id": 7,
+            "pixels": 14,
+            "area_m2": 319.52,
+            "bounding_box_pixels": {
+                "x_min": 115,
+                "y_min": 136,
+                "x_max": 120,
+                "y_max": 138
+            },
+            "centroid_pixels": {
+                "x": 117.5,
+                "y": 137.0
+            },
+            "centroid_latitude": 36.345774,
+            "centroid_longitude": -94.301577,
+            "mean_confidence": 0.765,
+            "max_confidence": 0.937
+        }
+    ]
+}

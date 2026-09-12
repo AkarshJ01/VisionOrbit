@@ -1,0 +1,609 @@
+{
+  "project": "SpaceNet 7 long-term urban development change detection",
+  "model": "SpaceNet 7 U-Net",
+  "change_type": "likely new building / urban development",
+  "time_period": {
+    "before": "2018-01",
+    "after": "2019-12"
+  },
+  "processing": {
+    "threshold": 0.3,
+    "merge_distance_pixels": 20,
+    "minimum_region_pixels": 20,
+    "minimum_mean_confidence": 0.6,
+    "source_crs": "EPSG:3857",
+    "output_crs": "EPSG:4326"
+  },
+  "validation_aois": [
+    "L15-0487E-1246N_1950_3207_13",
+    "L15-0506E-1204N_2027_3374_13"
+  ],
+  "summary": {
+    "validation_patches": 32,
+    "raw_detected_regions": 127,
+    "merged_regions": 31,
+    "filtered_regions": 13,
+    "final_change_events": 18,
+    "predicted_changed_pixels": 8788,
+    "predicted_changed_area_m2": 200566.17
+  },
+  "change_events": [
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.318549,
+        "longitude": -94.269402
+      },
+      "area_m2": 753.14,
+      "confidence": {
+        "mean": 0.6368,
+        "maximum": 0.9237
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 851,
+        "y_min": 923,
+        "x_max": 886,
+        "y_max": 926
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        15
+      ],
+      "detected_pixels": 33,
+      "event_id": "change_010"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.318891,
+        "longitude": -94.265567
+      },
+      "area_m2": 8604.18,
+      "confidence": {
+        "mean": 0.8087,
+        "maximum": 0.996
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 907,
+        "y_min": 895,
+        "x_max": 999,
+        "y_max": 953
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        15
+      ],
+      "detected_pixels": 377,
+      "event_id": "change_009"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.321127,
+        "longitude": -94.269458
+      },
+      "area_m2": 102884.87,
+      "confidence": {
+        "mean": 0.8904,
+        "maximum": 0.9984
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 823,
+        "y_min": 775,
+        "x_max": 904,
+        "y_max": 898
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        15
+      ],
+      "detected_pixels": 4508,
+      "event_id": "change_008"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.32392,
+        "longitude": -94.262908
+      },
+      "area_m2": 2510.5,
+      "confidence": {
+        "mean": 0.7613,
+        "maximum": 0.9918
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 1015,
+        "y_min": 753,
+        "x_max": 1022,
+        "y_max": 781
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        11,
+        15
+      ],
+      "detected_pixels": 110,
+      "event_id": "change_007"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.328128,
+        "longitude": -94.263492
+      },
+      "area_m2": 24762.66,
+      "confidence": {
+        "mean": 0.9346,
+        "maximum": 0.9974
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 987,
+        "y_min": 628,
+        "x_max": 1023,
+        "y_max": 675
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        11
+      ],
+      "detected_pixels": 1085,
+      "event_id": "change_006"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.332009,
+        "longitude": -94.275254
+      },
+      "area_m2": 502.1,
+      "confidence": {
+        "mean": 0.7527,
+        "maximum": 0.9725
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 728,
+        "y_min": 533,
+        "x_max": 734,
+        "y_max": 537
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        10
+      ],
+      "detected_pixels": 22,
+      "event_id": "change_005"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.33841,
+        "longitude": -94.263154
+      },
+      "area_m2": 2556.15,
+      "confidence": {
+        "mean": 0.7811,
+        "maximum": 0.993
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 994,
+        "y_min": 320,
+        "x_max": 1023,
+        "y_max": 389
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        7
+      ],
+      "detected_pixels": 112,
+      "event_id": "change_004"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.338981,
+        "longitude": -94.2661
+      },
+      "area_m2": 23165.06,
+      "confidence": {
+        "mean": 0.7823,
+        "maximum": 0.9977
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 916,
+        "y_min": 261,
+        "x_max": 1000,
+        "y_max": 400
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        7
+      ],
+      "detected_pixels": 1015,
+      "event_id": "change_003"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.346609,
+        "longitude": -94.301646
+      },
+      "area_m2": 11639.59,
+      "confidence": {
+        "mean": 0.8401,
+        "maximum": 0.9999
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 98,
+        "y_min": 84,
+        "x_max": 129,
+        "y_max": 138
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        0
+      ],
+      "detected_pixels": 510,
+      "event_id": "change_002"
+    },
+    {
+      "aoi": "L15-0487E-1246N_1950_3207_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 36.3482,
+        "longitude": -94.305013
+      },
+      "area_m2": 479.28,
+      "confidence": {
+        "mean": 0.8227,
+        "maximum": 0.9957
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 35,
+        "y_min": 65,
+        "x_max": 40,
+        "y_max": 69
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        0
+      ],
+      "detected_pixels": 21,
+      "event_id": "change_001"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.183679,
+        "longitude": -90.92137
+      },
+      "area_m2": 1437.84,
+      "confidence": {
+        "mean": 0.728,
+        "maximum": 0.9751
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 9,
+        "y_min": 994,
+        "x_max": 52,
+        "y_max": 1021
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        12
+      ],
+      "detected_pixels": 63,
+      "event_id": "change_017"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.183981,
+        "longitude": -90.915258
+      },
+      "area_m2": 798.8,
+      "confidence": {
+        "mean": 0.7449,
+        "maximum": 0.9472
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 172,
+        "y_min": 998,
+        "x_max": 183,
+        "y_max": 1003
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        12
+      ],
+      "detected_pixels": 35,
+      "event_id": "change_018"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.185,
+        "longitude": -90.916368
+      },
+      "area_m2": 1643.23,
+      "confidence": {
+        "mean": 0.7755,
+        "maximum": 0.9917
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 139,
+        "y_min": 970,
+        "x_max": 164,
+        "y_max": 978
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        12
+      ],
+      "detected_pixels": 72,
+      "event_id": "change_016"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.187115,
+        "longitude": -90.917029
+      },
+      "area_m2": 7120.69,
+      "confidence": {
+        "mean": 0.8776,
+        "maximum": 0.9952
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 122,
+        "y_min": 903,
+        "x_max": 148,
+        "y_max": 928
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        12
+      ],
+      "detected_pixels": 312,
+      "event_id": "change_015"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.200536,
+        "longitude": -90.881666
+      },
+      "area_m2": 616.21,
+      "confidence": {
+        "mean": 0.7681,
+        "maximum": 0.9867
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 953,
+        "y_min": 548,
+        "x_max": 964,
+        "y_max": 559
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        11
+      ],
+      "detected_pixels": 27,
+      "event_id": "change_014"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.201296,
+        "longitude": -90.915735
+      },
+      "area_m2": 2715.91,
+      "confidence": {
+        "mean": 0.8848,
+        "maximum": 0.9979
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 158,
+        "y_min": 527,
+        "x_max": 170,
+        "y_max": 542
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        8
+      ],
+      "detected_pixels": 119,
+      "event_id": "change_013"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.201424,
+        "longitude": -90.917798
+      },
+      "area_m2": 1506.3,
+      "confidence": {
+        "mean": 0.855,
+        "maximum": 0.9927
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 114,
+        "y_min": 525,
+        "x_max": 120,
+        "y_max": 536
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        8
+      ],
+      "detected_pixels": 66,
+      "event_id": "change_012"
+    },
+    {
+      "aoi": "L15-0506E-1204N_2027_3374_13",
+      "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+      },
+      "change_type": "likely new building / urban development",
+      "location": {
+        "latitude": 30.21173,
+        "longitude": -90.901455
+      },
+      "area_m2": 1346.54,
+      "confidence": {
+        "mean": 0.8856,
+        "maximum": 0.9989
+      },
+      "bounding_box_full_image_pixels": {
+        "x_min": 494,
+        "y_min": 249,
+        "x_max": 503,
+        "y_max": 255
+      },
+      "source_image_size_pixels": {
+        "width": 1024,
+        "height": 1024
+      },
+      "contributing_patches": [
+        1
+      ],
+      "detected_pixels": 59,
+      "event_id": "change_011"
+    }
+  ]
+}

@@ -1,0 +1,4782 @@
+{
+    "project": "SpaceNet 7 long-term urban development change detection",
+    "model": "SpaceNet 7 U-Net",
+    "change_type": "likely new building / urban development",
+    "time_period": {
+        "before": "2018-01",
+        "after": "2019-12"
+    },
+    "threshold": 0.3,
+    "patch_size_pixels": 256,
+    "source_crs": "EPSG:3857",
+    "output_crs": "EPSG:4326",
+    "validation_aois": [
+        "L15-0487E-1246N_1950_3207_13",
+        "L15-0506E-1204N_2027_3374_13"
+    ],
+    "validation_patch_count": 32,
+    "summary": {
+        "ground_truth_changed_pixels": 5658,
+        "predicted_changed_pixels": 8788,
+        "predicted_changed_area_m2": 200566.17,
+        "detected_change_regions": 127,
+        "mean_prediction_probability": 0.045565
+    },
+    "patch_results": [
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 0,
+            "patch_row": 0,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 444,
+            "total_predicted_pixels": 539,
+            "total_predicted_area_m2": 12301.45,
+            "maximum_probability": 0.9999496936798096,
+            "mean_probability": 0.007996940985321999,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 8,
+                    "area_m2": 182.58,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 1,
+                        "y_min": 39,
+                        "x_max": 4,
+                        "y_max": 41
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1,
+                        "y_min": 39,
+                        "x_max": 4,
+                        "y_max": 41
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 2.38,
+                        "y": 39.75
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 2.38,
+                        "y": 39.75
+                    },
+                    "centroid_latitude": 36.349136,
+                    "centroid_longitude": -94.306517,
+                    "mean_confidence": 0.6923,
+                    "max_confidence": 0.8901
+                },
+                {
+                    "id": 2,
+                    "pixels": 21,
+                    "area_m2": 479.28,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 35,
+                        "y_min": 65,
+                        "x_max": 40,
+                        "y_max": 69
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 35,
+                        "y_min": 65,
+                        "x_max": 40,
+                        "y_max": 69
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 37.43,
+                        "y": 66.81
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 37.43,
+                        "y": 66.81
+                    },
+                    "centroid_latitude": 36.3482,
+                    "centroid_longitude": -94.305013,
+                    "mean_confidence": 0.8227,
+                    "max_confidence": 0.9957
+                },
+                {
+                    "id": 3,
+                    "pixels": 12,
+                    "area_m2": 273.87,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 98,
+                        "y_min": 84,
+                        "x_max": 102,
+                        "y_max": 87
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 98,
+                        "y_min": 84,
+                        "x_max": 102,
+                        "y_max": 87
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 99.83,
+                        "y": 85.58
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 99.83,
+                        "y": 85.58
+                    },
+                    "centroid_latitude": 36.347552,
+                    "centroid_longitude": -94.302335,
+                    "mean_confidence": 0.7083,
+                    "max_confidence": 0.9514
+                },
+                {
+                    "id": 4,
+                    "pixels": 308,
+                    "area_m2": 7029.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 107,
+                        "y_min": 94,
+                        "x_max": 129,
+                        "y_max": 116
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 107,
+                        "y_min": 94,
+                        "x_max": 129,
+                        "y_max": 116
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 115.45,
+                        "y": 105.65
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 115.45,
+                        "y": 105.65
+                    },
+                    "centroid_latitude": 36.346858,
+                    "centroid_longitude": -94.301664,
+                    "mean_confidence": 0.8729,
+                    "max_confidence": 0.9999
+                },
+                {
+                    "id": 5,
+                    "pixels": 101,
+                    "area_m2": 2305.1,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 107,
+                        "y_min": 118,
+                        "x_max": 128,
+                        "y_max": 128
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 107,
+                        "y_min": 118,
+                        "x_max": 128,
+                        "y_max": 128
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 116.35,
+                        "y": 121.85
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 116.35,
+                        "y": 121.85
+                    },
+                    "centroid_latitude": 36.346298,
+                    "centroid_longitude": -94.301626,
+                    "mean_confidence": 0.7766,
+                    "max_confidence": 0.9879
+                },
+                {
+                    "id": 6,
+                    "pixels": 75,
+                    "area_m2": 1711.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 110,
+                        "y_min": 127,
+                        "x_max": 127,
+                        "y_max": 133
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 110,
+                        "y_min": 127,
+                        "x_max": 127,
+                        "y_max": 133
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 119.23,
+                        "y": 130.25
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 119.23,
+                        "y": 130.25
+                    },
+                    "centroid_latitude": 36.346007,
+                    "centroid_longitude": -94.301503,
+                    "mean_confidence": 0.8258,
+                    "max_confidence": 0.9897
+                },
+                {
+                    "id": 7,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 115,
+                        "y_min": 136,
+                        "x_max": 120,
+                        "y_max": 138
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 115,
+                        "y_min": 136,
+                        "x_max": 120,
+                        "y_max": 138
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 117.5,
+                        "y": 137.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 117.5,
+                        "y": 137.0
+                    },
+                    "centroid_latitude": 36.345774,
+                    "centroid_longitude": -94.301577,
+                    "mean_confidence": 0.765,
+                    "max_confidence": 0.937
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 1,
+            "patch_row": 0,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.019555388018488884,
+            "mean_probability": 0.0005747734103351831,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 2,
+            "patch_row": 0,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.005299355834722519,
+            "mean_probability": 0.00047791533870622516,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 3,
+            "patch_row": 0,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 89,
+            "total_predicted_pixels": 9,
+            "total_predicted_area_m2": 205.4,
+            "maximum_probability": 0.6452950835227966,
+            "mean_probability": 0.0007560550584457815,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 180,
+                        "y_min": 185,
+                        "x_max": 183,
+                        "y_max": 187
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 948,
+                        "y_min": 185,
+                        "x_max": 951,
+                        "y_max": 187
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 181.56,
+                        "y": 185.89
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 949.56,
+                        "y": 185.89
+                    },
+                    "centroid_latitude": 36.344084,
+                    "centroid_longitude": -94.265869,
+                    "mean_confidence": 0.4533,
+                    "max_confidence": 0.6453
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 4,
+            "patch_row": 1,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.005801231134682894,
+            "mean_probability": 0.0004907376132905483,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 5,
+            "patch_row": 1,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 14,
+            "total_predicted_area_m2": 319.52,
+            "maximum_probability": 0.9793609976768494,
+            "mean_probability": 0.0006022263551130891,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 220,
+                        "y_min": 37,
+                        "x_max": 223,
+                        "y_max": 40
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 476,
+                        "y_min": 293,
+                        "x_max": 479,
+                        "y_max": 296
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 221.5,
+                        "y": 38.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 477.5,
+                        "y": 294.5
+                    },
+                    "centroid_latitude": 36.34033,
+                    "centroid_longitude": -94.286127,
+                    "mean_confidence": 0.848,
+                    "max_confidence": 0.9794
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 6,
+            "patch_row": 1,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 39,
+            "total_predicted_pixels": 2,
+            "total_predicted_area_m2": 45.65,
+            "maximum_probability": 0.39265206456184387,
+            "mean_probability": 0.0004805737698916346,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 7,
+            "patch_row": 1,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 1020,
+            "total_predicted_pixels": 1166,
+            "total_predicted_area_m2": 26611.31,
+            "maximum_probability": 0.9976856708526611,
+            "mean_probability": 0.016005702316761017,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 32,
+                    "area_m2": 730.33,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 151,
+                        "y_min": 5,
+                        "x_max": 157,
+                        "y_max": 11
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 919,
+                        "y_min": 261,
+                        "x_max": 925,
+                        "y_max": 267
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 153.44,
+                        "y": 8.03
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 921.44,
+                        "y": 264.03
+                    },
+                    "centroid_latitude": 36.341383,
+                    "centroid_longitude": -94.267075,
+                    "mean_confidence": 0.8549,
+                    "max_confidence": 0.987
+                },
+                {
+                    "id": 2,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 155,
+                        "y_min": 13,
+                        "x_max": 157,
+                        "y_max": 15
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 923,
+                        "y_min": 269,
+                        "x_max": 925,
+                        "y_max": 271
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 155.83,
+                        "y": 14.17
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 923.83,
+                        "y": 270.17
+                    },
+                    "centroid_latitude": 36.341171,
+                    "centroid_longitude": -94.266973,
+                    "mean_confidence": 0.5104,
+                    "max_confidence": 0.8411
+                },
+                {
+                    "id": 3,
+                    "pixels": 13,
+                    "area_m2": 296.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 171,
+                        "y_min": 13,
+                        "x_max": 175,
+                        "y_max": 16
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 939,
+                        "y_min": 269,
+                        "x_max": 943,
+                        "y_max": 272
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 172.77,
+                        "y": 14.77
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 940.77,
+                        "y": 270.77
+                    },
+                    "centroid_latitude": 36.34115,
+                    "centroid_longitude": -94.266246,
+                    "mean_confidence": 0.7777,
+                    "max_confidence": 0.9789
+                },
+                {
+                    "id": 4,
+                    "pixels": 16,
+                    "area_m2": 365.16,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 196,
+                        "y_min": 13,
+                        "x_max": 201,
+                        "y_max": 16
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 964,
+                        "y_min": 269,
+                        "x_max": 969,
+                        "y_max": 272
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 198.5,
+                        "y": 14.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 966.5,
+                        "y": 270.5
+                    },
+                    "centroid_latitude": 36.34116,
+                    "centroid_longitude": -94.265141,
+                    "mean_confidence": 0.7385,
+                    "max_confidence": 0.9744
+                },
+                {
+                    "id": 5,
+                    "pixels": 8,
+                    "area_m2": 182.58,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 211,
+                        "y_min": 15,
+                        "x_max": 214,
+                        "y_max": 17
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 979,
+                        "y_min": 271,
+                        "x_max": 982,
+                        "y_max": 273
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 212.38,
+                        "y": 15.75
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 980.38,
+                        "y": 271.75
+                    },
+                    "centroid_latitude": 36.341116,
+                    "centroid_longitude": -94.264546,
+                    "mean_confidence": 0.7157,
+                    "max_confidence": 0.9263
+                },
+                {
+                    "id": 6,
+                    "pixels": 15,
+                    "area_m2": 342.34,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 164,
+                        "y_min": 24,
+                        "x_max": 171,
+                        "y_max": 26
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 932,
+                        "y_min": 280,
+                        "x_max": 939,
+                        "y_max": 282
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 167.33,
+                        "y": 25.2
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 935.33,
+                        "y": 281.2
+                    },
+                    "centroid_latitude": 36.34079,
+                    "centroid_longitude": -94.266479,
+                    "mean_confidence": 0.7493,
+                    "max_confidence": 0.9292
+                },
+                {
+                    "id": 7,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 184,
+                        "y_min": 24,
+                        "x_max": 186,
+                        "y_max": 25
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 952,
+                        "y_min": 280,
+                        "x_max": 954,
+                        "y_max": 281
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 184.8,
+                        "y": 24.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 952.8,
+                        "y": 280.6
+                    },
+                    "centroid_latitude": 36.34081,
+                    "centroid_longitude": -94.265729,
+                    "mean_confidence": 0.577,
+                    "max_confidence": 0.7424
+                },
+                {
+                    "id": 8,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 189,
+                        "y_min": 24,
+                        "x_max": 191,
+                        "y_max": 26
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 957,
+                        "y_min": 280,
+                        "x_max": 959,
+                        "y_max": 282
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 190.17,
+                        "y": 25.17
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 958.17,
+                        "y": 281.17
+                    },
+                    "centroid_latitude": 36.340791,
+                    "centroid_longitude": -94.265499,
+                    "mean_confidence": 0.6358,
+                    "max_confidence": 0.8868
+                },
+                {
+                    "id": 9,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 231,
+                        "y_min": 25,
+                        "x_max": 232,
+                        "y_max": 27
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 999,
+                        "y_min": 281,
+                        "x_max": 1000,
+                        "y_max": 283
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 231.5,
+                        "y": 26.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 999.5,
+                        "y": 282.0
+                    },
+                    "centroid_latitude": 36.340762,
+                    "centroid_longitude": -94.263725,
+                    "mean_confidence": 0.7519,
+                    "max_confidence": 0.9047
+                },
+                {
+                    "id": 10,
+                    "pixels": 52,
+                    "area_m2": 1186.78,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 175,
+                        "y_min": 38,
+                        "x_max": 190,
+                        "y_max": 42
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 943,
+                        "y_min": 294,
+                        "x_max": 958,
+                        "y_max": 298
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 182.73,
+                        "y": 39.98
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 950.73,
+                        "y": 295.98
+                    },
+                    "centroid_latitude": 36.340279,
+                    "centroid_longitude": -94.265818,
+                    "mean_confidence": 0.8002,
+                    "max_confidence": 0.9856
+                },
+                {
+                    "id": 11,
+                    "pixels": 28,
+                    "area_m2": 639.04,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 205,
+                        "y_min": 39,
+                        "x_max": 214,
+                        "y_max": 42
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 973,
+                        "y_min": 295,
+                        "x_max": 982,
+                        "y_max": 298
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 209.68,
+                        "y": 40.39
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 977.68,
+                        "y": 296.39
+                    },
+                    "centroid_latitude": 36.340264,
+                    "centroid_longitude": -94.264662,
+                    "mean_confidence": 0.7501,
+                    "max_confidence": 0.9715
+                },
+                {
+                    "id": 12,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 180,
+                        "y_min": 49,
+                        "x_max": 183,
+                        "y_max": 52
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 948,
+                        "y_min": 305,
+                        "x_max": 951,
+                        "y_max": 308
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 181.45,
+                        "y": 50.82
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 949.45,
+                        "y": 306.82
+                    },
+                    "centroid_latitude": 36.339904,
+                    "centroid_longitude": -94.265873,
+                    "mean_confidence": 0.7921,
+                    "max_confidence": 0.947
+                },
+                {
+                    "id": 13,
+                    "pixels": 56,
+                    "area_m2": 1278.07,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 169,
+                        "y_min": 50,
+                        "x_max": 178,
+                        "y_max": 57
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 937,
+                        "y_min": 306,
+                        "x_max": 946,
+                        "y_max": 313
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 173.52,
+                        "y": 53.32
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 941.52,
+                        "y": 309.32
+                    },
+                    "centroid_latitude": 36.339818,
+                    "centroid_longitude": -94.266214,
+                    "mean_confidence": 0.8514,
+                    "max_confidence": 0.9912
+                },
+                {
+                    "id": 14,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 164,
+                        "y_min": 51,
+                        "x_max": 166,
+                        "y_max": 53
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 932,
+                        "y_min": 307,
+                        "x_max": 934,
+                        "y_max": 309
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 164.83,
+                        "y": 51.83
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 932.83,
+                        "y": 307.83
+                    },
+                    "centroid_latitude": 36.339869,
+                    "centroid_longitude": -94.266586,
+                    "mean_confidence": 0.7554,
+                    "max_confidence": 0.9176
+                },
+                {
+                    "id": 15,
+                    "pixels": 18,
+                    "area_m2": 410.81,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 186,
+                        "y_min": 51,
+                        "x_max": 189,
+                        "y_max": 56
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 954,
+                        "y_min": 307,
+                        "x_max": 957,
+                        "y_max": 312
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 187.28,
+                        "y": 53.17
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 955.28,
+                        "y": 309.17
+                    },
+                    "centroid_latitude": 36.339823,
+                    "centroid_longitude": -94.265623,
+                    "mean_confidence": 0.7504,
+                    "max_confidence": 0.9507
+                },
+                {
+                    "id": 16,
+                    "pixels": 15,
+                    "area_m2": 342.34,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 198,
+                        "y_min": 51,
+                        "x_max": 202,
+                        "y_max": 55
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 966,
+                        "y_min": 307,
+                        "x_max": 970,
+                        "y_max": 311
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 199.73,
+                        "y": 52.93
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 967.73,
+                        "y": 308.93
+                    },
+                    "centroid_latitude": 36.339831,
+                    "centroid_longitude": -94.265089,
+                    "mean_confidence": 0.6812,
+                    "max_confidence": 0.9384
+                },
+                {
+                    "id": 17,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 204,
+                        "y_min": 51,
+                        "x_max": 206,
+                        "y_max": 52
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 972,
+                        "y_min": 307,
+                        "x_max": 974,
+                        "y_max": 308
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 205.0,
+                        "y": 51.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 973.0,
+                        "y": 307.5
+                    },
+                    "centroid_latitude": 36.33988,
+                    "centroid_longitude": -94.264863,
+                    "mean_confidence": 0.5925,
+                    "max_confidence": 0.8592
+                },
+                {
+                    "id": 18,
+                    "pixels": 42,
+                    "area_m2": 958.55,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 150,
+                        "y_min": 54,
+                        "x_max": 156,
+                        "y_max": 64
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 918,
+                        "y_min": 310,
+                        "x_max": 924,
+                        "y_max": 320
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 152.9,
+                        "y": 59.02
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 920.9,
+                        "y": 315.02
+                    },
+                    "centroid_latitude": 36.33962,
+                    "centroid_longitude": -94.267098,
+                    "mean_confidence": 0.682,
+                    "max_confidence": 0.9633
+                },
+                {
+                    "id": 19,
+                    "pixels": 20,
+                    "area_m2": 456.45,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 175,
+                        "y_min": 63,
+                        "x_max": 180,
+                        "y_max": 66
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 943,
+                        "y_min": 319,
+                        "x_max": 948,
+                        "y_max": 322
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 177.5,
+                        "y": 64.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 945.5,
+                        "y": 320.5
+                    },
+                    "centroid_latitude": 36.339431,
+                    "centroid_longitude": -94.266043,
+                    "mean_confidence": 0.7855,
+                    "max_confidence": 0.9889
+                },
+                {
+                    "id": 20,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 183,
+                        "y_min": 63,
+                        "x_max": 185,
+                        "y_max": 64
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 951,
+                        "y_min": 319,
+                        "x_max": 953,
+                        "y_max": 320
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 183.8,
+                        "y": 63.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 951.8,
+                        "y": 319.6
+                    },
+                    "centroid_latitude": 36.339462,
+                    "centroid_longitude": -94.265772,
+                    "mean_confidence": 0.6178,
+                    "max_confidence": 0.7819
+                },
+                {
+                    "id": 21,
+                    "pixels": 42,
+                    "area_m2": 958.55,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 190,
+                        "y_min": 63,
+                        "x_max": 200,
+                        "y_max": 68
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 958,
+                        "y_min": 319,
+                        "x_max": 968,
+                        "y_max": 324
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 195.1,
+                        "y": 65.17
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 963.1,
+                        "y": 321.17
+                    },
+                    "centroid_latitude": 36.339408,
+                    "centroid_longitude": -94.265288,
+                    "mean_confidence": 0.8237,
+                    "max_confidence": 0.9895
+                },
+                {
+                    "id": 22,
+                    "pixels": 23,
+                    "area_m2": 524.92,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 209,
+                        "y_min": 64,
+                        "x_max": 217,
+                        "y_max": 67
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 977,
+                        "y_min": 320,
+                        "x_max": 985,
+                        "y_max": 323
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 213.0,
+                        "y": 65.26
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 981.0,
+                        "y": 321.26
+                    },
+                    "centroid_latitude": 36.339405,
+                    "centroid_longitude": -94.264519,
+                    "mean_confidence": 0.7253,
+                    "max_confidence": 0.9592
+                },
+                {
+                    "id": 23,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 252,
+                        "y_min": 64,
+                        "x_max": 255,
+                        "y_max": 67
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1020,
+                        "y_min": 320,
+                        "x_max": 1023,
+                        "y_max": 323
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 253.64,
+                        "y": 65.45
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1021.64,
+                        "y": 321.45
+                    },
+                    "centroid_latitude": 36.339398,
+                    "centroid_longitude": -94.262775,
+                    "mean_confidence": 0.7332,
+                    "max_confidence": 0.9506
+                },
+                {
+                    "id": 24,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 163,
+                        "y_min": 65,
+                        "x_max": 166,
+                        "y_max": 68
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 931,
+                        "y_min": 321,
+                        "x_max": 934,
+                        "y_max": 324
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 164.18,
+                        "y": 66.55
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 932.18,
+                        "y": 322.55
+                    },
+                    "centroid_latitude": 36.33936,
+                    "centroid_longitude": -94.266614,
+                    "mean_confidence": 0.82,
+                    "max_confidence": 0.9577
+                },
+                {
+                    "id": 25,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 170,
+                        "y_min": 65,
+                        "x_max": 172,
+                        "y_max": 66
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 938,
+                        "y_min": 321,
+                        "x_max": 940,
+                        "y_max": 322
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 170.8,
+                        "y": 65.4
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 938.8,
+                        "y": 321.4
+                    },
+                    "centroid_latitude": 36.3394,
+                    "centroid_longitude": -94.26633,
+                    "mean_confidence": 0.4934,
+                    "max_confidence": 0.6909
+                },
+                {
+                    "id": 26,
+                    "pixels": 28,
+                    "area_m2": 639.04,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 246,
+                        "y_min": 66,
+                        "x_max": 250,
+                        "y_max": 74
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1014,
+                        "y_min": 322,
+                        "x_max": 1018,
+                        "y_max": 330
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 248.43,
+                        "y": 69.64
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1016.43,
+                        "y": 325.64
+                    },
+                    "centroid_latitude": 36.339253,
+                    "centroid_longitude": -94.262999,
+                    "mean_confidence": 0.756,
+                    "max_confidence": 0.9703
+                },
+                {
+                    "id": 27,
+                    "pixels": 39,
+                    "area_m2": 890.09,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 149,
+                        "y_min": 70,
+                        "x_max": 155,
+                        "y_max": 79
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 917,
+                        "y_min": 326,
+                        "x_max": 923,
+                        "y_max": 335
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 151.46,
+                        "y": 75.51
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 919.46,
+                        "y": 331.51
+                    },
+                    "centroid_latitude": 36.33905,
+                    "centroid_longitude": -94.26716,
+                    "mean_confidence": 0.8333,
+                    "max_confidence": 0.9864
+                },
+                {
+                    "id": 28,
+                    "pixels": 12,
+                    "area_m2": 273.87,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 208,
+                        "y_min": 73,
+                        "x_max": 212,
+                        "y_max": 75
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 976,
+                        "y_min": 329,
+                        "x_max": 980,
+                        "y_max": 331
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 210.17,
+                        "y": 74.08
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 978.17,
+                        "y": 330.08
+                    },
+                    "centroid_latitude": 36.3391,
+                    "centroid_longitude": -94.264641,
+                    "mean_confidence": 0.7905,
+                    "max_confidence": 0.9675
+                },
+                {
+                    "id": 29,
+                    "pixels": 16,
+                    "area_m2": 365.16,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 163,
+                        "y_min": 74,
+                        "x_max": 166,
+                        "y_max": 80
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 931,
+                        "y_min": 330,
+                        "x_max": 934,
+                        "y_max": 336
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 164.5,
+                        "y": 76.56
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 932.5,
+                        "y": 332.56
+                    },
+                    "centroid_latitude": 36.339014,
+                    "centroid_longitude": -94.266601,
+                    "mean_confidence": 0.8453,
+                    "max_confidence": 0.9776
+                },
+                {
+                    "id": 30,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 170,
+                        "y_min": 74,
+                        "x_max": 173,
+                        "y_max": 77
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 938,
+                        "y_min": 330,
+                        "x_max": 941,
+                        "y_max": 333
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 171.29,
+                        "y": 75.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 939.29,
+                        "y": 331.5
+                    },
+                    "centroid_latitude": 36.339051,
+                    "centroid_longitude": -94.266309,
+                    "mean_confidence": 0.7274,
+                    "max_confidence": 0.9411
+                },
+                {
+                    "id": 31,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 176,
+                        "y_min": 74,
+                        "x_max": 178,
+                        "y_max": 79
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 944,
+                        "y_min": 330,
+                        "x_max": 946,
+                        "y_max": 335
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 177.14,
+                        "y": 76.29
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 945.14,
+                        "y": 332.29
+                    },
+                    "centroid_latitude": 36.339024,
+                    "centroid_longitude": -94.266058,
+                    "mean_confidence": 0.6278,
+                    "max_confidence": 0.8797
+                },
+                {
+                    "id": 32,
+                    "pixels": 25,
+                    "area_m2": 570.57,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 249,
+                        "y_min": 82,
+                        "x_max": 253,
+                        "y_max": 90
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1017,
+                        "y_min": 338,
+                        "x_max": 1021,
+                        "y_max": 346
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 251.24,
+                        "y": 85.92
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1019.24,
+                        "y": 341.92
+                    },
+                    "centroid_latitude": 36.338691,
+                    "centroid_longitude": -94.262878,
+                    "mean_confidence": 0.825,
+                    "max_confidence": 0.9724
+                },
+                {
+                    "id": 33,
+                    "pixels": 24,
+                    "area_m2": 547.75,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 148,
+                        "y_min": 87,
+                        "x_max": 156,
+                        "y_max": 91
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 916,
+                        "y_min": 343,
+                        "x_max": 924,
+                        "y_max": 347
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 151.92,
+                        "y": 89.17
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 919.92,
+                        "y": 345.17
+                    },
+                    "centroid_latitude": 36.338578,
+                    "centroid_longitude": -94.267141,
+                    "mean_confidence": 0.8245,
+                    "max_confidence": 0.9747
+                },
+                {
+                    "id": 34,
+                    "pixels": 30,
+                    "area_m2": 684.68,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 168,
+                        "y_min": 87,
+                        "x_max": 177,
+                        "y_max": 91
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 936,
+                        "y_min": 343,
+                        "x_max": 945,
+                        "y_max": 347
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 172.8,
+                        "y": 88.93
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 940.8,
+                        "y": 344.93
+                    },
+                    "centroid_latitude": 36.338586,
+                    "centroid_longitude": -94.266244,
+                    "mean_confidence": 0.7794,
+                    "max_confidence": 0.9838
+                },
+                {
+                    "id": 35,
+                    "pixels": 27,
+                    "area_m2": 616.21,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 183,
+                        "y_min": 87,
+                        "x_max": 189,
+                        "y_max": 91
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 951,
+                        "y_min": 343,
+                        "x_max": 957,
+                        "y_max": 347
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 185.85,
+                        "y": 89.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 953.85,
+                        "y": 345.0
+                    },
+                    "centroid_latitude": 36.338584,
+                    "centroid_longitude": -94.265684,
+                    "mean_confidence": 0.822,
+                    "max_confidence": 0.99
+                },
+                {
+                    "id": 36,
+                    "pixels": 16,
+                    "area_m2": 365.16,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 163,
+                        "y_min": 89,
+                        "x_max": 165,
+                        "y_max": 94
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 931,
+                        "y_min": 345,
+                        "x_max": 933,
+                        "y_max": 350
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 164.0,
+                        "y": 91.19
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 932.0,
+                        "y": 347.19
+                    },
+                    "centroid_latitude": 36.338509,
+                    "centroid_longitude": -94.266622,
+                    "mean_confidence": 0.8132,
+                    "max_confidence": 0.9546
+                },
+                {
+                    "id": 37,
+                    "pixels": 19,
+                    "area_m2": 433.63,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 196,
+                        "y_min": 92,
+                        "x_max": 200,
+                        "y_max": 96
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 964,
+                        "y_min": 348,
+                        "x_max": 968,
+                        "y_max": 352
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 197.84,
+                        "y": 94.16
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 965.84,
+                        "y": 350.16
+                    },
+                    "centroid_latitude": 36.338406,
+                    "centroid_longitude": -94.26517,
+                    "mean_confidence": 0.8336,
+                    "max_confidence": 0.9889
+                },
+                {
+                    "id": 38,
+                    "pixels": 66,
+                    "area_m2": 1506.3,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 162,
+                        "y_min": 96,
+                        "x_max": 167,
+                        "y_max": 112
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 930,
+                        "y_min": 352,
+                        "x_max": 935,
+                        "y_max": 368
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 164.7,
+                        "y": 103.08
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 932.7,
+                        "y": 359.08
+                    },
+                    "centroid_latitude": 36.338098,
+                    "centroid_longitude": -94.266592,
+                    "mean_confidence": 0.8489,
+                    "max_confidence": 0.9977
+                },
+                {
+                    "id": 39,
+                    "pixels": 33,
+                    "area_m2": 753.15,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 179,
+                        "y_min": 96,
+                        "x_max": 186,
+                        "y_max": 100
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 947,
+                        "y_min": 352,
+                        "x_max": 954,
+                        "y_max": 356
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 182.36,
+                        "y": 98.18
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 950.36,
+                        "y": 354.18
+                    },
+                    "centroid_latitude": 36.338267,
+                    "centroid_longitude": -94.265834,
+                    "mean_confidence": 0.9047,
+                    "max_confidence": 0.9895
+                },
+                {
+                    "id": 40,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 195,
+                        "y_min": 99,
+                        "x_max": 198,
+                        "y_max": 101
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 963,
+                        "y_min": 355,
+                        "x_max": 966,
+                        "y_max": 357
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 196.67,
+                        "y": 100.11
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 964.67,
+                        "y": 356.11
+                    },
+                    "centroid_latitude": 36.3382,
+                    "centroid_longitude": -94.26522,
+                    "mean_confidence": 0.7532,
+                    "max_confidence": 0.9454
+                },
+                {
+                    "id": 41,
+                    "pixels": 20,
+                    "area_m2": 456.45,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 178,
+                        "y_min": 102,
+                        "x_max": 185,
+                        "y_max": 105
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 946,
+                        "y_min": 358,
+                        "x_max": 953,
+                        "y_max": 361
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 181.1,
+                        "y": 103.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 949.1,
+                        "y": 359.6
+                    },
+                    "centroid_latitude": 36.338079,
+                    "centroid_longitude": -94.265888,
+                    "mean_confidence": 0.7352,
+                    "max_confidence": 0.9589
+                },
+                {
+                    "id": 42,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 152,
+                        "y_min": 105,
+                        "x_max": 154,
+                        "y_max": 106
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 920,
+                        "y_min": 361,
+                        "x_max": 922,
+                        "y_max": 362
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 152.8,
+                        "y": 105.4
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 920.8,
+                        "y": 361.4
+                    },
+                    "centroid_latitude": 36.338017,
+                    "centroid_longitude": -94.267103,
+                    "mean_confidence": 0.5074,
+                    "max_confidence": 0.7523
+                },
+                {
+                    "id": 43,
+                    "pixels": 21,
+                    "area_m2": 479.28,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 176,
+                        "y_min": 108,
+                        "x_max": 181,
+                        "y_max": 112
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 944,
+                        "y_min": 364,
+                        "x_max": 949,
+                        "y_max": 368
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 178.24,
+                        "y": 110.14
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 946.24,
+                        "y": 366.14
+                    },
+                    "centroid_latitude": 36.337853,
+                    "centroid_longitude": -94.266011,
+                    "mean_confidence": 0.7938,
+                    "max_confidence": 0.9735
+                },
+                {
+                    "id": 44,
+                    "pixels": 17,
+                    "area_m2": 387.99,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 243,
+                        "y_min": 109,
+                        "x_max": 247,
+                        "y_max": 113
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1011,
+                        "y_min": 365,
+                        "x_max": 1015,
+                        "y_max": 369
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 244.59,
+                        "y": 110.82
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1012.59,
+                        "y": 366.82
+                    },
+                    "centroid_latitude": 36.33783,
+                    "centroid_longitude": -94.263164,
+                    "mean_confidence": 0.8019,
+                    "max_confidence": 0.993
+                },
+                {
+                    "id": 45,
+                    "pixels": 10,
+                    "area_m2": 228.23,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 150,
+                        "y_min": 110,
+                        "x_max": 155,
+                        "y_max": 112
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 918,
+                        "y_min": 366,
+                        "x_max": 923,
+                        "y_max": 368
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 152.3,
+                        "y": 110.9
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 920.3,
+                        "y": 366.9
+                    },
+                    "centroid_latitude": 36.337827,
+                    "centroid_longitude": -94.267124,
+                    "mean_confidence": 0.6305,
+                    "max_confidence": 0.8417
+                },
+                {
+                    "id": 46,
+                    "pixels": 26,
+                    "area_m2": 593.39,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 189,
+                        "y_min": 110,
+                        "x_max": 193,
+                        "y_max": 116
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 957,
+                        "y_min": 366,
+                        "x_max": 961,
+                        "y_max": 372
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 190.92,
+                        "y": 112.85
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 958.92,
+                        "y": 368.85
+                    },
+                    "centroid_latitude": 36.33776,
+                    "centroid_longitude": -94.265467,
+                    "mean_confidence": 0.7803,
+                    "max_confidence": 0.9639
+                },
+                {
+                    "id": 47,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 226,
+                        "y_min": 112,
+                        "x_max": 228,
+                        "y_max": 115
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 994,
+                        "y_min": 368,
+                        "x_max": 996,
+                        "y_max": 371
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 226.91,
+                        "y": 113.64
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 994.91,
+                        "y": 369.64
+                    },
+                    "centroid_latitude": 36.337732,
+                    "centroid_longitude": -94.263922,
+                    "mean_confidence": 0.699,
+                    "max_confidence": 0.9256
+                },
+                {
+                    "id": 48,
+                    "pixels": 12,
+                    "area_m2": 273.87,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 150,
+                        "y_min": 114,
+                        "x_max": 155,
+                        "y_max": 117
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 918,
+                        "y_min": 370,
+                        "x_max": 923,
+                        "y_max": 373
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 152.67,
+                        "y": 115.42
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 920.67,
+                        "y": 371.42
+                    },
+                    "centroid_latitude": 36.337671,
+                    "centroid_longitude": -94.267108,
+                    "mean_confidence": 0.6392,
+                    "max_confidence": 0.9285
+                },
+                {
+                    "id": 49,
+                    "pixels": 17,
+                    "area_m2": 387.99,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 163,
+                        "y_min": 114,
+                        "x_max": 166,
+                        "y_max": 118
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 931,
+                        "y_min": 370,
+                        "x_max": 934,
+                        "y_max": 374
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 164.41,
+                        "y": 115.88
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 932.41,
+                        "y": 371.88
+                    },
+                    "centroid_latitude": 36.337655,
+                    "centroid_longitude": -94.266604,
+                    "mean_confidence": 0.8563,
+                    "max_confidence": 0.9896
+                },
+                {
+                    "id": 50,
+                    "pixels": 17,
+                    "area_m2": 387.99,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 175,
+                        "y_min": 114,
+                        "x_max": 181,
+                        "y_max": 116
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 943,
+                        "y_min": 370,
+                        "x_max": 949,
+                        "y_max": 372
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 178.18,
+                        "y": 115.12
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 946.18,
+                        "y": 371.12
+                    },
+                    "centroid_latitude": 36.337681,
+                    "centroid_longitude": -94.266014,
+                    "mean_confidence": 0.7887,
+                    "max_confidence": 0.9564
+                },
+                {
+                    "id": 51,
+                    "pixels": 28,
+                    "area_m2": 639.04,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 172,
+                        "y_min": 120,
+                        "x_max": 178,
+                        "y_max": 125
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 940,
+                        "y_min": 376,
+                        "x_max": 946,
+                        "y_max": 381
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 174.82,
+                        "y": 121.89
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 942.82,
+                        "y": 377.89
+                    },
+                    "centroid_latitude": 36.337447,
+                    "centroid_longitude": -94.266158,
+                    "mean_confidence": 0.7841,
+                    "max_confidence": 0.971
+                },
+                {
+                    "id": 52,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 239,
+                        "y_min": 120,
+                        "x_max": 241,
+                        "y_max": 121
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1007,
+                        "y_min": 376,
+                        "x_max": 1009,
+                        "y_max": 377
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 239.8,
+                        "y": 120.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1007.8,
+                        "y": 376.6
+                    },
+                    "centroid_latitude": 36.337492,
+                    "centroid_longitude": -94.263369,
+                    "mean_confidence": 0.706,
+                    "max_confidence": 0.8651
+                },
+                {
+                    "id": 53,
+                    "pixels": 28,
+                    "area_m2": 639.04,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 183,
+                        "y_min": 125,
+                        "x_max": 187,
+                        "y_max": 133
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 951,
+                        "y_min": 381,
+                        "x_max": 955,
+                        "y_max": 389
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 184.61,
+                        "y": 128.36
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 952.61,
+                        "y": 384.36
+                    },
+                    "centroid_latitude": 36.337224,
+                    "centroid_longitude": -94.265738,
+                    "mean_confidence": 0.832,
+                    "max_confidence": 0.9846
+                },
+                {
+                    "id": 54,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 149,
+                        "y_min": 127,
+                        "x_max": 154,
+                        "y_max": 129
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 917,
+                        "y_min": 383,
+                        "x_max": 922,
+                        "y_max": 385
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 151.36,
+                        "y": 128.14
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 919.36,
+                        "y": 384.14
+                    },
+                    "centroid_latitude": 36.337231,
+                    "centroid_longitude": -94.267165,
+                    "mean_confidence": 0.794,
+                    "max_confidence": 0.9554
+                },
+                {
+                    "id": 55,
+                    "pixels": 15,
+                    "area_m2": 342.34,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 162,
+                        "y_min": 127,
+                        "x_max": 165,
+                        "y_max": 131
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 930,
+                        "y_min": 383,
+                        "x_max": 933,
+                        "y_max": 387
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 163.47,
+                        "y": 129.13
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 931.47,
+                        "y": 385.13
+                    },
+                    "centroid_latitude": 36.337197,
+                    "centroid_longitude": -94.266645,
+                    "mean_confidence": 0.7637,
+                    "max_confidence": 0.9699
+                },
+                {
+                    "id": 56,
+                    "pixels": 12,
+                    "area_m2": 273.87,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 168,
+                        "y_min": 127,
+                        "x_max": 170,
+                        "y_max": 131
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 936,
+                        "y_min": 383,
+                        "x_max": 938,
+                        "y_max": 387
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 169.08,
+                        "y": 129.17
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 937.08,
+                        "y": 385.17
+                    },
+                    "centroid_latitude": 36.337196,
+                    "centroid_longitude": -94.266404,
+                    "mean_confidence": 0.7472,
+                    "max_confidence": 0.9497
+                },
+                {
+                    "id": 57,
+                    "pixels": 15,
+                    "area_m2": 342.34,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 234,
+                        "y_min": 130,
+                        "x_max": 238,
+                        "y_max": 133
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1002,
+                        "y_min": 386,
+                        "x_max": 1006,
+                        "y_max": 389
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 235.93,
+                        "y": 131.73
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1003.93,
+                        "y": 387.73
+                    },
+                    "centroid_latitude": 36.337107,
+                    "centroid_longitude": -94.263535,
+                    "mean_confidence": 0.8515,
+                    "max_confidence": 0.9861
+                },
+                {
+                    "id": 58,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 151,
+                        "y_min": 133,
+                        "x_max": 155,
+                        "y_max": 135
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 919,
+                        "y_min": 389,
+                        "x_max": 923,
+                        "y_max": 391
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 153.0,
+                        "y": 134.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 921.0,
+                        "y": 390.0
+                    },
+                    "centroid_latitude": 36.337028,
+                    "centroid_longitude": -94.267094,
+                    "mean_confidence": 0.7709,
+                    "max_confidence": 0.9638
+                },
+                {
+                    "id": 59,
+                    "pixels": 13,
+                    "area_m2": 296.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 161,
+                        "y_min": 141,
+                        "x_max": 164,
+                        "y_max": 144
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 929,
+                        "y_min": 397,
+                        "x_max": 932,
+                        "y_max": 400
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 162.38,
+                        "y": 142.38
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 930.38,
+                        "y": 398.38
+                    },
+                    "centroid_latitude": 36.336739,
+                    "centroid_longitude": -94.266691,
+                    "mean_confidence": 0.7444,
+                    "max_confidence": 0.9678
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 8,
+            "patch_row": 2,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 24,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.007738705258816481,
+            "mean_probability": 0.00040624893154017627,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 9,
+            "patch_row": 2,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.018245555460453033,
+            "mean_probability": 0.00040725848521105945,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 10,
+            "patch_row": 2,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 8,
+            "total_predicted_pixels": 22,
+            "total_predicted_area_m2": 502.1,
+            "maximum_probability": 0.9724818468093872,
+            "mean_probability": 0.0007201525731943548,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 22,
+                    "area_m2": 502.1,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 216,
+                        "y_min": 21,
+                        "x_max": 222,
+                        "y_max": 25
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 728,
+                        "y_min": 533,
+                        "x_max": 734,
+                        "y_max": 537
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 218.86,
+                        "y": 23.18
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 730.86,
+                        "y": 535.18
+                    },
+                    "centroid_latitude": 36.332009,
+                    "centroid_longitude": -94.275254,
+                    "mean_confidence": 0.7527,
+                    "max_confidence": 0.9725
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 11,
+            "patch_row": 2,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 1038,
+            "total_predicted_pixels": 1132,
+            "total_predicted_area_m2": 25835.33,
+            "maximum_probability": 0.997384250164032,
+            "mean_probability": 0.017039749771356583,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 1032,
+                    "area_m2": 23553.06,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 219,
+                        "y_min": 116,
+                        "x_max": 255,
+                        "y_max": 151
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 987,
+                        "y_min": 628,
+                        "x_max": 1023,
+                        "y_max": 663
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 237.02,
+                        "y": 134.29
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1005.02,
+                        "y": 646.29
+                    },
+                    "centroid_latitude": 36.328168,
+                    "centroid_longitude": -94.263488,
+                    "mean_confidence": 0.9515,
+                    "max_confidence": 0.9974
+                },
+                {
+                    "id": 2,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 226,
+                        "y_min": 152,
+                        "x_max": 229,
+                        "y_max": 154
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 994,
+                        "y_min": 664,
+                        "x_max": 997,
+                        "y_max": 666
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 227.67,
+                        "y": 152.89
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 995.67,
+                        "y": 664.89
+                    },
+                    "centroid_latitude": 36.327525,
+                    "centroid_longitude": -94.26389,
+                    "mean_confidence": 0.5957,
+                    "max_confidence": 0.8131
+                },
+                {
+                    "id": 3,
+                    "pixels": 16,
+                    "area_m2": 365.16,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 246,
+                        "y_min": 152,
+                        "x_max": 252,
+                        "y_max": 154
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1014,
+                        "y_min": 664,
+                        "x_max": 1020,
+                        "y_max": 666
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 248.62,
+                        "y": 153.19
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1016.62,
+                        "y": 665.19
+                    },
+                    "centroid_latitude": 36.327515,
+                    "centroid_longitude": -94.26299,
+                    "mean_confidence": 0.5062,
+                    "max_confidence": 0.8043
+                },
+                {
+                    "id": 4,
+                    "pixels": 22,
+                    "area_m2": 502.1,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 221,
+                        "y_min": 161,
+                        "x_max": 229,
+                        "y_max": 163
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 989,
+                        "y_min": 673,
+                        "x_max": 997,
+                        "y_max": 675
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 225.14,
+                        "y": 162.05
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 993.14,
+                        "y": 674.05
+                    },
+                    "centroid_latitude": 36.327208,
+                    "centroid_longitude": -94.263998,
+                    "mean_confidence": 0.7014,
+                    "max_confidence": 0.9536
+                },
+                {
+                    "id": 5,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 245,
+                        "y_min": 162,
+                        "x_max": 247,
+                        "y_max": 163
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1013,
+                        "y_min": 674,
+                        "x_max": 1015,
+                        "y_max": 675
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 246.0,
+                        "y": 162.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1014.0,
+                        "y": 674.5
+                    },
+                    "centroid_latitude": 36.327193,
+                    "centroid_longitude": -94.263103,
+                    "mean_confidence": 0.5331,
+                    "max_confidence": 0.7121
+                },
+                {
+                    "id": 6,
+                    "pixels": 38,
+                    "area_m2": 867.26,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 249,
+                        "y_min": 241,
+                        "x_max": 251,
+                        "y_max": 254
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1017,
+                        "y_min": 753,
+                        "x_max": 1019,
+                        "y_max": 766
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 250.05,
+                        "y": 247.21
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1018.05,
+                        "y": 759.21
+                    },
+                    "centroid_latitude": 36.324264,
+                    "centroid_longitude": -94.262929,
+                    "mean_confidence": 0.7378,
+                    "max_confidence": 0.951
+                },
+                {
+                    "id": 7,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 254,
+                        "y_min": 245,
+                        "x_max": 254,
+                        "y_max": 250
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1022,
+                        "y_min": 757,
+                        "x_max": 1022,
+                        "y_max": 762
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 254.0,
+                        "y": 247.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1022.0,
+                        "y": 759.5
+                    },
+                    "centroid_latitude": 36.324254,
+                    "centroid_longitude": -94.26276,
+                    "mean_confidence": 0.5801,
+                    "max_confidence": 0.7459
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 12,
+            "patch_row": 3,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.012643727473914623,
+            "mean_probability": 0.0005424282280728221,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 13,
+            "patch_row": 3,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 30,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.1154225617647171,
+            "mean_probability": 0.00040444807382300496,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 14,
+            "patch_row": 3,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 76,
+            "total_predicted_pixels": 4,
+            "total_predicted_area_m2": 91.29,
+            "maximum_probability": 0.6120678782463074,
+            "mean_probability": 0.00047425818047486246,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0487E-1246N_1950_3207_13",
+            "patch_index": 15,
+            "patch_row": 3,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 81,
+            "total_predicted_pixels": 4998,
+            "total_predicted_area_m2": 114068.01,
+            "maximum_probability": 0.9983844757080078,
+            "mean_probability": 0.07073009014129639,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 249,
+                        "y_min": 0,
+                        "x_max": 251,
+                        "y_max": 1
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1017,
+                        "y_min": 768,
+                        "x_max": 1019,
+                        "y_max": 769
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 249.8,
+                        "y": 0.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1017.8,
+                        "y": 768.6
+                    },
+                    "centroid_latitude": 36.323939,
+                    "centroid_longitude": -94.26294,
+                    "mean_confidence": 0.453,
+                    "max_confidence": 0.688
+                },
+                {
+                    "id": 2,
+                    "pixels": 61,
+                    "area_m2": 1392.19,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 247,
+                        "y_min": 4,
+                        "x_max": 254,
+                        "y_max": 13
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 1015,
+                        "y_min": 772,
+                        "x_max": 1022,
+                        "y_max": 781
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 250.59,
+                        "y": 8.34
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 1018.59,
+                        "y": 776.34
+                    },
+                    "centroid_latitude": 36.323671,
+                    "centroid_longitude": -94.262906,
+                    "mean_confidence": 0.819,
+                    "max_confidence": 0.9918
+                },
+                {
+                    "id": 3,
+                    "pixels": 7,
+                    "area_m2": 159.76,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 55,
+                        "y_min": 7,
+                        "x_max": 57,
+                        "y_max": 9
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 823,
+                        "y_min": 775,
+                        "x_max": 825,
+                        "y_max": 777
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 56.0,
+                        "y": 8.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 824.0,
+                        "y": 776.0
+                    },
+                    "centroid_latitude": 36.323683,
+                    "centroid_longitude": -94.271257,
+                    "mean_confidence": 0.3832,
+                    "max_confidence": 0.5015
+                },
+                {
+                    "id": 4,
+                    "pixels": 28,
+                    "area_m2": 639.04,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 75,
+                        "y_min": 10,
+                        "x_max": 83,
+                        "y_max": 13
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 843,
+                        "y_min": 778,
+                        "x_max": 851,
+                        "y_max": 781
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 79.11,
+                        "y": 11.32
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 847.11,
+                        "y": 779.32
+                    },
+                    "centroid_latitude": 36.323568,
+                    "centroid_longitude": -94.270265,
+                    "mean_confidence": 0.748,
+                    "max_confidence": 0.9421
+                },
+                {
+                    "id": 5,
+                    "pixels": 32,
+                    "area_m2": 730.33,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 86,
+                        "y_min": 11,
+                        "x_max": 97,
+                        "y_max": 14
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 854,
+                        "y_min": 779,
+                        "x_max": 865,
+                        "y_max": 782
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 92.62,
+                        "y": 12.25
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 860.62,
+                        "y": 780.25
+                    },
+                    "centroid_latitude": 36.323536,
+                    "centroid_longitude": -94.269685,
+                    "mean_confidence": 0.7171,
+                    "max_confidence": 0.9697
+                },
+                {
+                    "id": 6,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 101,
+                        "y_min": 12,
+                        "x_max": 103,
+                        "y_max": 13
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 869,
+                        "y_min": 780,
+                        "x_max": 871,
+                        "y_max": 781
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 102.2,
+                        "y": 12.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 870.2,
+                        "y": 780.6
+                    },
+                    "centroid_latitude": 36.323524,
+                    "centroid_longitude": -94.269274,
+                    "mean_confidence": 0.6998,
+                    "max_confidence": 0.8365
+                },
+                {
+                    "id": 7,
+                    "pixels": 15,
+                    "area_m2": 342.34,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 115,
+                        "y_min": 12,
+                        "x_max": 120,
+                        "y_max": 14
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 883,
+                        "y_min": 780,
+                        "x_max": 888,
+                        "y_max": 782
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 117.2,
+                        "y": 12.8
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 885.2,
+                        "y": 780.8
+                    },
+                    "centroid_latitude": 36.323517,
+                    "centroid_longitude": -94.268631,
+                    "mean_confidence": 0.5543,
+                    "max_confidence": 0.8746
+                },
+                {
+                    "id": 8,
+                    "pixels": 8,
+                    "area_m2": 182.58,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 134,
+                        "y_min": 12,
+                        "x_max": 136,
+                        "y_max": 14
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 902,
+                        "y_min": 780,
+                        "x_max": 904,
+                        "y_max": 782
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 135.12,
+                        "y": 13.12
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 903.12,
+                        "y": 781.12
+                    },
+                    "centroid_latitude": 36.323506,
+                    "centroid_longitude": -94.267861,
+                    "mean_confidence": 0.5582,
+                    "max_confidence": 0.7617
+                },
+                {
+                    "id": 9,
+                    "pixels": 4374,
+                    "area_m2": 99826.63,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 61,
+                        "y_min": 18,
+                        "x_max": 129,
+                        "y_max": 130
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 829,
+                        "y_min": 786,
+                        "x_max": 897,
+                        "y_max": 898
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 97.98,
+                        "y": 83.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 865.98,
+                        "y": 851.5
+                    },
+                    "centroid_latitude": 36.321073,
+                    "centroid_longitude": -94.269455,
+                    "mean_confidence": 0.8989,
+                    "max_confidence": 0.9984
+                },
+                {
+                    "id": 10,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 83,
+                        "y_min": 42,
+                        "x_max": 86,
+                        "y_max": 44
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 851,
+                        "y_min": 810,
+                        "x_max": 854,
+                        "y_max": 812
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 84.56,
+                        "y": 42.67
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 852.56,
+                        "y": 810.67
+                    },
+                    "centroid_latitude": 36.322485,
+                    "centroid_longitude": -94.270031,
+                    "mean_confidence": 0.4735,
+                    "max_confidence": 0.6341
+                },
+                {
+                    "id": 11,
+                    "pixels": 7,
+                    "area_m2": 159.76,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 84,
+                        "y_min": 52,
+                        "x_max": 86,
+                        "y_max": 54
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 852,
+                        "y_min": 820,
+                        "x_max": 854,
+                        "y_max": 822
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 84.71,
+                        "y": 53.14
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 852.71,
+                        "y": 821.14
+                    },
+                    "centroid_latitude": 36.322122,
+                    "centroid_longitude": -94.270025,
+                    "mean_confidence": 0.363,
+                    "max_confidence": 0.4325
+                },
+                {
+                    "id": 12,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 82,
+                        "y_min": 60,
+                        "x_max": 85,
+                        "y_max": 62
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 850,
+                        "y_min": 828,
+                        "x_max": 853,
+                        "y_max": 830
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 83.33,
+                        "y": 61.11
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 851.33,
+                        "y": 829.11
+                    },
+                    "centroid_latitude": 36.321847,
+                    "centroid_longitude": -94.270084,
+                    "mean_confidence": 0.561,
+                    "max_confidence": 0.8086
+                },
+                {
+                    "id": 13,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 128,
+                        "y_min": 119,
+                        "x_max": 132,
+                        "y_max": 122
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 896,
+                        "y_min": 887,
+                        "x_max": 900,
+                        "y_max": 890
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 130.07,
+                        "y": 120.29
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 898.07,
+                        "y": 888.29
+                    },
+                    "centroid_latitude": 36.319801,
+                    "centroid_longitude": -94.268078,
+                    "mean_confidence": 0.5466,
+                    "max_confidence": 0.7336
+                },
+                {
+                    "id": 14,
+                    "pixels": 14,
+                    "area_m2": 319.52,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 191,
+                        "y_min": 127,
+                        "x_max": 195,
+                        "y_max": 130
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 959,
+                        "y_min": 895,
+                        "x_max": 963,
+                        "y_max": 898
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 192.79,
+                        "y": 128.64
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 960.79,
+                        "y": 896.64
+                    },
+                    "centroid_latitude": 36.319512,
+                    "centroid_longitude": -94.265387,
+                    "mean_confidence": 0.6423,
+                    "max_confidence": 0.8773
+                },
+                {
+                    "id": 15,
+                    "pixels": 91,
+                    "area_m2": 2076.87,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 197,
+                        "y_min": 127,
+                        "x_max": 218,
+                        "y_max": 133
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 965,
+                        "y_min": 895,
+                        "x_max": 986,
+                        "y_max": 901
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 206.73,
+                        "y": 129.41
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 974.73,
+                        "y": 897.41
+                    },
+                    "centroid_latitude": 36.319485,
+                    "centroid_longitude": -94.264788,
+                    "mean_confidence": 0.8089,
+                    "max_confidence": 0.9816
+                },
+                {
+                    "id": 16,
+                    "pixels": 154,
+                    "area_m2": 3514.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 156,
+                        "y_min": 139,
+                        "x_max": 189,
+                        "y_max": 145
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 924,
+                        "y_min": 907,
+                        "x_max": 957,
+                        "y_max": 913
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 172.05,
+                        "y": 142.04
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 940.05,
+                        "y": 910.04
+                    },
+                    "centroid_latitude": 36.319049,
+                    "centroid_longitude": -94.266277,
+                    "mean_confidence": 0.8347,
+                    "max_confidence": 0.9928
+                },
+                {
+                    "id": 17,
+                    "pixels": 13,
+                    "area_m2": 296.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 225,
+                        "y_min": 148,
+                        "x_max": 231,
+                        "y_max": 149
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 993,
+                        "y_min": 916,
+                        "x_max": 999,
+                        "y_max": 917
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 228.23,
+                        "y": 148.54
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 996.23,
+                        "y": 916.54
+                    },
+                    "centroid_latitude": 36.318824,
+                    "centroid_longitude": -94.263866,
+                    "mean_confidence": 0.6649,
+                    "max_confidence": 0.867
+                },
+                {
+                    "id": 18,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 170,
+                        "y_min": 151,
+                        "x_max": 172,
+                        "y_max": 153
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 938,
+                        "y_min": 919,
+                        "x_max": 940,
+                        "y_max": 921
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 171.0,
+                        "y": 151.83
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 939.0,
+                        "y": 919.83
+                    },
+                    "centroid_latitude": 36.31871,
+                    "centroid_longitude": -94.266322,
+                    "mean_confidence": 0.693,
+                    "max_confidence": 0.8515
+                },
+                {
+                    "id": 19,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 88,
+                        "y_min": 155,
+                        "x_max": 90,
+                        "y_max": 158
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 856,
+                        "y_min": 923,
+                        "x_max": 858,
+                        "y_max": 926
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 89.33,
+                        "y": 156.56
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 857.33,
+                        "y": 924.56
+                    },
+                    "centroid_latitude": 36.318547,
+                    "centroid_longitude": -94.269826,
+                    "mean_confidence": 0.6911,
+                    "max_confidence": 0.9237
+                },
+                {
+                    "id": 20,
+                    "pixels": 8,
+                    "area_m2": 182.58,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 103,
+                        "y_min": 155,
+                        "x_max": 105,
+                        "y_max": 157
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 871,
+                        "y_min": 923,
+                        "x_max": 873,
+                        "y_max": 925
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 103.88,
+                        "y": 156.12
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 871.88,
+                        "y": 924.12
+                    },
+                    "centroid_latitude": 36.318561,
+                    "centroid_longitude": -94.269202,
+                    "mean_confidence": 0.6118,
+                    "max_confidence": 0.8931
+                },
+                {
+                    "id": 21,
+                    "pixels": 30,
+                    "area_m2": 684.68,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 195,
+                        "y_min": 155,
+                        "x_max": 201,
+                        "y_max": 160
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 963,
+                        "y_min": 923,
+                        "x_max": 969,
+                        "y_max": 928
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 198.03,
+                        "y": 157.33
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 966.03,
+                        "y": 925.33
+                    },
+                    "centroid_latitude": 36.31852,
+                    "centroid_longitude": -94.265162,
+                    "mean_confidence": 0.8525,
+                    "max_confidence": 0.996
+                },
+                {
+                    "id": 22,
+                    "pixels": 7,
+                    "area_m2": 159.76,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 83,
+                        "y_min": 156,
+                        "x_max": 86,
+                        "y_max": 157
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 851,
+                        "y_min": 924,
+                        "x_max": 854,
+                        "y_max": 925
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 84.29,
+                        "y": 156.57
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 852.29,
+                        "y": 924.57
+                    },
+                    "centroid_latitude": 36.318546,
+                    "centroid_longitude": -94.270043,
+                    "mean_confidence": 0.6155,
+                    "max_confidence": 0.8415
+                },
+                {
+                    "id": 23,
+                    "pixels": 9,
+                    "area_m2": 205.4,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 115,
+                        "y_min": 156,
+                        "x_max": 118,
+                        "y_max": 158
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 883,
+                        "y_min": 924,
+                        "x_max": 886,
+                        "y_max": 926
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 116.56,
+                        "y": 156.67
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 884.56,
+                        "y": 924.67
+                    },
+                    "centroid_latitude": 36.318543,
+                    "centroid_longitude": -94.268658,
+                    "mean_confidence": 0.6213,
+                    "max_confidence": 0.8934
+                },
+                {
+                    "id": 24,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 139,
+                        "y_min": 156,
+                        "x_max": 141,
+                        "y_max": 158
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 907,
+                        "y_min": 924,
+                        "x_max": 909,
+                        "y_max": 926
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 140.0,
+                        "y": 156.83
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 908.0,
+                        "y": 924.83
+                    },
+                    "centroid_latitude": 36.318537,
+                    "centroid_longitude": -94.267652,
+                    "mean_confidence": 0.5814,
+                    "max_confidence": 0.7841
+                },
+                {
+                    "id": 25,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 147,
+                        "y_min": 157,
+                        "x_max": 148,
+                        "y_max": 159
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 915,
+                        "y_min": 925,
+                        "x_max": 916,
+                        "y_max": 927
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 147.6,
+                        "y": 157.8
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 915.6,
+                        "y": 925.8
+                    },
+                    "centroid_latitude": 36.318504,
+                    "centroid_longitude": -94.267326,
+                    "mean_confidence": 0.4404,
+                    "max_confidence": 0.5895
+                },
+                {
+                    "id": 26,
+                    "pixels": 58,
+                    "area_m2": 1323.72,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 194,
+                        "y_min": 179,
+                        "x_max": 205,
+                        "y_max": 185
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 962,
+                        "y_min": 947,
+                        "x_max": 973,
+                        "y_max": 953
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 199.57,
+                        "y": 181.53
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 967.57,
+                        "y": 949.53
+                    },
+                    "centroid_latitude": 36.317683,
+                    "centroid_longitude": -94.265096,
+                    "mean_confidence": 0.8561,
+                    "max_confidence": 0.9929
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 0,
+            "patch_row": 0,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 83,
+            "total_predicted_pixels": 21,
+            "total_predicted_area_m2": 479.28,
+            "maximum_probability": 0.8799493312835693,
+            "mean_probability": 0.0009239756036549807,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 77,
+                        "y_min": 26,
+                        "x_max": 79,
+                        "y_max": 30
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 77,
+                        "y_min": 26,
+                        "x_max": 79,
+                        "y_max": 30
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 78.18,
+                        "y": 27.91
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 78.18,
+                        "y": 27.91
+                    },
+                    "centroid_latitude": 30.220048,
+                    "centroid_longitude": -90.919475,
+                    "mean_confidence": 0.6071,
+                    "max_confidence": 0.8799
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 1,
+            "patch_row": 0,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 85,
+            "total_predicted_pixels": 78,
+            "total_predicted_area_m2": 1780.17,
+            "maximum_probability": 0.998870313167572,
+            "mean_probability": 0.001589204533956945,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 13,
+                    "area_m2": 296.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 159,
+                        "y_min": 50,
+                        "x_max": 162,
+                        "y_max": 53
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 415,
+                        "y_min": 50,
+                        "x_max": 418,
+                        "y_max": 53
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 160.38,
+                        "y": 51.38
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 416.38,
+                        "y": 51.38
+                    },
+                    "centroid_latitude": 30.219178,
+                    "centroid_longitude": -90.904961,
+                    "mean_confidence": 0.796,
+                    "max_confidence": 0.9737
+                },
+                {
+                    "id": 2,
+                    "pixels": 59,
+                    "area_m2": 1346.54,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 238,
+                        "y_min": 249,
+                        "x_max": 247,
+                        "y_max": 255
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 494,
+                        "y_min": 249,
+                        "x_max": 503,
+                        "y_max": 255
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 242.08,
+                        "y": 252.22
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 498.08,
+                        "y": 252.22
+                    },
+                    "centroid_latitude": 30.21173,
+                    "centroid_longitude": -90.901455,
+                    "mean_confidence": 0.8856,
+                    "max_confidence": 0.9989
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 2,
+            "patch_row": 0,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 181,
+            "total_predicted_pixels": 9,
+            "total_predicted_area_m2": 205.4,
+            "maximum_probability": 0.8515914082527161,
+            "mean_probability": 0.0006977224256843328,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 15,
+                        "y_min": 13,
+                        "x_max": 17,
+                        "y_max": 14
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 527,
+                        "y_min": 13,
+                        "x_max": 529,
+                        "y_max": 14
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 15.8,
+                        "y": 13.6
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 527.8,
+                        "y": 13.6
+                    },
+                    "centroid_latitude": 30.220579,
+                    "centroid_longitude": -90.900179,
+                    "mean_confidence": 0.5626,
+                    "max_confidence": 0.7549
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 3,
+            "patch_row": 0,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 0
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 8,
+            "total_predicted_pixels": 3,
+            "total_predicted_area_m2": 68.47,
+            "maximum_probability": 0.5963649749755859,
+            "mean_probability": 0.000491930462885648,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 4,
+            "patch_row": 1,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 39,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.10736077278852463,
+            "mean_probability": 0.0006261669332161546,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 5,
+            "patch_row": 1,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 54,
+            "total_predicted_pixels": 2,
+            "total_predicted_area_m2": 45.65,
+            "maximum_probability": 0.3300143778324127,
+            "mean_probability": 0.0005331819411367178,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 6,
+            "patch_row": 1,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 139,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.015267148613929749,
+            "mean_probability": 0.0004189671890344471,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 7,
+            "patch_row": 1,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 256
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 152,
+            "total_predicted_pixels": 33,
+            "total_predicted_area_m2": 753.15,
+            "maximum_probability": 0.9858118295669556,
+            "mean_probability": 0.000881059153471142,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 6,
+                    "area_m2": 136.94,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 66,
+                        "y_min": 69,
+                        "x_max": 68,
+                        "y_max": 71
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 834,
+                        "y_min": 325,
+                        "x_max": 836,
+                        "y_max": 327
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 67.17,
+                        "y": 69.83
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 835.17,
+                        "y": 325.83
+                    },
+                    "centroid_latitude": 30.209,
+                    "centroid_longitude": -90.886989,
+                    "mean_confidence": 0.7077,
+                    "max_confidence": 0.9275
+                },
+                {
+                    "id": 2,
+                    "pixels": 12,
+                    "area_m2": 273.87,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 13,
+                        "y_min": 164,
+                        "x_max": 16,
+                        "y_max": 167
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 781,
+                        "y_min": 420,
+                        "x_max": 784,
+                        "y_max": 423
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 14.5,
+                        "y": 165.5
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 782.5,
+                        "y": 421.5
+                    },
+                    "centroid_latitude": 30.205452,
+                    "centroid_longitude": -90.889249,
+                    "mean_confidence": 0.7685,
+                    "max_confidence": 0.9638
+                },
+                {
+                    "id": 3,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 109,
+                        "y_min": 249,
+                        "x_max": 111,
+                        "y_max": 253
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 877,
+                        "y_min": 505,
+                        "x_max": 879,
+                        "y_max": 509
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 110.0,
+                        "y": 251.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 878.0,
+                        "y": 507.0
+                    },
+                    "centroid_latitude": 30.202281,
+                    "centroid_longitude": -90.88515,
+                    "mean_confidence": 0.8516,
+                    "max_confidence": 0.9858
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 8,
+            "patch_row": 2,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 156,
+            "total_predicted_pixels": 186,
+            "total_predicted_area_m2": 4245.03,
+            "maximum_probability": 0.9979405999183655,
+            "mean_probability": 0.003153544617816806,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 66,
+                    "area_m2": 1506.3,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 114,
+                        "y_min": 13,
+                        "x_max": 120,
+                        "y_max": 24
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 114,
+                        "y_min": 525,
+                        "x_max": 120,
+                        "y_max": 536
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 117.26,
+                        "y": 18.09
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 117.26,
+                        "y": 530.09
+                    },
+                    "centroid_latitude": 30.201424,
+                    "centroid_longitude": -90.917798,
+                    "mean_confidence": 0.855,
+                    "max_confidence": 0.9927
+                },
+                {
+                    "id": 2,
+                    "pixels": 119,
+                    "area_m2": 2715.91,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 158,
+                        "y_min": 15,
+                        "x_max": 170,
+                        "y_max": 30
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 158,
+                        "y_min": 527,
+                        "x_max": 170,
+                        "y_max": 542
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 165.34,
+                        "y": 21.55
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 165.34,
+                        "y": 533.55
+                    },
+                    "centroid_latitude": 30.201296,
+                    "centroid_longitude": -90.915735,
+                    "mean_confidence": 0.8848,
+                    "max_confidence": 0.9979
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 9,
+            "patch_row": 2,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 7,
+            "total_predicted_area_m2": 159.76,
+            "maximum_probability": 0.9618908762931824,
+            "mean_probability": 0.0004791335668414831,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 7,
+                    "area_m2": 159.76,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 180,
+                        "y_min": 222,
+                        "x_max": 182,
+                        "y_max": 224
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 436,
+                        "y_min": 734,
+                        "x_max": 438,
+                        "y_max": 736
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 180.71,
+                        "y": 223.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 436.71,
+                        "y": 735.0
+                    },
+                    "centroid_latitude": 30.193824,
+                    "centroid_longitude": -90.904088,
+                    "mean_confidence": 0.7888,
+                    "max_confidence": 0.9619
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 10,
+            "patch_row": 2,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 39,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.0023001166991889477,
+            "mean_probability": 0.0003729940508492291,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 11,
+            "patch_row": 2,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 512
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 158,
+            "total_predicted_pixels": 35,
+            "total_predicted_area_m2": 798.8,
+            "maximum_probability": 0.9866625666618347,
+            "mean_probability": 0.00085123919416219,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 11,
+                    "area_m2": 251.05,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 185,
+                        "y_min": 36,
+                        "x_max": 188,
+                        "y_max": 39
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 953,
+                        "y_min": 548,
+                        "x_max": 956,
+                        "y_max": 551
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 186.45,
+                        "y": 37.36
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 954.45,
+                        "y": 549.36
+                    },
+                    "centroid_latitude": 30.200709,
+                    "centroid_longitude": -90.881869,
+                    "mean_confidence": 0.6442,
+                    "max_confidence": 0.8909
+                },
+                {
+                    "id": 2,
+                    "pixels": 16,
+                    "area_m2": 365.16,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 193,
+                        "y_min": 43,
+                        "x_max": 196,
+                        "y_max": 47
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 961,
+                        "y_min": 555,
+                        "x_max": 964,
+                        "y_max": 559
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 194.44,
+                        "y": 45.25
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 962.44,
+                        "y": 557.25
+                    },
+                    "centroid_latitude": 30.200417,
+                    "centroid_longitude": -90.881527,
+                    "mean_confidence": 0.8532,
+                    "max_confidence": 0.9867
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 12,
+            "patch_row": 3,
+            "patch_column": 0,
+            "patch_offset_pixels": {
+                "x": 0,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 1636,
+            "total_predicted_pixels": 510,
+            "total_predicted_area_m2": 11639.59,
+            "maximum_probability": 0.9952482581138611,
+            "mean_probability": 0.007462234236299992,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 162,
+                    "area_m2": 3697.28,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 122,
+                        "y_min": 135,
+                        "x_max": 147,
+                        "y_max": 142
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 122,
+                        "y_min": 903,
+                        "x_max": 147,
+                        "y_max": 910
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 134.91,
+                        "y": 138.81
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 134.91,
+                        "y": 906.81
+                    },
+                    "centroid_latitude": 30.187451,
+                    "centroid_longitude": -90.917041,
+                    "mean_confidence": 0.8788,
+                    "max_confidence": 0.9902
+                },
+                {
+                    "id": 2,
+                    "pixels": 150,
+                    "area_m2": 3423.41,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 122,
+                        "y_min": 155,
+                        "x_max": 148,
+                        "y_max": 160
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 122,
+                        "y_min": 923,
+                        "x_max": 148,
+                        "y_max": 928
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 135.51,
+                        "y": 157.61
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 135.51,
+                        "y": 925.61
+                    },
+                    "centroid_latitude": 30.186753,
+                    "centroid_longitude": -90.917015,
+                    "mean_confidence": 0.8764,
+                    "max_confidence": 0.9952
+                },
+                {
+                    "id": 3,
+                    "pixels": 13,
+                    "area_m2": 296.7,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 228,
+                        "y_min": 201,
+                        "x_max": 230,
+                        "y_max": 205
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 228,
+                        "y_min": 969,
+                        "x_max": 230,
+                        "y_max": 973
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 228.85,
+                        "y": 202.77
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 228.85,
+                        "y": 970.77
+                    },
+                    "centroid_latitude": 30.185078,
+                    "centroid_longitude": -90.913009,
+                    "mean_confidence": 0.837,
+                    "max_confidence": 0.9759
+                },
+                {
+                    "id": 4,
+                    "pixels": 49,
+                    "area_m2": 1118.31,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 139,
+                        "y_min": 202,
+                        "x_max": 153,
+                        "y_max": 206
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 139,
+                        "y_min": 970,
+                        "x_max": 153,
+                        "y_max": 974
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 145.69,
+                        "y": 204.08
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 145.69,
+                        "y": 972.08
+                    },
+                    "centroid_latitude": 30.185029,
+                    "centroid_longitude": -90.916578,
+                    "mean_confidence": 0.8463,
+                    "max_confidence": 0.9917
+                },
+                {
+                    "id": 5,
+                    "pixels": 23,
+                    "area_m2": 524.92,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 157,
+                        "y_min": 203,
+                        "x_max": 164,
+                        "y_max": 210
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 157,
+                        "y_min": 971,
+                        "x_max": 164,
+                        "y_max": 978
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 161.0,
+                        "y": 206.52
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 161.0,
+                        "y": 974.52
+                    },
+                    "centroid_latitude": 30.184939,
+                    "centroid_longitude": -90.915921,
+                    "mean_confidence": 0.6246,
+                    "max_confidence": 0.9356
+                },
+                {
+                    "id": 6,
+                    "pixels": 10,
+                    "area_m2": 228.23,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 9,
+                        "y_min": 226,
+                        "x_max": 13,
+                        "y_max": 228
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 9,
+                        "y_min": 994,
+                        "x_max": 13,
+                        "y_max": 996
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 11.0,
+                        "y": 226.7
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 11.0,
+                        "y": 994.7
+                    },
+                    "centroid_latitude": 30.18419,
+                    "centroid_longitude": -90.922358,
+                    "mean_confidence": 0.6496,
+                    "max_confidence": 0.8559
+                },
+                {
+                    "id": 7,
+                    "pixels": 17,
+                    "area_m2": 387.99,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 27,
+                        "y_min": 226,
+                        "x_max": 30,
+                        "y_max": 233
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 27,
+                        "y_min": 994,
+                        "x_max": 30,
+                        "y_max": 1001
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 28.29,
+                        "y": 229.59
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 28.29,
+                        "y": 997.59
+                    },
+                    "centroid_latitude": 30.184083,
+                    "centroid_longitude": -90.921616,
+                    "mean_confidence": 0.6063,
+                    "max_confidence": 0.9281
+                },
+                {
+                    "id": 8,
+                    "pixels": 25,
+                    "area_m2": 570.57,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 172,
+                        "y_min": 230,
+                        "x_max": 177,
+                        "y_max": 235
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 172,
+                        "y_min": 998,
+                        "x_max": 177,
+                        "y_max": 1003
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 174.4,
+                        "y": 232.4
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 174.4,
+                        "y": 1000.4
+                    },
+                    "centroid_latitude": 30.183979,
+                    "centroid_longitude": -90.915346,
+                    "mean_confidence": 0.7784,
+                    "max_confidence": 0.9472
+                },
+                {
+                    "id": 9,
+                    "pixels": 10,
+                    "area_m2": 228.23,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 180,
+                        "y_min": 231,
+                        "x_max": 183,
+                        "y_max": 233
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 180,
+                        "y_min": 999,
+                        "x_max": 183,
+                        "y_max": 1001
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 181.6,
+                        "y": 232.2
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 181.6,
+                        "y": 1000.2
+                    },
+                    "centroid_latitude": 30.183986,
+                    "centroid_longitude": -90.915037,
+                    "mean_confidence": 0.6612,
+                    "max_confidence": 0.8855
+                },
+                {
+                    "id": 10,
+                    "pixels": 15,
+                    "area_m2": 342.34,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 49,
+                        "y_min": 247,
+                        "x_max": 52,
+                        "y_max": 251
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 49,
+                        "y_min": 1015,
+                        "x_max": 52,
+                        "y_max": 1019
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 50.27,
+                        "y": 248.67
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 50.27,
+                        "y": 1016.67
+                    },
+                    "centroid_latitude": 30.183375,
+                    "centroid_longitude": -90.920673,
+                    "mean_confidence": 0.8077,
+                    "max_confidence": 0.9708
+                },
+                {
+                    "id": 11,
+                    "pixels": 21,
+                    "area_m2": 479.28,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 36,
+                        "y_min": 248,
+                        "x_max": 40,
+                        "y_max": 253
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 36,
+                        "y_min": 1016,
+                        "x_max": 40,
+                        "y_max": 1021
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 38.0,
+                        "y": 250.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 38.0,
+                        "y": 1018.0
+                    },
+                    "centroid_latitude": 30.183326,
+                    "centroid_longitude": -90.921199,
+                    "mean_confidence": 0.8068,
+                    "max_confidence": 0.9751
+                }
+            ]
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 13,
+            "patch_row": 3,
+            "patch_column": 1,
+            "patch_offset_pixels": {
+                "x": 256,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 10,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.006995281204581261,
+            "mean_probability": 0.00040592619916424155,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 14,
+            "patch_row": 3,
+            "patch_column": 2,
+            "patch_offset_pixels": {
+                "x": 512,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 0,
+            "total_predicted_pixels": 0,
+            "total_predicted_area_m2": 0.0,
+            "maximum_probability": 0.008778481744229794,
+            "mean_probability": 0.0003471950476523489,
+            "detected_regions": []
+        },
+        {
+            "aoi": "L15-0506E-1204N_2027_3374_13",
+            "patch_index": 15,
+            "patch_row": 3,
+            "patch_column": 3,
+            "patch_offset_pixels": {
+                "x": 768,
+                "y": 768
+            },
+            "patch_size_pixels": 256,
+            "time_period": {
+                "before": "2018-01",
+                "after": "2019-12"
+            },
+            "change_type": "likely new building / urban development",
+            "model": "SpaceNet 7 U-Net",
+            "threshold": 0.3,
+            "source_crs": "EPSG:3857",
+            "output_crs": "EPSG:4326",
+            "source_image_size_pixels": {
+                "width": 1024,
+                "height": 1024
+            },
+            "pixel_width_m": 4.777314,
+            "pixel_height_m": 4.777314,
+            "pixel_area_m2": 22.8227,
+            "ground_truth_changed_pixels": 69,
+            "total_predicted_pixels": 18,
+            "total_predicted_area_m2": 410.81,
+            "maximum_probability": 0.9216980338096619,
+            "mean_probability": 0.0006527092773467302,
+            "detected_regions": [
+                {
+                    "id": 1,
+                    "pixels": 7,
+                    "area_m2": 159.76,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 93,
+                        "y_min": 17,
+                        "x_max": 95,
+                        "y_max": 19
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 861,
+                        "y_min": 785,
+                        "x_max": 863,
+                        "y_max": 787
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 94.0,
+                        "y": 18.0
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 862.0,
+                        "y": 786.0
+                    },
+                    "centroid_latitude": 30.191932,
+                    "centroid_longitude": -90.885837,
+                    "mean_confidence": 0.7811,
+                    "max_confidence": 0.9217
+                },
+                {
+                    "id": 2,
+                    "pixels": 5,
+                    "area_m2": 114.11,
+                    "bounding_box_patch_pixels": {
+                        "x_min": 82,
+                        "y_min": 248,
+                        "x_max": 84,
+                        "y_max": 249
+                    },
+                    "bounding_box_full_image_pixels": {
+                        "x_min": 850,
+                        "y_min": 1016,
+                        "x_max": 852,
+                        "y_max": 1017
+                    },
+                    "centroid_patch_pixels": {
+                        "x": 83.2,
+                        "y": 248.4
+                    },
+                    "centroid_full_image_pixels": {
+                        "x": 851.2,
+                        "y": 1016.4
+                    },
+                    "centroid_latitude": 30.183385,
+                    "centroid_longitude": -90.886301,
+                    "mean_confidence": 0.6068,
+                    "max_confidence": 0.8322
+                }
+            ]
+        }
+    ]
+}
