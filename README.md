@@ -1,223 +1,167 @@
 # VisionOrbit: Multi-Sensor All-Weather Building Footprint Segmentation
 
-[![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.14-orange.svg)](https://pytorch.org)
-[![Hardware](https://img.shields.io/badge/Hardware-Apple%20Silicon%20MPS%20%7C%20CUDA-green.svg)]()
-[![Dataset](https://img.shields.io/badge/Dataset-SpaceNet%206-purple.svg)](https://spacenet.ai/sn6-challenge/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange.svg)](https://pytorch.org)
+[![Hardware](https://img.shields.io/badge/Hardware-Apple%20Silicon%20MPS%20%7C%20CUDA%20%7C%20CPU-green.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)]()
 
-**VisionOrbit** is a deep learning system designed for **all-weather, automated building footprint segmentation** by fusing complementary Earth observation modalities:
-* **Optical Pan-Sharpened RGB (3 bands)**: High spatial resolution and semantic context, but vulnerable to cloud cover, precipitation, and nighttime.
-* **Synthetic Aperture Radar / SAR (4 polarimetric bands)**: Active microwave imaging that penetrates dense cloud cover and operates day or night, but suffers from radar speckle noise and terrain geometry distortions.
+**VisionOrbit** is a deep learning system for **all-weather, automated building footprint extraction** from multimodal satellite imagery. It fuses two complementary Earth observation sensors:
 
-By stacking RGB + SAR into **7-channel input tensors**, VisionOrbit learns invariant structural representations that enable robust building extraction across varying atmospheric and lighting conditions.
+* **Optical Pan-Sharpened RGB (3 bands)**: High spatial resolution and color contrast, but obscured by clouds, heavy precipitation, and nighttime.
+* **Synthetic Aperture Radar / SAR (4 polarimetric bands)**: Active microwave imaging that penetrates dense cloud cover and functions day or night, but contains speckle noise.
 
----
+By stacking RGB + SAR into a **7-channel input tensor**, VisionOrbit learns invariant structural features to accurately segment building footprints even when optical visibility is degraded.
 
-## Architecture Overview
-
-```
-                      ┌──────────────────────────────┐
-                      │    Raw SpaceNet 6 Imagery    │
-                      │  PS-RGB (3) + SAR-Intensity(4)│
-                      └──────────────┬───────────────┘
-                                     │
-                                     ▼
-                      ┌──────────────────────────────┐
-                      │   Multimodal Preprocessing   │
-                      │  • SAR Percentile Scaling    │
-                      │  • Building Polygon Rasterize│
-                      │  • 256x256 Sliding Window    │
-                      └──────────────┬───────────────┘
-                                     │
-                                     ▼
-                      ┌──────────────────────────────┐
-                      │    7-Channel Input Tensor    │
-                      │       (B, 7, 256, 256)       │
-                      └──────────────┬───────────────┘
-                                     │
-                                     ▼
-                 ┌───────────────────────────────────────┐
-                 │       Multi-Sensor 2D U-Net           │
-                 │  • 4-Stage DoubleConv Encoder         │
-                 │  • Bottleneck (1024 channels)         │
-                 │  • Decoder with Skip Concatenation    │
-                 │  • Final 1x1 Conv Logit Output        │
-                 └───────────────────┬───────────────────┘
-                                     │
-                     ┌───────────────┴───────────────┐
-                     │                               │
-                     ▼                               ▼
-       ┌───────────────────────────┐   ┌───────────────────────────┐
-       │   Training & Optimization │   │   Inference & Multi-Export│
-       │   • BCE + Soft Dice Loss  │   │   • Binary PNG Masks      │
-       │   • Cosine Annealing LR   │   │   • GeoJSON Vector Polys  │
-       │   • Spatial Augmentations │   │   • Probability Heatmaps  │
-       │   • Dataset-Level IoU/Dice│   │   • 4-Panel Visual Reports│
-       └───────────────────────────┘   └───────────────────────────┘
-```
+Pretrained model weights and sample data are included directly in this repository so you can run predictions immediately.
 
 ---
 
-## Project Structure
+## Quickstart (Run in 30 Seconds)
 
-```
-Ignite26/
-├── data/
-│   └── SpaceNet6/
-│       ├── raw/                       # Extracted SpaceNet 6 Rotterdam (PS-RGB, SAR, GeoJSON)
-│       ├── preprocess.py              # Ingestion, normalization, rasterization, and patch tiling
-│       ├── visualize.py               # Preprocessing quality check & sample visualization
-│       └── processed/                 # 90 preprocessed patches (256x256)
-│           ├── images/                # 7-channel .npy arrays (RGB + SAR)
-│           └── masks/                 # Binary .npy masks (0 or 1)
-│
-└── VisionOrbit/
-    ├── dataset.py                     # PyTorch Dataset & DataLoader with spatial tile splitting
-    ├── model.py                       # 7-channel input U-Net architecture (~31M parameters)
-    ├── test_model.py                  # End-to-end integration and smoke test
-    ├── train.py                       # Full training loop, hybrid loss, and checkpointing
-    ├── predict.py                     # Multi-format prediction and diagnostic export pipeline
-    ├── checkpoints/
-    │   ├── best_model.pth             # Optimal model weights (Epoch 22, Val IoU: 0.5111)
-    │   ├── latest_model.pth           # Final epoch snapshot
-    │   └── training_history.json      # 25-epoch metrics trajectory
-    ├── predictions/
-    │   ├── masks/                     # Grayscale binary masks (PNG, 0/255)
-    │   ├── vectors/                   # Individual patch GeoJSON building footprints
-    │   ├── heatmaps/                  # Raw probability maps (.npy)
-    │   ├── visualizations/            # 4-panel diagnostic comparison plots
-    │   ├── all_predicted_buildings.geojson
-    │   └── summary_report.json        # Quantitative test metrics & building counts
-    └── README.md
-```
-
----
-
-## Data Preparation & Leakage Prevention
-
-### 1. Robust SAR Normalization
-SAR backscatter values exhibit a wide dynamic range and speckle noise. The preprocessing pipeline calculates the **2nd and 98th percentiles** per polarimetric band to scale radar intensity into $[0.0, 1.0]$ without outlier saturation:
-$$\tilde{x} = \text{clip}\left(\frac{x - P_2}{P_{98} - P_2}, 0, 1\right)$$
-
-### 2. Spatial Tile-Based Splitting
-To prevent data leakage caused by spatial autocorrelation and overlapping patches, data is split **strictly by geographical tile ID**:
-* **Training Set** (7 tiles: `55, 69, 783, 8137, 4164, 108, 442`): **63 patches**
-* **Validation Set** (2 tiles: `7924, 2317`): **18 patches**
-* **Test Set** (1 tile: `7218`): **9 patches**
-
----
-
-## Loss Function & Evaluation Metrics
-
-Satellite building footprints represent a minority class against large background areas. Relying solely on Binary Cross-Entropy (BCE) causes models to predict all-background pixels. VisionOrbit employs a **Hybrid Objective**:
-
-$$\mathcal{L}_{\text{total}} = 0.5 \cdot \mathcal{L}_{\text{BCE}} + 0.5 \cdot \mathcal{L}_{\text{Dice}}$$
-
-$$\mathcal{L}_{\text{Dice}} = 1 - \frac{2 \sum (p_i y_i) + \epsilon}{\sum p_i + \sum y_i + \epsilon}$$
-
-### Exact Dataset-Level Tracking
-Instead of averaging per-batch scores (which skews scores on sparse tiles), the `MetricTracker` accumulates total True Positives ($TP$), False Positives ($FP$), and False Negatives ($FN$) across the entire dataset:
-$$\text{IoU} = \frac{TP + \epsilon}{TP + FP + FN + \epsilon}, \quad \text{Dice} = \frac{2 \cdot TP + \epsilon}{2 \cdot TP + FP + FN + \epsilon}$$
-
----
-
-## Performance Results
-
-Trained on Apple Silicon (`MPS`) for 25 epochs:
-
-| Metric | Initial (Epoch 1) | Best (Epoch 22) |
-| :--- | :--- | :--- |
-| **Train Loss** | `0.6976` | `0.4332` |
-| **Train IoU** | `20.67%` | `50.97%` |
-| **Validation Loss** | `0.6896` | **`0.4438`** |
-| **Validation IoU** | `0.00%` | **`51.11%`** |
-| **Validation Dice / F1** | `0.01%` | **`67.65%`** |
-| **Average Epoch Time** | ~12.5 seconds | ~13.5 seconds |
-
----
-
-## Dataset Setup & Portability for New Users
-
-### 1. Where Does the Data Go?
-The codebase includes dynamic path discovery and will automatically locate the data in any of the following locations:
-1. Custom path specified via CLI: `--data-dir /path/to/SpaceNet6`
-2. Environment variable: `export SPACENET_DATA_DIR=/path/to/SpaceNet6`
-3. Internal directory: `VisionOrbit/data/SpaceNet6/`
-4. Parent directory: `../data/SpaceNet6/`
-
-### 2. Generating the 7-Channel Patches
-If starting from the raw SpaceNet 6 Rotterdam archive (`SN6_buildings_AOI_11_Rotterdam_train_sample.tar.gz`):
+### 1. Clone the Repository
 ```bash
-# 1. Extract raw data
-cd ../data/SpaceNet6
-tar -xzf SN6_buildings_AOI_11_Rotterdam_train_sample.tar.gz -C raw/
-
-# 2. Run preprocessing (matches RGB+SAR, normalizes, rasterizes GeoJSON, and extracts 256x256 patches)
-python preprocess.py
+git clone https://github.com/AkarshJ01/VisionOrbit.git
+cd VisionOrbit
 ```
-This produces the 90 processed `.npy` patches in `processed/images/` and `processed/masks/`.
 
-### 3. Running Without the Full Dataset
-* **Hardware & Pipeline Smoke Test**: You can run `python test_model.py` even if you have not downloaded the dataset yet! It will automatically generate a synthetic 7-channel test batch to verify MPS/CUDA acceleration, the U-Net forward pass, and backpropagation.
-* **Single-File Inference**: You can run predictions on any individual `.npy` patch without needing the entire training dataset:
-  ```bash
-  python predict.py --checkpoint checkpoints/best_model.pth --input /path/to/sample_patch.npy
-  ```
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run Inference with Pretrained Weights
+Run predictions immediately using the included pretrained weights and demo patch:
+```bash
+python predict.py
+```
+Outputs are automatically generated and saved to the `predictions/` directory:
+* `predictions/visualizations/` &mdash; 4-panel diagnostic comparison plots (RGB, SAR, Ground Truth, Predicted Overlay)
+* `predictions/masks/` &mdash; Grayscale binary mask PNGs (0 = background, 255 = building)
+* `predictions/vectors/` &mdash; GeoJSON polygon files for GIS viewers (QGIS, ArcGIS, Mapbox)
+* `predictions/heatmaps/` &mdash; Raw continuous probability `.npy` arrays
+* `predictions/all_predicted_buildings.geojson` &mdash; Consolidated vector polygons for all detected buildings
+* `predictions/summary_report.json` &mdash; Evaluation metrics & detected building counts
 
 ---
 
-## Quickstart & Usage
+## How It Works
 
-### 1. Environment Setup
-Activate the virtual environment:
-```bash
-# From the repository root
-source .venv/bin/activate
-
-# Or if located in the parent directory
-source ../.venv/bin/activate
+```
+              ┌──────────────────────────────────────┐
+              │    Multimodal Satellite Input        │
+              │  3 Optical RGB  +  4 SAR Radar Bands │
+              └──────────────────┬───────────────────┘
+                                 │
+                                 ▼
+              ┌──────────────────────────────────────┐
+              │        7-Channel Input Tensor        │
+              │           (B, 7, 256, 256)           │
+              └──────────────────┬───────────────────┘
+                                 │
+                                 ▼
+             ┌──────────────────────────────────────────┐
+             │       Multi-Sensor 2D U-Net              │
+             │  • 4-Stage DoubleConv Encoder (64→512)   │
+             │  • Bottleneck Feature Map (1024 channels)│
+             │  • Decoder with Skip Concatenation       │
+             │  • Final 1x1 Conv Logit Output           │
+             └───────────────────┬──────────────────────┘
+                                 │
+                 ┌───────────────┴───────────────┐
+                 │                               │
+                 ▼                               ▼
+   ┌───────────────────────────┐   ┌───────────────────────────┐
+   │    Raster Deliverables    │   │     GIS & Analytics       │
+   │  • Binary Mask (0 or 255) │   │  • Vector GeoJSON Polygons│
+   │  • Probability Heatmaps   │   │  • Surface Area & Counts  │
+   │  • 4-Panel Report PNGs    │   │  • Building Confidence    │
+   └───────────────────────────┘   └───────────────────────────┘
 ```
 
-### 2. Integration Smoke Test
-Verify model forward pass, device compatibility (MPS/CUDA), and loss backpropagation:
+---
+
+## Repository Structure
+
+```
+VisionOrbit/
+├── demo_data/                     # Ready-to-use multimodal sample data
+│   ├── sample_image.npy           # 7-channel test patch (3 RGB + 4 SAR)
+│   └── sample_mask.npy            # Ground-truth binary building mask
+├── weights/                       # Pretrained model weights
+│   └── best_model.pth             # Pretrained U-Net weights (IoU: 51.11%, Dice: 67.65%)
+├── scripts/                       # Data processing & visualization utilities
+│   ├── preprocess.py              # Multimodal normalization, rasterization, and tiling
+│   └── visualize.py               # Visual inspection script
+├── model.py                       # 7-channel input U-Net architecture (~31M parameters)
+├── dataset.py                     # PyTorch Dataset loader with dynamic data discovery
+├── test_model.py                  # Integration smoke test for hardware & forward/backward pass
+├── train.py                       # Training pipeline with BCE+Dice loss and augmentations
+├── predict.py                     # Multi-format prediction and diagnostic export pipeline
+├── pyproject.toml                 # Project configuration
+├── requirements.txt               # Dependencies list
+└── README.md                      # Project documentation
+```
+
+---
+
+## Advanced Usage
+
+### Running Predictions on Custom Images or Folders
+Predict on any 7-channel `.npy` patch or directory of patches:
+```bash
+# Predict on a single image file
+python predict.py --input /path/to/my_patch.npy
+
+# Predict on an entire folder of patches
+python predict.py --input /path/to/my_patches_folder/
+
+# Adjust decision threshold (default: 0.5) and minimum building area
+python predict.py --threshold 0.45 --min-area 15
+```
+
+### Verification Smoke Test
+Run an end-to-end integration check to test your GPU/CPU hardware and model pipeline:
 ```bash
 python test_model.py
 ```
 
-### 3. Training the Model
-Run the training pipeline with spatial augmentations and Cosine Annealing (optionally passing `--data-dir` if stored in a custom path):
+### Training on Custom Datasets
+Train the U-Net from scratch or resume training:
 ```bash
-python train.py --epochs 25 --batch-size 4 --lr 1e-4 --save-dir checkpoints
-```
+# Basic training
+python train.py --epochs 25 --batch-size 4 --lr 1e-4
 
-### 4. Running Inference & Generating Deliverables
-Run predictions on unseen test tiles or custom inputs and export all output formats:
-```bash
-# On default test tiles
-python predict.py --checkpoint checkpoints/best_model.pth --threshold 0.5
-
-# On custom data directory or single file
-python predict.py --checkpoint checkpoints/best_model.pth --data-dir /path/to/data
-python predict.py --checkpoint checkpoints/best_model.pth --input /path/to/tile_patch.npy
+# Specify custom data directory and checkpoint output
+python train.py --data-dir /path/to/data --save-dir checkpoints --epochs 30
 ```
 
 ---
 
-## Export Formats
+## Model Performance
 
-`predict.py` generates four standard deliverables simultaneously:
+Trained for 25 epochs using a hybrid **BCEWithLogitsLoss + Soft Dice Loss** with spatial data augmentations and Cosine Annealing learning rate schedule:
 
-| Format | Directory | Description | Use Case |
+| Metric | Baseline (Epoch 1) | Best Model (Epoch 22) |
+| :--- | :--- | :--- |
+| **Validation IoU (Jaccard Index)** | `0.00%` | **`51.11%`** |
+| **Validation Dice / F1-Score** | `0.01%` | **`67.65%`** |
+| **Validation Loss** | `0.6896` | **`0.4438`** |
+| **Training Speed** | ~12 seconds / epoch (Apple Silicon MPS) | |
+
+---
+
+## Supported Deliverables
+
+When running `predict.py`, the following four standard formats are exported simultaneously:
+
+| Format | Output Path | Description | Best For |
 | :--- | :--- | :--- | :--- |
-| **Binary Mask PNGs** | `predictions/masks/` | Grayscale $256 \times 256$ images ($0$ background, $255$ building). | Computer vision pipelines, OpenCV, web viewers. |
-| **GeoJSON Vectors** | `predictions/vectors/` | GeoJSON `FeatureCollection` with individual building polygons, pixel area, and confidence. | QGIS, ArcGIS, Mapbox, official SpaceNet benchmark evaluation. |
-| **Probability Heatmaps** | `predictions/heatmaps/` | Raw float32 NumPy arrays (`.npy`) containing continuous $[0.0, 1.0]$ probabilities. | Model ensembling, post-processing, calibration. |
-| **Diagnostic Comparisons** | `predictions/visualizations/` | 4-panel visual reports comparing RGB, SAR, Ground Truth, and Predicted overlays. | Presentations, team review, qualitative inspection. |
+| **Binary Mask Images** | `predictions/masks/` | Grayscale $256 \times 256$ PNGs (`0` background, `255` building). | Computer vision pipelines, OpenCV, frontend web apps. |
+| **Vector Polygons** | `predictions/vectors/` | GeoJSON `FeatureCollection` containing building polygons, areas, and confidence. | QGIS, ArcGIS, Mapbox, urban planning spatial queries. |
+| **Probability Heatmaps** | `predictions/heatmaps/` | Raw float32 NumPy arrays (`.npy`) containing continuous $[0.0, 1.0]$ confidence values. | Model calibration, ensemble modeling, custom thresholds. |
+| **Diagnostic Reports** | `predictions/visualizations/` | High-resolution 4-panel visual plots comparing RGB, SAR, Ground Truth, and Predictions. | Slide decks, executive reports, model inspection. |
 
 ---
 
-## Future Roadmap
-
-- [ ] **Multi-Sensor Ablation Study**: Train and compare Optical-Only (3 channels), SAR-Only (4 channels), and Fused (7 channels) to quantify multimodal fusion gains.
-- [ ] **Simulated Cloud Masking**: Evaluate model degradation under synthetic optical occlusion to validate radar resilience.
-- [ ] **Tile Mosaicking**: Stitch $256 \times 256$ patch predictions back into full-resolution geographic scenes.
+## License
+This project is open-source under the MIT License.

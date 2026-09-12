@@ -9,7 +9,7 @@ import rasterio.features
 from shapely.geometry import shape, mapping
 import torch
 
-from dataset import SpaceNetDataset, resolve_data_root, IMAGE_DIR, MASK_DIR
+from dataset import MultiSensorDataset, resolve_data_root, IMAGE_DIR, MASK_DIR
 from model import UNet
 
 
@@ -123,7 +123,7 @@ def save_visual_comparison(rgb, sar, gt_mask, pred_mask, prob_map, iou, dice, sa
 # --------------------------------------------------
 
 def run_predictions(
-    checkpoint_path="checkpoints/best_model.pth",
+    checkpoint_path=None,
     output_dir="predictions",
     threshold=0.5,
     min_area=10,
@@ -131,8 +131,13 @@ def run_predictions(
     data_dir=None,
     input_path=None
 ):
-    if test_tiles is None:
-        test_tiles = [7218]  # Default unseen test tile
+    if checkpoint_path is None:
+        if Path("weights/best_model.pth").exists():
+            checkpoint_path = "weights/best_model.pth"
+        elif Path("checkpoints/best_model.pth").exists():
+            checkpoint_path = "checkpoints/best_model.pth"
+        else:
+            checkpoint_path = "weights/best_model.pth"
 
     # Hardware acceleration
     if torch.backends.mps.is_available():
@@ -143,8 +148,14 @@ def run_predictions(
         device = torch.device("cpu")
 
     data_root = resolve_data_root(data_dir)
-    image_dir = data_root / "processed" / "images"
-    mask_dir = data_root / "processed" / "masks"
+    image_dir = data_root / "processed" / "images" if (data_root / "processed" / "images").exists() else data_root / "images"
+    mask_dir = data_root / "processed" / "masks" if (data_root / "processed" / "masks").exists() else data_root / "masks"
+
+    # Fallback to demo_data if no input specified and image_dir doesn't exist
+    if input_path is None and not image_dir.exists():
+        demo_sample = Path("demo_data/sample_image.npy")
+        if demo_sample.exists():
+            input_path = str(demo_sample)
 
     print("=" * 65)
     print("VISIONORBIT: MULTI-SENSOR PREDICTION & EXPORT PIPELINE")
@@ -157,7 +168,6 @@ def run_predictions(
         print(f"Input Target:       {input_path}")
     else:
         print(f"Data Root:          {data_root.resolve()}")
-        print(f"Test Tiles:         {test_tiles}")
     print("=" * 65)
 
     # Setup output directories
@@ -174,14 +184,18 @@ def run_predictions(
     model = UNet(in_channels=7, out_channels=1).to(device)
     checkpoint = torch.load(checkpoint_path, map_location=device)
 
-    if "model_state_dict" in checkpoint:
-        model.load_state_dict(checkpoint["model_state_dict"])
+    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+        state_dict = checkpoint["model_state_dict"]
         ckpt_epoch = checkpoint.get("epoch", "N/A")
         ckpt_iou = checkpoint.get("val_iou", "N/A")
-        print(f"Loaded weights from Epoch {ckpt_epoch} (Val IoU: {ckpt_iou:.4f})")
+        iou_str = f"{ckpt_iou:.4f}" if isinstance(ckpt_iou, (int, float)) else str(ckpt_iou)
+        print(f"Loaded weights from Epoch {ckpt_epoch} (Val IoU: {iou_str})")
     else:
-        model.load_state_dict(checkpoint)
+        state_dict = checkpoint
 
+    # Cast fp16 weights to fp32 if needed
+    state_dict_fp32 = {k: v.float() if v.is_floating_point() else v for k, v in state_dict.items()}
+    model.load_state_dict(state_dict_fp32)
     model.eval()
 
     # Load items to predict
@@ -189,13 +203,18 @@ def run_predictions(
     if input_path:
         inp = Path(input_path)
         if inp.is_file():
-            samples.append((inp, None))
+            mask_candidate = inp.parent / f"{inp.stem.replace('image', 'mask')}.npy"
+            gt = mask_candidate if mask_candidate.exists() else None
+            samples.append((inp, gt))
         elif inp.is_dir():
             for f in sorted(inp.glob("*.npy")):
-                samples.append((f, None))
+                if "mask" in f.name:
+                    continue
+                mask_cand = inp / f"{f.stem.replace('image', 'mask')}.npy"
+                samples.append((f, mask_cand if mask_cand.exists() else None))
         print(f"Found {len(samples)} input file(s) to predict.\n")
     else:
-        dataset = SpaceNetDataset(image_dir, mask_dir, test_tiles)
+        dataset = MultiSensorDataset(image_dir, mask_dir, test_tiles)
         samples = dataset.samples
         print(f"Found {len(samples)} test patches to predict.\n")
 
@@ -318,13 +337,13 @@ def run_predictions(
 # --------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="Run VisionOrbit Multi-Sensor Inference")
-    parser.add_argument("--checkpoint", type=str, default="checkpoints/best_model.pth", help="Path to trained model checkpoint")
+    parser = argparse.ArgumentParser(description="Run VisionOrbit Multi-Sensor Satellite Inference")
+    parser.add_argument("--checkpoint", type=str, default=None, help="Path to trained model checkpoint (default: weights/best_model.pth)")
     parser.add_argument("--output-dir", type=str, default="predictions", help="Output directory for generated predictions")
     parser.add_argument("--threshold", type=float, default=0.5, help="Probability threshold for building mask (default: 0.5)")
     parser.add_argument("--min-area", type=int, default=10, help="Minimum pixel area for polygon filtering (default: 10)")
     parser.add_argument("--tiles", nargs="+", type=int, default=[7218], help="List of tile IDs to evaluate")
-    parser.add_argument("--data-dir", type=str, default=None, help="Path to SpaceNet6 data directory (default: auto-detected)")
+    parser.add_argument("--data-dir", type=str, default=None, help="Path to dataset directory (default: auto-detected)")
     parser.add_argument("--input", type=str, default=None, help="Path to a single .npy file or directory of .npy files to predict on")
     args = parser.parse_args()
 

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from dataset import SpaceNetDataset, IMAGE_DIR, MASK_DIR
+from dataset import MultiSensorDataset, IMAGE_DIR, MASK_DIR
 from model import UNet
 
 
@@ -17,8 +17,8 @@ class DiceLoss(nn.Module):
 
     def forward(self, logits, targets):
         probs = torch.sigmoid(logits)
-        probs = probs.view(-1)
-        targets = targets.view(-1)
+        probs = probs.reshape(-1)
+        targets = targets.reshape(-1)
         intersection = (probs * targets).sum()
         dice = (2.0 * intersection + self.smooth) / (probs.sum() + targets.sum() + self.smooth)
         return 1.0 - dice
@@ -42,8 +42,8 @@ def calculate_metrics(logits, targets, threshold=0.5, smooth=1e-6):
     probs = torch.sigmoid(logits)
     preds = (probs > threshold).float()
 
-    preds_flat = preds.view(-1)
-    targets_flat = targets.view(-1)
+    preds_flat = preds.reshape(-1)
+    targets_flat = targets.reshape(-1)
 
     intersection = (preds_flat * targets_flat).sum().item()
     total_preds = preds_flat.sum().item()
@@ -76,15 +76,17 @@ def test_pipeline():
 
     # 2. Load batch (real if dataset exists, synthetic fallback if not yet downloaded)
     try:
-        sample_tiles = [55, 69]
-        dataset = SpaceNetDataset(IMAGE_DIR, MASK_DIR, sample_tiles)
-        loader = DataLoader(dataset, batch_size=2, shuffle=True)
+        dataset = MultiSensorDataset(IMAGE_DIR, MASK_DIR)
+        if len(dataset) == 0:
+            raise ValueError("No dataset samples found")
+        batch_size = min(2, len(dataset))
+        loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
         images, masks = next(iter(loader))
-        print(f"[2] Real SpaceNet Batch Loaded:")
+        print(f"[2] Sample Multi-Sensor Batch Loaded:")
         print(f"    Images: shape={images.shape}, dtype={images.dtype}, min={images.min():.3f}, max={images.max():.3f}")
         print(f"    Masks:  shape={masks.shape}, dtype={masks.dtype}, unique={torch.unique(masks).tolist()}")
-    except (FileNotFoundError, IndexError):
-        print(f"[2] [NOTICE] Processed SpaceNet6 dataset not found on this path.")
+    except (FileNotFoundError, IndexError, ValueError):
+        print(f"[2] [NOTICE] Full dataset not found on this path.")
         print(f"    Generating synthetic 7-channel multi-sensor batch for verification...")
         images = torch.rand(2, 7, 256, 256, dtype=torch.float32)
         masks = (torch.rand(2, 1, 256, 256) > 0.85).float()
@@ -119,7 +121,7 @@ def test_pipeline():
     print(f"    Batch Dice: {dice:.4f}")
 
     print("=" * 60)
-    print("ALL TESTS PASSED! Ready for train.py.")
+    print("ALL TESTS PASSED! Ready for training or inference.")
     print("=" * 60)
 
 

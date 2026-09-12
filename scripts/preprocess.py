@@ -43,7 +43,7 @@ MASK_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_tile_number(filename):
     """
-    Extract tile number from a SpaceNet filename.
+    Extract tile number from a satellite filename.
 
     Example:
         ..._tile_69.tif

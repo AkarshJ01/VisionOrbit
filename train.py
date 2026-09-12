@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from dataset import SpaceNetDataset, resolve_data_root, IMAGE_DIR, MASK_DIR
+from dataset import MultiSensorDataset, resolve_data_root, IMAGE_DIR, MASK_DIR
 from model import UNet
 
 
@@ -172,14 +172,14 @@ def validate(model, loader, criterion, device):
 # --------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="Train Multi-Sensor U-Net on SpaceNet 6")
+    parser = argparse.ArgumentParser(description="Train Multi-Sensor U-Net for Building Footprint Extraction")
     parser.add_argument("--epochs", type=int, default=25, help="Number of training epochs")
     parser.add_argument("--batch-size", type=int, default=4, help="Batch size for DataLoader")
     parser.add_argument("--lr", type=float, default=1e-4, help="Initial learning rate")
     parser.add_argument("--weight-decay", type=float, default=1e-4, help="AdamW weight decay")
     parser.add_argument("--no-augment", action="store_true", help="Disable spatial data augmentation")
     parser.add_argument("--save-dir", type=str, default="checkpoints", help="Directory to save model checkpoints")
-    parser.add_argument("--data-dir", type=str, default=None, help="Path to SpaceNet6 data directory (default: auto-detected)")
+    parser.add_argument("--data-dir", type=str, default=None, help="Path to dataset directory (default: auto-detected)")
     args = parser.parse_args()
 
     # Hardware acceleration
@@ -191,8 +191,8 @@ def main():
         device = torch.device("cpu")
 
     data_root = resolve_data_root(args.data_dir)
-    image_dir = data_root / "processed" / "images"
-    mask_dir = data_root / "processed" / "masks"
+    image_dir = data_root / "processed" / "images" if (data_root / "processed" / "images").exists() else data_root / "images"
+    mask_dir = data_root / "processed" / "masks" if (data_root / "processed" / "masks").exists() else data_root / "masks"
 
     print("=" * 65)
     print("VISIONORBIT: MULTI-SENSOR U-NET TRAINING")
@@ -212,8 +212,8 @@ def main():
     train_tiles = [55, 69, 783, 8137, 4164, 108, 442]
     val_tiles = [7924, 2317]
 
-    train_dataset = SpaceNetDataset(image_dir, mask_dir, train_tiles)
-    val_dataset = SpaceNetDataset(image_dir, mask_dir, val_tiles)
+    train_dataset = MultiSensorDataset(image_dir, mask_dir, train_tiles)
+    val_dataset = MultiSensorDataset(image_dir, mask_dir, val_tiles)
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
