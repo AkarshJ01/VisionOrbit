@@ -1,0 +1,37 @@
+0 Small Car
+1 Van
+2 Dump Truck
+3 Cargo Truck
+4 Dry Cargo Ship
+5 Motorboat
+6 Intersection
+7 other-vehicle
+8 Fishing Boat
+9 other-ship
+10 other-airplane
+11 A220
+12 Liquid Cargo Ship
+13 Tennis Court
+14 Boeing737
+15 Tugboat
+16 Bus
+17 Passenger Ship
+18 Engineering Ship
+19 A321
+20 Excavator
+21 Trailer
+22 Truck Tractor
+23 Baseball Field
+24 Football Field
+25 Warship
+26 Basketball Court
+27 Tractor
+28 A330
+29 Boeing787
+30 Bridge
+31 Boeing747
+32 Boeing777
+33 ARJ21
+34 A350
+35 Roundabout
+36 C919

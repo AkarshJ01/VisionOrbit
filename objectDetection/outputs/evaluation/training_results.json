@@ -1,0 +1,18 @@
+{
+  "status": "success",
+  "smoke_test": false,
+  "model": "yolo11n-obb.pt",
+  "device": "mps",
+  "epochs": 25,
+  "imgsz": 640,
+  "batch_size": 8,
+  "best_model_path": "models/best.pt",
+  "results_dir": "/Users/shashanksekhar/ObjDect/runs/obb/runs/train/satquery_obb",
+  "metrics": {
+    "metrics/precision(B)": 0.43700876981473397,
+    "metrics/recall(B)": 0.24960796638413696,
+    "metrics/mAP50(B)": 0.2170959620669677,
+    "metrics/mAP50-95(B)": 0.15631986963536956,
+    "fitness": 0.15631986963536956
+  }
+}
