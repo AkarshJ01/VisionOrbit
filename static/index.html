@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VisionOrbit - Multimodal AI & Visual Intelligence</title>
-  <meta name="description" content="VisionOrbit: Modern OpenAI-style conversational AI with advanced multimodal vision analysis, image text extraction, and prompt intelligence.">
+  <title>VisionOrbit - Multimodal AI & Pinecone RAG</title>
+  <meta name="description" content="VisionOrbit: Modern OpenAI-style conversational AI with advanced multimodal vision analysis and Pinecone RAG retrieval.">
   
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +51,7 @@
           </div>
           <div class="brand-text">
             <h2>VisionOrbit</h2>
-            <span class="badge">Multimodal</span>
+            <span class="badge">RAG & Vision</span>
           </div>
         </div>
         <button id="sidebarCloseBtn" class="icon-btn mobile-only" title="Close sidebar" aria-label="Close sidebar">
@@ -80,15 +80,15 @@
       <div class="sidebar-provider-card">
         <div class="provider-status-row">
           <div class="provider-dot active" id="providerDot"></div>
-          <span class="provider-name" id="currentProviderLabel">VisionOrbit Smart Core</span>
+          <span class="provider-name" id="currentProviderLabel">Ollama gpt-oss:20b</span>
         </div>
-        <div class="provider-sub" id="providerSubText">Instant Multimodal Analysis</div>
+        <div class="provider-sub" id="providerSubText">Pinecone RAG Active</div>
       </div>
 
       <!-- Sidebar Footer -->
       <div class="sidebar-footer">
         <button id="openSettingsBtn" class="footer-btn" title="Settings & API Keys">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           <span>Settings</span>
         </button>
         <button id="themeToggleBtn" class="footer-btn icon-only" title="Toggle Theme" aria-label="Toggle Theme">
@@ -110,15 +110,23 @@
           <!-- Model Selector Dropdown -->
           <div class="model-selector-wrapper">
             <select id="modelSelector" class="model-select" aria-label="Select AI Model">
+              <option value="ollama:gpt-oss:20b">🦙 Ollama gpt-oss:20b (Pinecone RAG)</option>
+              <option value="ollama:qwen2.5-coder:14b">🦙 Ollama qwen2.5-coder:14b</option>
+              <option value="ollama:llama3.1:8b">🦙 Ollama llama3.1:8b</option>
               <option value="builtin:visionorbit-core">✨ VisionOrbit Smart Core (Built-in)</option>
               <option value="openai:gpt-4o">⚡ OpenAI GPT-4o (Omni Vision)</option>
               <option value="openai:gpt-4o-mini">🚀 OpenAI GPT-4o Mini</option>
-              <option value="ollama:llava">🦙 Ollama LLaVA (Local)</option>
             </select>
           </div>
         </div>
 
         <div class="nav-right">
+          <!-- Pinecone RAG Toggle Button -->
+          <button id="ragToggle" class="chip-btn active" title="Toggle Pinecone Document Knowledge Base">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Pinecone RAG</span>
+          </button>
+
           <!-- Web Search Toggle Button -->
           <button id="webSearchToggle" class="chip-btn" title="Toggle Web Search Enrichment">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -143,35 +151,35 @@
         <!-- Welcoming Hero Handle (Empty State) -->
         <div id="welcomeHero" class="welcome-hero">
           <div class="hero-badge">
-            <span class="pulse-spark"></span> Next-Gen Multimodal Vision AI
+            <span class="pulse-spark"></span> Pinecone RAG & Multimodal AI
           </div>
-          <h1 class="hero-title">What would you like to analyze today?</h1>
-          <p class="hero-subtitle">Upload any image or document screenshot, ask questions, extract text, and get detailed visual analysis.</p>
+          <h1 class="hero-title">What would you like to ask or analyze?</h1>
+          <p class="hero-subtitle">Ask questions from your Pinecone document knowledge base (SAR PDFs), upload images, and get detailed grounded answers.</p>
 
           <!-- Quick Starter Capability Cards -->
           <div class="prompt-suggestions-grid">
+            <div class="suggestion-card" data-prompt="What is SAR imagery, and how is it different from optical satellite imagery?" data-badge="Pinecone RAG">
+              <div class="sugg-icon">🛰️</div>
+              <div class="sugg-title">SAR Satellite Imagery Q&A</div>
+              <div class="sugg-desc">Retrieve from Pinecone knowledge base on radar & forestry</div>
+            </div>
+
+            <div class="suggestion-card" data-prompt="What are the key applications of SAR for forest biomass monitoring?" data-badge="Pinecone RAG">
+              <div class="sugg-icon">🌲</div>
+              <div class="sugg-title">Biomass & Forestry Analysis</div>
+              <div class="sugg-desc">Query document insights on biomass estimation and radar metrics</div>
+            </div>
+
             <div class="suggestion-card" data-prompt="Analyze this image in detail and extract all key visual elements and text." data-badge="General Vision">
               <div class="sugg-icon">🔍</div>
               <div class="sugg-title">Deep Visual Inspection</div>
-              <div class="sugg-desc">Extract key subjects, background context & properties</div>
+              <div class="sugg-desc">Extract key subjects, background context & telemetry</div>
             </div>
 
             <div class="suggestion-card" data-prompt="Extract all visible text and table data from this screenshot accurately." data-badge="OCR">
               <div class="sugg-icon">📝</div>
               <div class="sugg-title">OCR & Text Extraction</div>
               <div class="sugg-desc">Transcribe typography, labels, signs & document text</div>
-            </div>
-
-            <div class="suggestion-card" data-prompt="Analyze this UI/UX design or code screenshot and critique its layout, contrast, and components." data-badge="UI / Code">
-              <div class="sugg-icon">💻</div>
-              <div class="sugg-title">UI/UX & Code Review</div>
-              <div class="sugg-desc">Inspect design system, responsiveness & component structure</div>
-            </div>
-
-            <div class="suggestion-card" data-prompt="Analyze this chart/graph and break down the trends, axes, data points, and takeaways." data-badge="Data">
-              <div class="sugg-icon">📊</div>
-              <div class="sugg-title">Chart & Graph Analysis</div>
-              <div class="sugg-desc">Evaluate coordinate trends, metrics & quantitative insights</div>
             </div>
           </div>
 
@@ -186,7 +194,7 @@
             </div>
             <div class="dropzone-content">
               <strong>Drag and drop images here</strong>, or <span class="browse-link">browse from files</span>
-              <div class="dropzone-meta">Supports PNG, JPG, JPEG, WEBP, GIF • Paste screenshots directly (`Cmd+V`)</div>
+              <div class="dropzone-meta">Supports PNG, JPG, JPEG, WEBP, GIF • Or type questions to search Pinecone documents</div>
             </div>
           </div>
         </div>
@@ -206,7 +214,7 @@
               <span></span>
               <span></span>
             </div>
-            <span class="analyzing-text" id="analyzingText">Analyzing multimodal image features & telemetry...</span>
+            <span class="analyzing-text" id="analyzingText">Retrieving Pinecone documents & generating response...</span>
           </div>
         </div>
 
@@ -240,7 +248,7 @@
               <textarea 
                 id="promptInput" 
                 rows="1" 
-                placeholder="Ask anything about your images or prompt VisionOrbit... (Shift+Enter for new line)"
+                placeholder="Ask about your Pinecone documents or prompt VisionOrbit... (Shift+Enter for new line)"
                 aria-label="Prompt Input"
               ></textarea>
             </div>
@@ -260,7 +268,7 @@
         </div>
 
         <div class="prompt-disclaimer">
-          VisionOrbit analyzes multimodal data. Press <kbd>Enter</kbd> to send, <kbd>Shift+Enter</kbd> for new line.
+          Pinecone RAG Active. Press <kbd>Enter</kbd> to send, <kbd>Shift+Enter</kbd> for new line.
         </div>
       </footer>
     </main>
@@ -299,7 +307,7 @@
           <div class="modal-icon">⚙️</div>
           <div>
             <h3>VisionOrbit Settings & API Keys</h3>
-            <p>Configure OpenAI, local Ollama, and Tavily integrations</p>
+            <p>Configure OpenAI, Pinecone RAG, and local Ollama integrations</p>
           </div>
         </div>
         <button id="closeSettingsModalBtn" class="icon-btn" title="Close modal" aria-label="Close modal">
@@ -322,9 +330,9 @@
 
         <!-- Ollama Base URL -->
         <div class="form-group">
-          <label for="ollamaUrlInput">Ollama Server Base URL (for local models like LLaVA)</label>
+          <label for="ollamaUrlInput">Ollama Server Base URL (for models like gpt-oss:20b)</label>
           <input type="text" id="ollamaUrlInput" placeholder="http://localhost:11434" value="http://localhost:11434">
-          <small>Make sure Ollama is running (`ollama serve` and `ollama run llava`).</small>
+          <small>Make sure Ollama is running (`ollama serve` and `ollama run gpt-oss:20b`).</small>
         </div>
 
         <!-- Tavily API Key -->
