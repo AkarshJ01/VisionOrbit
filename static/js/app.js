@@ -14,6 +14,7 @@
     isGenerating: false,
     useWebSearch: false,
     useRag: true, // Pinecone RAG enabled by default
+    useDetection: true, // YOLO-OBB real-time object detection
     theme: localStorage.getItem('visionorbit_theme') || 'dark',
     settings: {
       openaiKey: localStorage.getItem('visionorbit_openai_key') || '',
@@ -41,6 +42,7 @@
     themeIconLight: document.getElementById('themeIconLight'),
     
     modelSelector: document.getElementById('modelSelector'),
+    detectionToggle: document.getElementById('detectionToggle'),
     ragToggle: document.getElementById('ragToggle'),
     webSearchToggle: document.getElementById('webSearchToggle'),
     exportChatBtn: document.getElementById('exportChatBtn'),
@@ -341,27 +343,49 @@
      Image Upload & Staging
      ========================================================================== */
 
-  function handleFileSelection(files) {
+  async function handleFileSelection(files) {
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach(file => {
-      if (!file.type.startsWith('image/')) {
+    for (const file of Array.from(files)) {
+      const nameLower = file.name.toLowerCase();
+      const isImage = file.type.startsWith('image/') || nameLower.endsWith('.tif') || nameLower.endsWith('.tiff');
+      if (!isImage) {
         showToast(`Skipped non-image file: ${file.name}`, 'error');
-        return;
+        continue;
       }
-      if (file.size > 15 * 1024 * 1024) {
-        showToast(`Image too large (max 15MB): ${file.name}`, 'error');
-        return;
+      if (file.size > 50 * 1024 * 1024) {
+        showToast(`Image too large (max 50MB): ${file.name}`, 'error');
+        continue;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        state.stagedImages.push(e.target.result);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          throw new Error(`Upload failed with status ${res.status}`);
+        }
+
+        const uploadData = await res.json();
+        state.stagedImages.push(uploadData.data_url);
         renderStagedImages();
-        showToast(`Attached image: ${file.name}`, 'info');
-      };
-      reader.readAsDataURL(file);
-    });
+        showToast(`Loaded satellite visual: ${file.name}`, 'success');
+      } catch (err) {
+        console.warn('Server upload fallback to local reader:', err);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          state.stagedImages.push(e.target.result);
+          renderStagedImages();
+          showToast(`Attached image: ${file.name}`, 'info');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
   }
 
   function renderStagedImages() {
@@ -434,7 +458,7 @@
     };
 
     if (chat.messages.length === 0) {
-      const autoTitle = prompt ? (prompt.length > 32 ? prompt.substring(0, 32) + '...' : prompt) : 'Visual & Knowledge Inquiry';
+      const autoTitle = prompt ? (prompt.length > 32 ? prompt.substring(0, 32) + '...' : prompt) : 'Visual & Target Analysis';
       chat.title = autoTitle;
       saveConversations();
     }
@@ -454,9 +478,9 @@
     state.isGenerating = true;
     updateSendButtonState();
     elements.analysisIndicator.classList.remove('hidden');
-    elements.analyzingText.textContent = state.useRag && images.length === 0
-      ? 'Retrieving from Pinecone knowledge base & thinking...'
-      : (images.length > 0 ? 'Analyzing multimodal image features & telemetry...' : 'Generating response...');
+    elements.analyzingText.textContent = state.useDetection && images.length > 0
+      ? 'Running YOLO-OBB detection & retrieving Pinecone knowledge...'
+      : (state.useRag ? 'Retrieving from Pinecone knowledge base & thinking...' : 'Generating response...');
     scrollChatToBottom();
 
     const [provider, model] = state.currentModel.split(':');
@@ -464,12 +488,14 @@
 
     const historyPayload = chat.messages.slice(0, -1).map(m => ({
       role: m.role,
-      content: m.content
+      content: m.content,
+      detection_results: m.detection_results || null,
+      images: m.images || []
     }));
 
     try {
       const payload = {
-        prompt: prompt || 'Describe and analyze the attached image in detail.',
+        prompt: prompt || 'Describe and analyze the attached satellite image in detail.',
         images: images,
         history: historyPayload,
         provider: provider,
@@ -479,6 +505,7 @@
         tavilyApiKey: state.settings.tavilyKey || null,
         useWebSearch: state.useWebSearch,
         useRag: state.useRag,
+        useDetection: state.useDetection,
         systemPrompt: state.settings.systemPrompt || null
       };
 
@@ -501,6 +528,8 @@
         content: data.reply,
         provider_used: data.provider_used,
         model_used: data.model_used,
+        annotated_image: data.annotated_image || null,
+        detection_results: data.detection_results || null,
         image_metadata: data.image_metadata || [],
         search_sources: data.search_sources || [],
         rag_sources: data.rag_sources || [],
@@ -546,8 +575,76 @@
   }
 
   /* ==========================================================================
-     DOM Message Rendering & RAG Sources Display
+     DOM Message Rendering, Telemetry Cards & RAG Sources Display
      ========================================================================== */
+
+  function renderDetectionCard(msg) {
+    if (!msg.detection_results && !msg.annotated_image) return null;
+
+    const det = msg.detection_results || {};
+    const totalDets = det.total_detections !== undefined ? det.total_detections : (det.detections ? det.detections.length : 0);
+    const classCounts = det.class_counts || {};
+
+    const card = document.createElement('div');
+    card.className = 'detection-telemetry-card';
+
+    // Header with counts and badges
+    const header = document.createElement('div');
+    header.className = 'detection-card-header';
+
+    header.innerHTML = `
+      <div class="det-header-left">
+        <span class="det-icon">🎯</span>
+        <div>
+          <div class="det-title">YOLO-OBB Detection Telemetry</div>
+          <div class="det-subtitle">${totalDets} Target${totalDets === 1 ? '' : 's'} Identified • ${det.resolution || 'High-Res'} • ${det.crs || 'WGS84'}</div>
+        </div>
+      </div>
+      <div class="det-header-right">
+        <span class="det-count-badge">${totalDets} Detections</span>
+      </div>
+    `;
+    card.appendChild(header);
+
+    // Class breakdown pills
+    if (Object.keys(classCounts).length > 0) {
+      const chipsBar = document.createElement('div');
+      chipsBar.className = 'det-chips-bar';
+      Object.entries(classCounts).forEach(([cls, count]) => {
+        const pill = document.createElement('span');
+        pill.className = 'det-pill';
+        pill.innerHTML = `<strong>${count}</strong> ${cls}`;
+        chipsBar.appendChild(pill);
+      });
+      card.appendChild(chipsBar);
+    }
+
+    // Annotated Image Preview
+    if (msg.annotated_image) {
+      const visualContainer = document.createElement('div');
+      visualContainer.className = 'det-visual-container';
+
+      const imgWrapper = document.createElement('div');
+      imgWrapper.className = 'det-img-wrapper';
+
+      const img = document.createElement('img');
+      img.src = msg.annotated_image;
+      img.alt = 'YOLO Oriented Bounding Box Detections';
+      img.className = 'det-annotated-image';
+      img.onclick = () => openLightbox(msg.annotated_image);
+
+      const overlayBadge = document.createElement('div');
+      overlayBadge.className = 'det-img-badge';
+      overlayBadge.innerHTML = `<span>🔍 Click for Full-Screen Inspection</span>`;
+
+      imgWrapper.appendChild(img);
+      imgWrapper.appendChild(overlayBadge);
+      visualContainer.appendChild(imgWrapper);
+      card.appendChild(visualContainer);
+    }
+
+    return card;
+  }
 
   function formatMarkdown(rawText) {
     if (window.marked) {
@@ -641,6 +738,12 @@
       bubble.appendChild(imgStrip);
     }
 
+    // Render YOLO Detection Card if present
+    if (msg.detection_results || msg.annotated_image) {
+      const detCard = renderDetectionCard(msg);
+      if (detCard) bubble.appendChild(detCard);
+    }
+
     const textCard = document.createElement('div');
     textCard.className = 'msg-text-card markdown-body';
     textCard.innerHTML = formatMarkdown(msg.content);
@@ -699,6 +802,12 @@
 
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
+
+    // Render YOLO Detection Card if present
+    if (msg.detection_results || msg.annotated_image) {
+      const detCard = renderDetectionCard(msg);
+      if (detCard) bubble.appendChild(detCard);
+    }
 
     const textCard = document.createElement('div');
     textCard.className = 'msg-text-card markdown-body';
@@ -872,6 +981,15 @@
     });
 
     elements.modelSelector.addEventListener('change', handleModelChange);
+
+    // YOLO-OBB Detection Toggle
+    if (elements.detectionToggle) {
+      elements.detectionToggle.addEventListener('click', () => {
+        state.useDetection = !state.useDetection;
+        elements.detectionToggle.classList.toggle('active', state.useDetection);
+        showToast(`YOLO-OBB Object Detection ${state.useDetection ? 'enabled' : 'disabled'}`, 'info');
+      });
+    }
 
     // Pinecone RAG Toggle
     if (elements.ragToggle) {

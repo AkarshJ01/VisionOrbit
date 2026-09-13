@@ -31,7 +31,7 @@
         </svg>
       </div>
       <h3>Drop images to analyze with VisionOrbit</h3>
-      <p>Supports PNG, JPG, JPEG, WEBP, and GIF</p>
+      <p>Supports TIFF / GeoTIFF (.tif, .tiff), PNG, JPG, JPEG, WEBP, and GIF</p>
     </div>
   </div>
 
@@ -51,7 +51,7 @@
           </div>
           <div class="brand-text">
             <h2>VisionOrbit</h2>
-            <span class="badge">RAG & Vision</span>
+            <span class="badge">YOLO-OBB & RAG</span>
           </div>
         </div>
         <button id="sidebarCloseBtn" class="icon-btn mobile-only" title="Close sidebar" aria-label="Close sidebar">
@@ -82,7 +82,7 @@
           <div class="provider-dot active" id="providerDot"></div>
           <span class="provider-name" id="currentProviderLabel">Ollama gpt-oss:20b</span>
         </div>
-        <div class="provider-sub" id="providerSubText">Pinecone RAG Active</div>
+        <div class="provider-sub" id="providerSubText">YOLO-OBB + Pinecone RAG Active</div>
       </div>
 
       <!-- Sidebar Footer -->
@@ -110,7 +110,7 @@
           <!-- Model Selector Dropdown -->
           <div class="model-selector-wrapper">
             <select id="modelSelector" class="model-select" aria-label="Select AI Model">
-              <option value="ollama:gpt-oss:20b">🦙 Ollama gpt-oss:20b (Pinecone RAG)</option>
+              <option value="ollama:gpt-oss:20b">🦙 Ollama gpt-oss:20b (YOLO + RAG)</option>
               <option value="ollama:qwen2.5-coder:14b">🦙 Ollama qwen2.5-coder:14b</option>
               <option value="ollama:llama3.1:8b">🦙 Ollama llama3.1:8b</option>
               <option value="builtin:visionorbit-core">✨ VisionOrbit Smart Core (Built-in)</option>
@@ -121,6 +121,12 @@
         </div>
 
         <div class="nav-right">
+          <!-- YOLO-OBB Detection Toggle Button -->
+          <button id="detectionToggle" class="chip-btn active" title="Toggle Real-Time YOLO-OBB Object Detection">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            <span>YOLO-OBB</span>
+          </button>
+
           <!-- Pinecone RAG Toggle Button -->
           <button id="ragToggle" class="chip-btn active" title="Toggle Pinecone Document Knowledge Base">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
@@ -151,13 +157,19 @@
         <!-- Welcoming Hero Handle (Empty State) -->
         <div id="welcomeHero" class="welcome-hero">
           <div class="hero-badge">
-            <span class="pulse-spark"></span> Pinecone RAG & Multimodal AI
+            <span class="pulse-spark"></span> Real-Time YOLO-OBB & Pinecone RAG
           </div>
-          <h1 class="hero-title">What would you like to ask or analyze?</h1>
-          <p class="hero-subtitle">Ask questions from your Pinecone document knowledge base (SAR PDFs), upload images, and get detailed grounded answers.</p>
+          <h1 class="hero-title">What would you like to analyze or ask?</h1>
+          <p class="hero-subtitle">Upload satellite imagery (.tif, .png, .jpg) for instant Oriented Bounding Box object detection and ask questions grounded in your Pinecone knowledge base.</p>
 
           <!-- Quick Starter Capability Cards -->
           <div class="prompt-suggestions-grid">
+            <div class="suggestion-card" data-prompt="Detect and count all aircraft, ships, and vehicles in this satellite image." data-badge="YOLO-OBB">
+              <div class="sugg-icon">🎯</div>
+              <div class="sugg-title">Satellite Target Detection</div>
+              <div class="sugg-desc">Identify aircraft, ships, vehicles & infrastructure with bounding boxes</div>
+            </div>
+
             <div class="suggestion-card" data-prompt="What is SAR imagery, and how is it different from optical satellite imagery?" data-badge="Pinecone RAG">
               <div class="sugg-icon">🛰️</div>
               <div class="sugg-title">SAR Satellite Imagery Q&A</div>
@@ -170,16 +182,10 @@
               <div class="sugg-desc">Query document insights on biomass estimation and radar metrics</div>
             </div>
 
-            <div class="suggestion-card" data-prompt="Analyze this image in detail and extract all key visual elements and text." data-badge="General Vision">
-              <div class="sugg-icon">🔍</div>
-              <div class="sugg-title">Deep Visual Inspection</div>
-              <div class="sugg-desc">Extract key subjects, background context & telemetry</div>
-            </div>
-
-            <div class="suggestion-card" data-prompt="Extract all visible text and table data from this screenshot accurately." data-badge="OCR">
-              <div class="sugg-icon">📝</div>
-              <div class="sugg-title">OCR & Text Extraction</div>
-              <div class="sugg-desc">Transcribe typography, labels, signs & document text</div>
+            <div class="suggestion-card" data-prompt="Analyze the geospatial coordinates and distribution of detected targets." data-badge="Geolocation">
+              <div class="sugg-icon">📍</div>
+              <div class="sugg-title">Geospatial Telemetry</div>
+              <div class="sugg-desc">Extract WGS84 coordinates, dimensions, angles & surface distances</div>
             </div>
           </div>
 
@@ -193,11 +199,12 @@
               </svg>
             </div>
             <div class="dropzone-content">
-              <strong>Drag and drop images here</strong>, or <span class="browse-link">browse from files</span>
-              <div class="dropzone-meta">Supports PNG, JPG, JPEG, WEBP, GIF • Or type questions to search Pinecone documents</div>
+              <strong>Drag and drop satellite imagery (.tif, .png, .jpg)</strong>, or <span class="browse-link">browse from files</span>
+              <div class="dropzone-meta">Supports TIFF / GeoTIFF, PNG, JPG, WEBP • Dynamic real-time YOLO-OBB inference & Pinecone RAG</div>
             </div>
           </div>
         </div>
+
 
         <!-- Dynamic Message Stream -->
         <div id="messagesList" class="messages-list hidden"></div>
@@ -234,7 +241,7 @@
           <!-- Prompt Input Form -->
           <form id="chatForm" class="chat-form">
             <!-- Hidden File Input -->
-            <input type="file" id="imageFileInput" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" multiple class="hidden">
+            <input type="file" id="imageFileInput" accept=".tif, .tiff, image/tiff, image/png, image/jpeg, image/jpg, image/webp, image/gif" multiple class="hidden">
             
             <div class="input-controls-left">
               <!-- Upload Image Button -->
