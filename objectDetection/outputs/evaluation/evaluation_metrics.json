@@ -1,0 +1,193 @@
+{
+  "model": "models/best.pt",
+  "split": "test",
+  "device": "mps",
+  "precision": 0.3882783525853869,
+  "recall": 0.20739322772941365,
+  "mAP50": 0.13812749358297513,
+  "mAP50_95": 0.10067009724066611,
+  "per_class": {
+    "Small Car": {
+      "class_id": 0,
+      "precision": 0.3126,
+      "recall": 0.5398,
+      "mAP50": 0.2768,
+      "mAP50_95": 0.1353
+    },
+    "Van": {
+      "class_id": 1,
+      "precision": 0.2682,
+      "recall": 0.5624,
+      "mAP50": 0.2318,
+      "mAP50_95": 0.1257
+    },
+    "Dump Truck": {
+      "class_id": 2,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0206,
+      "mAP50_95": 0.0109
+    },
+    "Cargo Truck": {
+      "class_id": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Dry Cargo Ship": {
+      "class_id": 4,
+      "precision": 0.3354,
+      "recall": 0.4444,
+      "mAP50": 0.4494,
+      "mAP50_95": 0.2778
+    },
+    "Motorboat": {
+      "class_id": 5,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Intersection": {
+      "class_id": 6,
+      "precision": 0.31,
+      "recall": 0.1538,
+      "mAP50": 0.1417,
+      "mAP50_95": 0.072
+    },
+    "other-vehicle": {
+      "class_id": 7,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Fishing Boat": {
+      "class_id": 8,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "other-ship": {
+      "class_id": 9,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "other-airplane": {
+      "class_id": 10,
+      "precision": 0.1937,
+      "recall": 0.6364,
+      "mAP50": 0.3809,
+      "mAP50_95": 0.3064
+    },
+    "A220": {
+      "class_id": 11,
+      "precision": 0.4027,
+      "recall": 0.7333,
+      "mAP50": 0.4064,
+      "mAP50_95": 0.3568
+    },
+    "Liquid Cargo Ship": {
+      "class_id": 12,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Tennis Court": {
+      "class_id": 13,
+      "precision": 0.8682,
+      "recall": 1.0,
+      "mAP50": 0.995,
+      "mAP50_95": 0.7987
+    },
+    "Boeing737": {
+      "class_id": 14,
+      "precision": 0.219,
+      "recall": 0.6667,
+      "mAP50": 0.4284,
+      "mAP50_95": 0.3419
+    },
+    "Tugboat": {
+      "class_id": 15,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Bus": {
+      "class_id": 16,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Passenger Ship": {
+      "class_id": 17,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Engineering Ship": {
+      "class_id": 18,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "A321": {
+      "class_id": 19,
+      "precision": 0.1855,
+      "recall": 0.6554,
+      "mAP50": 0.2235,
+      "mAP50_95": 0.1844
+    },
+    "Excavator": {
+      "class_id": 20,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Trailer": {
+      "class_id": 21,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Truck Tractor": {
+      "class_id": 22,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0369,
+      "mAP50_95": 0.0074
+    },
+    "Baseball Field": {
+      "class_id": 23,
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Football Field": {
+      "class_id": 24,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    },
+    "Warship": {
+      "class_id": 25,
+      "precision": 0.0,
+      "recall": 0.0,
+      "mAP50": 0.0,
+      "mAP50_95": 0.0
+    }
+  }
+}

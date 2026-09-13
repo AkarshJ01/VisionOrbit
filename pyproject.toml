@@ -1,10 +1,11 @@
 [project]
 name = "visionorbit"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI-powered vision-language assistant for satellite image analysis"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+<<<<<<< HEAD
     "torch>=2.0.0",
     "torchvision>=0.15.0",
     "numpy>=1.24.0",
@@ -13,4 +14,20 @@ dependencies = [
     "matplotlib>=3.7.0",
     "pillow>=9.0.0",
     "geopandas>=0.13.0"
+=======
+    "black>=26.5.1",
+    "fastapi>=0.141.1",
+    "isort>=8.0.1",
+    "langchain>=1.3.1",
+    "langchain-community>=0.4.2",
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.2.2",
+    "langchain-pinecone>=0.2.13",
+    "langchain-tavily>=0.2.18",
+    "pypdf>=6.18.1",
+    "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.32",
+    "tavily-python>=0.7.24",
+    "uvicorn>=0.52.4",
+>>>>>>> origin/main
 ]

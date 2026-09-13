@@ -1,0 +1,74 @@
+{
+  "total_images_in_hf": 1732,
+  "total_xmls_in_hf": 1732,
+  "total_xmls_parsed": 1732,
+  "total_objects": 82938,
+  "num_classes": 37,
+  "classes": {
+    "Small Car": 32887,
+    "Van": 29973,
+    "Dump Truck": 4618,
+    "Cargo Truck": 2671,
+    "Dry Cargo Ship": 2155,
+    "Motorboat": 1458,
+    "Intersection": 1285,
+    "other-vehicle": 1259,
+    "Fishing Boat": 762,
+    "other-ship": 654,
+    "other-airplane": 574,
+    "A220": 478,
+    "Liquid Cargo Ship": 430,
+    "Tennis Court": 410,
+    "Boeing737": 375,
+    "Tugboat": 347,
+    "Bus": 309,
+    "Passenger Ship": 289,
+    "Engineering Ship": 288,
+    "A321": 269,
+    "Excavator": 240,
+    "Trailer": 216,
+    "Truck Tractor": 213,
+    "Baseball Field": 149,
+    "Football Field": 132,
+    "Warship": 93,
+    "Basketball Court": 67,
+    "Tractor": 67,
+    "A330": 58,
+    "Boeing787": 58,
+    "Bridge": 53,
+    "Boeing747": 37,
+    "Boeing777": 24,
+    "ARJ21": 18,
+    "A350": 15,
+    "Roundabout": 4,
+    "C919": 3
+  },
+  "image_dimensions": [
+    {
+      "width": 1500.0,
+      "height": 1500.0,
+      "depth": 3,
+      "count": 474
+    },
+    {
+      "width": 1000.0,
+      "height": 1000.0,
+      "depth": 3,
+      "count": 1235
+    },
+    {
+      "width": 5000.0,
+      "height": 5000.0,
+      "depth": 3,
+      "count": 7
+    },
+    {
+      "width": 3000.0,
+      "height": 3000.0,
+      "depth": 3,
+      "count": 16
+    }
+  ],
+  "malformed_xmls_count": 0,
+  "invalid_coords_count": 40
+}
