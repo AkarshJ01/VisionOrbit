@@ -1,7 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "visionorbit"
 version = "0.1.0"
-description = "Add your description here"
+description = "SpaceNet 7 Multi-Temporal Satellite Urban Change Detection and Event Extraction"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.11"
+authors = [
+    { name = "VisionOrbit Team" }
+]
+dependencies = [
+    "numpy",
+    "torch",
+    "rasterio",
+    "scipy",
+    "pyproj",
+    "geopandas",
+    "matplotlib",
+    "affine"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["models*", "datasets*", "inference*", "preprocessing*", "training*", "evaluation*", "rag*", "visualization*"]

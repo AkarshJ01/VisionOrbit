@@ -3,3 +3,6 @@ torch
 rasterio
 scipy
 pyproj
+geopandas
+matplotlib
+affine

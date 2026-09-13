@@ -1,11 +1,8 @@
-"""Root backward-compatibility shim for VisionOrbit change detector.
-
-Re-exports public symbols from `inference.change_detector`.
-"""
+"""Inference module for VisionOrbit change detection."""
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -36,7 +33,3 @@ __all__ = [
     "create_events",
     "merge_regions",
 ]
-
-if __name__ == "__main__":
-    from inference.change_detector import main
-    main()
