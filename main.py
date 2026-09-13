@@ -118,6 +118,8 @@ async def get_models(ollama_url: Optional[str] = None):
         }
     }
 
+from backend.detection_service import detection_service
+
 @app.post("/api/rag")
 async def rag_direct_endpoint(request: RagRequest):
     """Direct invocation of rag.py retrieval chain."""
@@ -135,9 +137,25 @@ async def rag_direct_endpoint(request: RagRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/detect")
+async def detect_direct_endpoint(request: ImageAnalysisRequest):
+    """Direct invocation of YOLO-OBB real-time object detection."""
+    try:
+        loop = asyncio.get_running_loop()
+        res = await loop.run_in_executor(
+            None,
+            lambda: detection_service.detect(
+                request.image,
+                conf_threshold=request.confThreshold or 0.20
+            )
+        )
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
-    """Main multimodal chat and Pinecone RAG endpoint."""
+    """Main multimodal chat, real-time YOLO object detection, and Pinecone RAG endpoint."""
     try:
         result = await vision_service.generate_response(
             prompt=request.prompt,
@@ -150,12 +168,16 @@ async def chat_endpoint(request: ChatRequest):
             tavily_key=request.tavilyApiKey,
             use_web_search=request.useWebSearch or False,
             use_rag=request.useRag if request.useRag is not None else True,
-            system_prompt=request.systemPrompt
+            system_prompt=request.systemPrompt,
+            conf_threshold=request.confThreshold if request.confThreshold is not None else 0.20,
+            use_detection=request.useDetection if request.useDetection is not None else True
         )
         return ChatResponse(
             reply=result.get("reply", ""),
             provider_used=result.get("provider_used", "VisionOrbit Engine"),
             model_used=result.get("model_used", "VisionOrbit Core"),
+            annotated_image=result.get("annotated_image"),
+            detection_results=result.get("detection_results"),
             image_metadata=result.get("image_metadata", []),
             search_sources=result.get("search_sources", []),
             rag_sources=result.get("rag_sources", [])
@@ -165,13 +187,30 @@ async def chat_endpoint(request: ChatRequest):
 
 @app.post("/api/upload")
 async def upload_image(file: UploadFile = File(...)):
-    """Upload an image file and return its base64 data URL with metadata."""
+    """Upload an image file (supports TIFF, PNG, JPEG, WEBP) and return web-compatible data URL."""
     try:
         contents = await file.read()
-        mime_type = file.content_type or "image/png"
-        b64 = base64.b64encode(contents).decode("utf-8")
-        data_url = f"data:{mime_type};base64,{b64}"
-        metadata = vision_service.parse_image_info(data_url)
+        filename_lower = (file.filename or "").lower()
+        
+        # If TIFF/GeoTIFF, convert to displayable RGB JPEG for browser preview
+        if filename_lower.endswith(('.tif', '.tiff')) or file.content_type in ["image/tiff", "image/tif"]:
+            img_rgb, fmt, w, h = detection_service.decode_image_data(contents)
+            data_url = detection_service.encode_image_to_data_url(img_rgb)
+            mime_type = "image/jpeg"
+            metadata = {
+                "format": "TIFF (Converted for Preview)",
+                "width": w,
+                "height": h,
+                "aspect_ratio": f"{round(w/h, 2)}:1" if h > 0 else "1:1",
+                "size_kb": round(len(contents)/1024, 2),
+                "is_valid": True
+            }
+        else:
+            mime_type = file.content_type or "image/png"
+            b64 = base64.b64encode(contents).decode("utf-8")
+            data_url = f"data:{mime_type};base64,{b64}"
+            metadata = vision_service.parse_image_info(data_url)
+
         return {
             "filename": file.filename,
             "data_url": data_url,
@@ -180,6 +219,7 @@ async def upload_image(file: UploadFile = File(...)):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to process image: {str(e)}")
+
 
 # Mount static files at /static
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

@@ -146,6 +146,7 @@ def print_detection_report(image_name, img_w, img_h, detections, model_name="YOL
     print("=" * 80 + "\n")
 
 def predict(source, model_path="models/best.pt", conf=0.20, iou=0.45, tiled=True, tile_size=640,
+            enhance_contrast=True, multi_scale_fusion=True,
             save_dir="outputs/predictions", reference_lat=None, reference_lon=None, pairwise=False):
     
     source = os.path.expanduser(source)
@@ -174,7 +175,12 @@ def predict(source, model_path="models/best.pt", conf=0.20, iou=0.45, tiled=True
         geo_engine = GeoReferenceEngine(fpath)
         
         annotated_img, raw_dets = inferrer.predict_image(
-            img_rgb, conf_threshold=conf, iou_threshold=iou, use_tiling=tiled
+            img_rgb,
+            conf_threshold=conf,
+            iou_threshold=iou,
+            use_tiling=tiled,
+            enhance_contrast=enhance_contrast,
+            multi_scale_fusion=multi_scale_fusion
         )
         
         # Save annotated image
@@ -274,6 +280,8 @@ if __name__ == "__main__":
     parser.add_argument("--reference-lat", type=float, default=None, help="Reference latitude for distance calculation")
     parser.add_argument("--reference-lon", type=float, default=None, help="Reference longitude for distance calculation")
     parser.add_argument("--calc-pairwise-dist", action="store_true", help="Calculate pairwise distances between detected objects")
+    parser.add_argument("--no-contrast", action="store_true", help="Disable adaptive CLAHE contrast enhancement")
+    parser.add_argument("--no-multiscale", action="store_true", help="Disable global multi-scale context fusion")
     
     args = parser.parse_args()
     predict(
@@ -283,8 +291,11 @@ if __name__ == "__main__":
         iou=args.iou,
         tiled=args.tiled,
         tile_size=args.tile_size,
+        enhance_contrast=not args.no_contrast,
+        multi_scale_fusion=not args.no_multiscale,
         save_dir=args.save_dir,
         reference_lat=args.reference_lat,
         reference_lon=args.reference_lon,
         pairwise=args.calc_pairwise_dist
     )
+
