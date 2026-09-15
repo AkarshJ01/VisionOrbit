@@ -1,0 +1,943 @@
+{
+  "source_image": "uploads/bfb19c2a6dbd4c83b95007fcd6b01502.npy",
+  "filename": "bfb19c2a6dbd4c83b95007fcd6b01502.npy",
+  "image_dimensions": {
+    "width": 256,
+    "height": 256,
+    "channels": 3
+  },
+  "georeferencing": {
+    "is_georeferenced": false,
+    "crs": null,
+    "bounds": null
+  },
+  "detection_count": 22,
+  "reference_point": null,
+  "distance_measurement_note": "Distances represent 2D geographic surface geodesic distance on Earth's ellipsoid (WGS84), distinct from 3D sensor-to-object altitude.",
+  "detections": [
+    {
+      "id": 1,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.3307,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          98.9,
+          231.6
+        ],
+        "width_px": 3.4,
+        "height_px": 2.3,
+        "angle_degrees": -90.2,
+        "bbox_xywh_px": [
+          97.8,
+          230.0,
+          2.3,
+          3.4
+        ],
+        "polygon_corners_px": [
+          [
+            97.8,
+            233.3
+          ],
+          [
+            100.1,
+            233.3
+          ],
+          [
+            100.1,
+            230.0
+          ],
+          [
+            97.8,
+            230.0
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 2,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.324,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          150.5,
+          252.9
+        ],
+        "width_px": 4.8,
+        "height_px": 2.6,
+        "angle_degrees": -102.98,
+        "bbox_xywh_px": [
+          148.8,
+          250.3,
+          3.6,
+          5.2
+        ],
+        "polygon_corners_px": [
+          [
+            149.8,
+            255.5
+          ],
+          [
+            152.3,
+            254.9
+          ],
+          [
+            151.3,
+            250.3
+          ],
+          [
+            148.8,
+            250.9
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 3,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.3165,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          124.4,
+          229.5
+        ],
+        "width_px": 3.8,
+        "height_px": 2.1,
+        "angle_degrees": -87.68,
+        "bbox_xywh_px": [
+          123.3,
+          227.6,
+          2.3,
+          3.8
+        ],
+        "polygon_corners_px": [
+          [
+            123.3,
+            231.3
+          ],
+          [
+            125.4,
+            231.4
+          ],
+          [
+            125.5,
+            227.7
+          ],
+          [
+            123.4,
+            227.6
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 4,
+      "class_id": 0,
+      "class_name": "Small Car",
+      "confidence": 0.313,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          9.2,
+          255.3
+        ],
+        "width_px": 3.4,
+        "height_px": 2.0,
+        "angle_degrees": -160.95,
+        "bbox_xywh_px": [
+          7.3,
+          253.8,
+          3.9,
+          3.0
+        ],
+        "polygon_corners_px": [
+          [
+            10.5,
+            256.8
+          ],
+          [
+            11.1,
+            254.9
+          ],
+          [
+            7.9,
+            253.8
+          ],
+          [
+            7.3,
+            255.7
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 5,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2964,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          222.1,
+          249.6
+        ],
+        "width_px": 3.3,
+        "height_px": 2.4,
+        "angle_degrees": -91.62,
+        "bbox_xywh_px": [
+          220.8,
+          247.9,
+          2.5,
+          3.4
+        ],
+        "polygon_corners_px": [
+          [
+            220.9,
+            251.3
+          ],
+          [
+            223.3,
+            251.3
+          ],
+          [
+            223.3,
+            247.9
+          ],
+          [
+            220.8,
+            248.0
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 6,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2896,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          128.3,
+          230.9
+        ],
+        "width_px": 4.4,
+        "height_px": 2.5,
+        "angle_degrees": -84.94,
+        "bbox_xywh_px": [
+          126.8,
+          228.5,
+          2.9,
+          4.6
+        ],
+        "polygon_corners_px": [
+          [
+            126.8,
+            233.0
+          ],
+          [
+            129.3,
+            233.2
+          ],
+          [
+            129.7,
+            228.8
+          ],
+          [
+            127.2,
+            228.5
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 7,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2878,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          212.5,
+          251.1
+        ],
+        "width_px": 3.2,
+        "height_px": 1.9,
+        "angle_degrees": -88.59,
+        "bbox_xywh_px": [
+          211.5,
+          249.5,
+          2.0,
+          3.2
+        ],
+        "polygon_corners_px": [
+          [
+            211.5,
+            252.6
+          ],
+          [
+            213.4,
+            252.7
+          ],
+          [
+            213.5,
+            249.5
+          ],
+          [
+            211.6,
+            249.5
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 8,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2728,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          150.0,
+          248.3
+        ],
+        "width_px": 5.1,
+        "height_px": 2.2,
+        "angle_degrees": -150.21,
+        "bbox_xywh_px": [
+          147.2,
+          246.1,
+          5.5,
+          4.4
+        ],
+        "polygon_corners_px": [
+          [
+            151.6,
+            250.5
+          ],
+          [
+            152.7,
+            248.6
+          ],
+          [
+            148.3,
+            246.1
+          ],
+          [
+            147.2,
+            247.9
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 9,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2662,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          142.1,
+          249.4
+        ],
+        "width_px": 3.5,
+        "height_px": 2.1,
+        "angle_degrees": -91.24,
+        "bbox_xywh_px": [
+          141.0,
+          247.6,
+          2.2,
+          3.5
+        ],
+        "polygon_corners_px": [
+          [
+            141.1,
+            251.1
+          ],
+          [
+            143.2,
+            251.1
+          ],
+          [
+            143.1,
+            247.6
+          ],
+          [
+            141.0,
+            247.6
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 10,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2537,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          61.1,
+          254.0
+        ],
+        "width_px": 3.5,
+        "height_px": 2.3,
+        "angle_degrees": -94.04,
+        "bbox_xywh_px": [
+          59.9,
+          252.1,
+          2.6,
+          3.7
+        ],
+        "polygon_corners_px": [
+          [
+            60.1,
+            255.8
+          ],
+          [
+            62.4,
+            255.6
+          ],
+          [
+            62.2,
+            252.1
+          ],
+          [
+            59.9,
+            252.3
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 11,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2504,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          138.3,
+          248.1
+        ],
+        "width_px": 4.9,
+        "height_px": 2.7,
+        "angle_degrees": -109.74,
+        "bbox_xywh_px": [
+          136.3,
+          245.4,
+          4.2,
+          5.5
+        ],
+        "polygon_corners_px": [
+          [
+            137.9,
+            250.9
+          ],
+          [
+            140.4,
+            249.9
+          ],
+          [
+            138.8,
+            245.4
+          ],
+          [
+            136.3,
+            246.3
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 12,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2486,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          236.9,
+          230.7
+        ],
+        "width_px": 3.5,
+        "height_px": 1.9,
+        "angle_degrees": 176.01,
+        "bbox_xywh_px": [
+          235.1,
+          229.7,
+          3.6,
+          2.1
+        ],
+        "polygon_corners_px": [
+          [
+            238.7,
+            231.6
+          ],
+          [
+            238.6,
+            229.7
+          ],
+          [
+            235.1,
+            229.9
+          ],
+          [
+            235.2,
+            231.8
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 13,
+      "class_id": 0,
+      "class_name": "Small Car",
+      "confidence": 0.2479,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          100.8,
+          211.9
+        ],
+        "width_px": 4.8,
+        "height_px": 2.3,
+        "angle_degrees": -166.43,
+        "bbox_xywh_px": [
+          98.3,
+          210.2,
+          5.2,
+          3.4
+        ],
+        "polygon_corners_px": [
+          [
+            102.9,
+            213.6
+          ],
+          [
+            103.4,
+            211.3
+          ],
+          [
+            98.8,
+            210.2
+          ],
+          [
+            98.3,
+            212.5
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 14,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.24,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          216.5,
+          216.6
+        ],
+        "width_px": 4.3,
+        "height_px": 2.6,
+        "angle_degrees": -112.7,
+        "bbox_xywh_px": [
+          214.4,
+          214.1,
+          4.0,
+          5.0
+        ],
+        "polygon_corners_px": [
+          [
+            216.1,
+            219.1
+          ],
+          [
+            218.5,
+            218.1
+          ],
+          [
+            216.8,
+            214.1
+          ],
+          [
+            214.4,
+            215.1
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 15,
+      "class_id": 0,
+      "class_name": "Small Car",
+      "confidence": 0.2337,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          115.3,
+          193.0
+        ],
+        "width_px": 3.5,
+        "height_px": 1.6,
+        "angle_degrees": -176.02,
+        "bbox_xywh_px": [
+          113.5,
+          192.1,
+          3.6,
+          1.8
+        ],
+        "polygon_corners_px": [
+          [
+            117.0,
+            193.9
+          ],
+          [
+            117.1,
+            192.4
+          ],
+          [
+            113.6,
+            192.1
+          ],
+          [
+            113.5,
+            193.7
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 16,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2333,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          156.5,
+          244.4
+        ],
+        "width_px": 4.5,
+        "height_px": 2.6,
+        "angle_degrees": -134.85,
+        "bbox_xywh_px": [
+          154.0,
+          241.9,
+          5.0,
+          5.0
+        ],
+        "polygon_corners_px": [
+          [
+            157.2,
+            246.9
+          ],
+          [
+            159.0,
+            245.1
+          ],
+          [
+            155.9,
+            241.9
+          ],
+          [
+            154.0,
+            243.8
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 17,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2271,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          12.3,
+          250.3
+        ],
+        "width_px": 5.0,
+        "height_px": 2.0,
+        "angle_degrees": -165.55,
+        "bbox_xywh_px": [
+          9.7,
+          248.7,
+          5.3,
+          3.2
+        ],
+        "polygon_corners_px": [
+          [
+            14.5,
+            251.9
+          ],
+          [
+            15.0,
+            250.0
+          ],
+          [
+            10.2,
+            248.7
+          ],
+          [
+            9.7,
+            250.7
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 18,
+      "class_id": 0,
+      "class_name": "Small Car",
+      "confidence": 0.2251,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          93.5,
+          235.2
+        ],
+        "width_px": 3.7,
+        "height_px": 2.3,
+        "angle_degrees": -32.97,
+        "bbox_xywh_px": [
+          91.3,
+          233.2,
+          4.4,
+          4.0
+        ],
+        "polygon_corners_px": [
+          [
+            92.6,
+            237.2
+          ],
+          [
+            95.7,
+            235.1
+          ],
+          [
+            94.4,
+            233.2
+          ],
+          [
+            91.3,
+            235.2
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 19,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2242,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          143.7,
+          238.2
+        ],
+        "width_px": 3.5,
+        "height_px": 1.9,
+        "angle_degrees": -88.92,
+        "bbox_xywh_px": [
+          142.7,
+          236.4,
+          2.0,
+          3.6
+        ],
+        "polygon_corners_px": [
+          [
+            142.7,
+            240.0
+          ],
+          [
+            144.7,
+            240.0
+          ],
+          [
+            144.7,
+            236.5
+          ],
+          [
+            142.8,
+            236.4
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 20,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2188,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          94.3,
+          230.6
+        ],
+        "width_px": 4.7,
+        "height_px": 2.3,
+        "angle_degrees": -139.1,
+        "bbox_xywh_px": [
+          91.8,
+          228.2,
+          5.1,
+          4.8
+        ],
+        "polygon_corners_px": [
+          [
+            95.4,
+            233.0
+          ],
+          [
+            96.9,
+            231.3
+          ],
+          [
+            93.3,
+            228.2
+          ],
+          [
+            91.8,
+            230.0
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 21,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2126,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          12.0,
+          251.5
+        ],
+        "width_px": 4.9,
+        "height_px": 1.9,
+        "angle_degrees": -165.91,
+        "bbox_xywh_px": [
+          9.4,
+          250.0,
+          5.2,
+          3.0
+        ],
+        "polygon_corners_px": [
+          [
+            14.2,
+            253.0
+          ],
+          [
+            14.6,
+            251.2
+          ],
+          [
+            9.9,
+            250.0
+          ],
+          [
+            9.4,
+            251.8
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 22,
+      "class_id": 0,
+      "class_name": "Small Car",
+      "confidence": 0.2016,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          112.1,
+          225.0
+        ],
+        "width_px": 4.2,
+        "height_px": 1.8,
+        "angle_degrees": -168.75,
+        "bbox_xywh_px": [
+          109.9,
+          223.7,
+          4.5,
+          2.6
+        ],
+        "polygon_corners_px": [
+          [
+            114.0,
+            226.3
+          ],
+          [
+            114.4,
+            224.5
+          ],
+          [
+            110.2,
+            223.7
+          ],
+          [
+            109.9,
+            225.5
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    }
+  ]
+}

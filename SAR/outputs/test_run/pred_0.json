@@ -1,0 +1,319 @@
+{
+  "source_image": "data/raw/images/0.tif",
+  "filename": "0.tif",
+  "image_dimensions": {
+    "width": 1500,
+    "height": 1500,
+    "channels": 3
+  },
+  "georeferencing": {
+    "is_georeferenced": true,
+    "crs": "EPSG:4326",
+    "bounds": {
+      "left": -118.1769919395448,
+      "bottom": 33.729400634765575,
+      "right": -118.16894531250013,
+      "top": 33.73744726181025
+    }
+  },
+  "detection_count": 5,
+  "reference_point": null,
+  "distance_measurement_note": "Distances represent 2D geographic surface geodesic distance on Earth's ellipsoid (WGS84), distinct from 3D sensor-to-object altitude.",
+  "detections": [
+    {
+      "id": 1,
+      "class_id": 12,
+      "class_name": "Liquid Cargo Ship",
+      "confidence": 0.5988,
+      "latitude": 33.736129,
+      "longitude": -118.169825,
+      "obb": {
+        "center_px": [
+          1335.5,
+          245.2
+        ],
+        "width_px": 371.2,
+        "height_px": 141.8,
+        "angle_degrees": -59.63,
+        "bbox_xywh_px": [
+          1180.5,
+          49.2,
+          310.0,
+          391.9
+        ],
+        "polygon_corners_px": [
+          [
+            1302.8,
+            441.1
+          ],
+          [
+            1490.5,
+            120.9
+          ],
+          [
+            1368.2,
+            49.2
+          ],
+          [
+            1180.5,
+            369.4
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            33.735078,
+            -118.17
+          ],
+          [
+            33.736796,
+            -118.168994
+          ],
+          [
+            33.737181,
+            -118.16965
+          ],
+          [
+            33.735463,
+            -118.170657
+          ]
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "class_id": 4,
+      "class_name": "Dry Cargo Ship",
+      "confidence": 0.4715,
+      "latitude": 33.735301,
+      "longitude": -118.173717,
+      "obb": {
+        "center_px": [
+          609.9,
+          399.5
+        ],
+        "width_px": 46.1,
+        "height_px": 13.8,
+        "angle_degrees": -148.32,
+        "bbox_xywh_px": [
+          586.6,
+          381.5,
+          46.5,
+          36.0
+        ],
+        "polygon_corners_px": [
+          [
+            625.9,
+            417.5
+          ],
+          [
+            633.1,
+            405.8
+          ],
+          [
+            593.8,
+            381.5
+          ],
+          [
+            586.6,
+            393.3
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            33.735205,
+            -118.173632
+          ],
+          [
+            33.735268,
+            -118.173593
+          ],
+          [
+            33.735398,
+            -118.173804
+          ],
+          [
+            33.735335,
+            -118.173843
+          ]
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "class_id": 4,
+      "class_name": "Dry Cargo Ship",
+      "confidence": 0.3833,
+      "latitude": 33.729931,
+      "longitude": -118.17337,
+      "obb": {
+        "center_px": [
+          674.7,
+          1400.6
+        ],
+        "width_px": 223.9,
+        "height_px": 113.2,
+        "angle_degrees": -42.77,
+        "bbox_xywh_px": [
+          554.0,
+          1283.0,
+          241.3,
+          235.2
+        ],
+        "polygon_corners_px": [
+          [
+            630.9,
+            1518.2
+          ],
+          [
+            795.3,
+            1366.1
+          ],
+          [
+            718.4,
+            1283.0
+          ],
+          [
+            554.0,
+            1435.1
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            33.7293,
+            -118.173605
+          ],
+          [
+            33.730116,
+            -118.172723
+          ],
+          [
+            33.730562,
+            -118.173135
+          ],
+          [
+            33.729746,
+            -118.174017
+          ]
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "class_id": 3,
+      "class_name": "Cargo Truck",
+      "confidence": 0.272,
+      "latitude": 33.735299,
+      "longitude": -118.173719,
+      "obb": {
+        "center_px": [
+          609.6,
+          400.0
+        ],
+        "width_px": 46.5,
+        "height_px": 15.2,
+        "angle_degrees": -149.67,
+        "bbox_xywh_px": [
+          585.7,
+          381.7,
+          47.8,
+          36.6
+        ],
+        "polygon_corners_px": [
+          [
+            625.8,
+            418.3
+          ],
+          [
+            633.5,
+            405.2
+          ],
+          [
+            593.4,
+            381.7
+          ],
+          [
+            585.7,
+            394.9
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            33.7352,
+            -118.173632
+          ],
+          [
+            33.735271,
+            -118.173591
+          ],
+          [
+            33.735397,
+            -118.173806
+          ],
+          [
+            33.735326,
+            -118.173847
+          ]
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "class_id": 4,
+      "class_name": "Dry Cargo Ship",
+      "confidence": 0.2679,
+      "latitude": 33.72977,
+      "longitude": -118.173451,
+      "obb": {
+        "center_px": [
+          659.6,
+          1430.7
+        ],
+        "width_px": 239.6,
+        "height_px": 57.7,
+        "angle_degrees": -41.81,
+        "bbox_xywh_px": [
+          551.0,
+          1329.4,
+          217.0,
+          202.7
+        ],
+        "polygon_corners_px": [
+          [
+            589.5,
+            1532.1
+          ],
+          [
+            768.1,
+            1372.4
+          ],
+          [
+            729.6,
+            1329.4
+          ],
+          [
+            551.0,
+            1489.1
+          ]
+        ],
+        "polygon_corners_latlon": [
+          [
+            33.729226,
+            -118.173827
+          ],
+          [
+            33.730082,
+            -118.172869
+          ],
+          [
+            33.730313,
+            -118.173075
+          ],
+          [
+            33.729457,
+            -118.174033
+          ]
+        ]
+      }
+    }
+  ]
+}

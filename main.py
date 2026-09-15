@@ -1,24 +1,62 @@
 import os
+import uuid
+import json
 import uvicorn
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+import asyncio
+import base64
+import numpy as np
+
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    HTTPException
+)
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
-from typing import List, Optional
-import base64
-import asyncio
+from fastapi.responses import FileResponse
+
+from typing import Optional
 
 import rag
-from backend.models import ChatRequest, ChatResponse, ImageAnalysisRequest, RagRequest
+
+from backend.models import (
+    ChatRequest,
+    ChatResponse,
+    ImageAnalysisRequest,
+    RagRequest
+)
+
 from backend.vision_service import vision_service
+from backend.detection_service import detection_service
+
+# ============================================================
+# SAR SENTINEL CNN
+# ============================================================
+
+from SAR.src.inference.sentinel_cnn import (
+    run_sentinel_inference,
+    extract_detections
+)
+
+
+# ============================================================
+# APP
+# ============================================================
 
 app = FastAPI(
     title="VisionOrbit API",
-    description="State-of-the-art Multimodal Vision & Pinecone RAG Prompting Interface",
-    version="1.2.0"
+    description=
+        "Multimodal Vision, SAR Inference and Pinecone RAG",
+    version="1.3.0"
 )
 
-# Enable CORS for development flexibility
+
+# ============================================================
+# CORS
+# ============================================================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,207 +65,1172 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static folder
-STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
-os.makedirs(STATIC_DIR, exist_ok=True)
-os.makedirs(os.path.join(STATIC_DIR, "css"), exist_ok=True)
-os.makedirs(os.path.join(STATIC_DIR, "js"), exist_ok=True)
-os.makedirs(os.path.join(STATIC_DIR, "images"), exist_ok=True)
+
+# ============================================================
+# DIRECTORIES
+# ============================================================
+
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+
+STATIC_DIR = os.path.join(
+    BASE_DIR,
+    "static"
+)
+
+UPLOAD_DIR = os.path.join(
+    BASE_DIR,
+    "uploads"
+)
+
+SAR_OUTPUT_DIR = os.path.join(
+    BASE_DIR,
+    "outputs",
+    "sar"
+)
+
+os.makedirs(
+    STATIC_DIR,
+    exist_ok=True
+)
+
+os.makedirs(
+    UPLOAD_DIR,
+    exist_ok=True
+)
+
+os.makedirs(
+    SAR_OUTPUT_DIR,
+    exist_ok=True
+)
+
+
+# ============================================================
+# STATIC
+# ============================================================
+
+app.mount(
+    "/static",
+    StaticFiles(
+        directory=STATIC_DIR
+    ),
+    name="static"
+)
+
+
+# ============================================================
+# HOME
+# ============================================================
 
 @app.get("/")
 async def serve_index():
-    index_path = os.path.join(STATIC_DIR, "index.html")
+
+    index_path = os.path.join(
+        STATIC_DIR,
+        "index.html"
+    )
+
     if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"message": "VisionOrbit API is running. Frontend index.html not found."}
+
+        return FileResponse(
+            index_path
+        )
+
+    return {
+        "message":
+            "VisionOrbit API is running."
+    }
+
+
+# ============================================================
+# HEALTH
+# ============================================================
 
 @app.get("/api/health")
 async def health_check():
+
     return {
-        "status": "ok",
-        "service": "VisionOrbit Multimodal AI & Pinecone RAG",
-        "has_pinecone": vision_service.has_pinecone,
-        "index_name": vision_service.pinecone_index,
-        "rag_module": "rag.py"
+
+        "status":
+            "ok",
+
+        "service":
+            "VisionOrbit Multimodal AI + SAR + RAG",
+
+        "has_pinecone":
+            vision_service.has_pinecone,
+
+        "index_name":
+            vision_service.pinecone_index,
+
+        "rag_module":
+            "rag.py",
+
+        "sar_model":
+            "models/best_model.pth"
     }
 
+
+# ============================================================
+# MODELS
+# ============================================================
+
 @app.get("/api/models")
-async def get_models(ollama_url: Optional[str] = None):
-    """Retrieve available models and provider capabilities."""
-    ollama_info = await vision_service.check_ollama_status(ollama_url)
-    has_env_openai = bool(os.getenv("OPENAI_API_KEY", "").strip())
-    has_env_tavily = bool(os.getenv("TAVILY_API_KEY", "").strip())
-    has_pinecone = vision_service.has_pinecone
-    
+async def get_models(
+    ollama_url: Optional[str] = None
+):
+
+    ollama_info = (
+        await vision_service
+        .check_ollama_status(
+            ollama_url
+        )
+    )
+
+    has_env_openai = bool(
+        os.getenv(
+            "OPENAI_API_KEY",
+            ""
+        ).strip()
+    )
+
+    has_env_tavily = bool(
+        os.getenv(
+            "TAVILY_API_KEY",
+            ""
+        ).strip()
+    )
+
+    has_pinecone = (
+        vision_service.has_pinecone
+    )
+
     ollama_models = []
+
     if ollama_info.get("available"):
-        # Prioritize gpt-oss:20b and other key models
-        all_m = ollama_info.get("all_models", [])
+
+        all_m = ollama_info.get(
+            "all_models",
+            []
+        )
+
         for m in all_m:
-            if "embed" in m.lower() or "nomic" in m.lower():
+
+            if (
+                "embed" in m.lower()
+                or
+                "nomic" in m.lower()
+            ):
                 continue
-            badge_desc = "Local LLM + Pinecone RAG"
-            if any(v in m.lower() for v in ["llava", "vision", "moondream"]):
-                badge_desc = "Local Multimodal Vision"
+
+            badge_desc = (
+                "Local LLM + Pinecone RAG"
+            )
+
+            if any(
+                v in m.lower()
+                for v in [
+                    "llava",
+                    "vision",
+                    "moondream"
+                ]
+            ):
+
+                badge_desc = (
+                    "Local Multimodal Vision"
+                )
+
             ollama_models.append({
-                "id": m,
-                "name": f"Ollama {m}",
-                "description": badge_desc
+
+                "id":
+                    m,
+
+                "name":
+                    f"Ollama {m}",
+
+                "description":
+                    badge_desc
             })
 
     return {
+
         "providers": [
+
             {
-                "id": "ollama",
-                "name": "Ollama Local (with Pinecone RAG)",
-                "badge": "Connected" if ollama_info.get("available") else "Offline",
-                "available": ollama_info.get("available", False),
-                "url": ollama_info.get("url"),
-                "models": ollama_models or [
-                    {"id": "gpt-oss:20b", "name": "Ollama gpt-oss:20b", "description": "High-capacity RAG Reasoning Model"}
+
+                "id":
+                    "ollama",
+
+                "name":
+                    "Ollama Local",
+
+                "badge":
+                    (
+                        "Connected"
+                        if ollama_info.get(
+                            "available"
+                        )
+                        else
+                        "Offline"
+                    ),
+
+                "available":
+                    ollama_info.get(
+                        "available",
+                        False
+                    ),
+
+                "url":
+                    ollama_info.get(
+                        "url"
+                    ),
+
+                "models":
+                    ollama_models or [
+                        {
+                            "id":
+                                "gpt-oss:20b",
+
+                            "name":
+                                "Ollama gpt-oss:20b",
+
+                            "description":
+                                "RAG Reasoning Model"
+                        }
+                    ]
+            },
+
+            {
+
+                "id":
+                    "builtin",
+
+                "name":
+                    "VisionOrbit Smart Engine",
+
+                "badge":
+                    "Active & Fast",
+
+                "available":
+                    True,
+
+                "models": [
+
+                    {
+
+                        "id":
+                            "visionorbit-core",
+
+                        "name":
+                            "VisionOrbit Core",
+
+                        "description":
+                            "Vision telemetry engine"
+                    }
                 ]
             },
+
             {
-                "id": "builtin",
-                "name": "VisionOrbit Smart Engine",
-                "badge": "Active & Fast",
-                "available": True,
+
+                "id":
+                    "openai",
+
+                "name":
+                    "OpenAI Vision",
+
+                "badge":
+                    (
+                        "Configured in .env"
+                        if has_env_openai
+                        else
+                        "API Key Required"
+                    ),
+
+                "available":
+                    True,
+
+                "configured":
+                    has_env_openai,
+
                 "models": [
-                    {"id": "visionorbit-core", "name": "VisionOrbit Multimodal Core", "description": "Instant visual telemetry & prompt engine"}
-                ]
-            },
-            {
-                "id": "openai",
-                "name": "OpenAI Vision (GPT-4o)",
-                "badge": "Configured in .env" if has_env_openai else "API Key Required",
-                "available": True,
-                "configured": has_env_openai,
-                "models": [
-                    {"id": "gpt-4o", "name": "GPT-4o (Omni Vision)", "description": "Flagship multimodal vision model"},
-                    {"id": "gpt-4o-mini", "name": "GPT-4o Mini", "description": "Fast & lightweight multimodal model"},
-                    {"id": "gpt-4-turbo", "name": "GPT-4 Turbo", "description": "High-accuracy vision reasoning"}
+
+                    {
+                        "id":
+                            "gpt-4o",
+
+                        "name":
+                            "GPT-4o",
+
+                        "description":
+                            "Multimodal vision model"
+                    },
+
+                    {
+                        "id":
+                            "gpt-4o-mini",
+
+                        "name":
+                            "GPT-4o Mini",
+
+                        "description":
+                            "Fast multimodal model"
+                    }
                 ]
             }
         ],
+
         "features": {
-            "has_tavily": has_env_tavily,
-            "has_openai": has_env_openai,
-            "has_ollama": ollama_info.get("available", False),
-            "has_pinecone": has_pinecone,
-            "pinecone_index": vision_service.pinecone_index
+
+            "has_tavily":
+                has_env_tavily,
+
+            "has_openai":
+                has_env_openai,
+
+            "has_ollama":
+                ollama_info.get(
+                    "available",
+                    False
+                ),
+
+            "has_pinecone":
+                has_pinecone,
+
+            "pinecone_index":
+                vision_service.pinecone_index,
+
+            "sar_npy":
+                True
         }
     }
 
-from backend.detection_service import detection_service
+
+# ============================================================
+# RAG DIRECT
+# ============================================================
 
 @app.post("/api/rag")
-async def rag_direct_endpoint(request: RagRequest):
-    """Direct invocation of rag.py retrieval chain."""
+async def rag_direct_endpoint(
+    request: RagRequest
+):
+
     try:
+
         loop = asyncio.get_running_loop()
+
         res = await loop.run_in_executor(
+
             None,
-            lambda: rag.retrival_chain_with_sources(
-                query=request.query,
-                model_name=request.model or "gpt-oss:20b",
-                k=request.k or 3
-            )
+
+            lambda:
+                rag.retrival_chain_with_sources(
+
+                    query=request.query,
+
+                    model_name=(
+                        request.model
+                        or
+                        "gpt-oss:20b"
+                    ),
+
+                    k=request.k or 3
+                )
         )
+
         return res
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+# ============================================================
+# NORMAL DETECTION
+# ============================================================
 
 @app.post("/api/detect")
-async def detect_direct_endpoint(request: ImageAnalysisRequest):
-    """Direct invocation of YOLO-OBB real-time object detection."""
+async def detect_direct_endpoint(
+    request: ImageAnalysisRequest
+):
+
     try:
+
         loop = asyncio.get_running_loop()
+
         res = await loop.run_in_executor(
+
             None,
-            lambda: detection_service.detect(
-                request.image,
-                conf_threshold=request.confThreshold or 0.20
+
+            lambda:
+                detection_service.detect(
+
+                    request.image,
+
+                    conf_threshold=
+                        request.confThreshold
+                        or
+                        0.20
+                )
+        )
+
+        return res
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+# ============================================================
+# SAR / SENTINEL CNN PIPELINE
+# ============================================================
+
+async def run_sar_pipeline(
+    npy_path: str,
+    prompt: str,
+    model_name: Optional[str] = None
+):
+
+    """
+    Complete Sentinel CNN pipeline:
+
+        NPY
+         ↓
+        Sentinel CNN
+         ↓
+        Segmentation mask
+         ↓
+        Connected detected regions
+         ↓
+        Pinecone RAG
+         ↓
+        Ollama LLM
+    """
+
+    print("\n")
+    print("=" * 80)
+    print("                 SENTINEL CNN PIPELINE")
+    print("=" * 80)
+
+    print(
+        f"[SAR] Input: {npy_path}"
+    )
+
+    print(
+        "[SAR] Running Sentinel CNN inference..."
+    )
+
+    # ========================================================
+    # SENTINEL CNN INFERENCE
+    # ========================================================
+
+    loop = asyncio.get_running_loop()
+
+    prediction = await loop.run_in_executor(
+
+        None,
+
+        lambda:
+            run_sentinel_inference(
+
+                npy_path=npy_path,
+
+                model_path=
+                    "SAR/models/best_model.pth",
+
+                threshold=0.5
+            )
+    )
+
+    if not prediction:
+
+        raise RuntimeError(
+            "Sentinel CNN inference returned no result."
+        )
+
+    # ========================================================
+    # EXTRACT REGIONS FROM SEGMENTATION MASK
+    # ========================================================
+
+    detections = extract_detections(
+        prediction["mask"]
+    )
+
+    detector_output = {
+
+        "model":
+            "Sentinel CNN",
+
+        "model_path":
+            "SAR/models/best_model.pth",
+
+        "input_channels":
+            7,
+
+        "input_shape":
+            prediction["input_shape"],
+
+        "mask_shape":
+            list(
+                prediction["mask"].shape
+            ),
+
+        "detections":
+            detections,
+
+        "detected_regions":
+            len(detections),
+
+        "positive_pixels":
+            int(
+                prediction["mask"].sum()
+            )
+    }
+
+    print(
+        f"[SAR] Input shape: "
+        f"{prediction['input_shape']}"
+    )
+
+    print(
+        f"[SAR] Mask shape: "
+        f"{prediction['mask'].shape}"
+    )
+
+    print(
+        f"[SAR] Positive pixels: "
+        f"{int(prediction['mask'].sum())}"
+    )
+
+    print(
+        f"[SAR] Sentinel CNN detected "
+        f"{len(detections)} regions."
+    )
+
+    # ========================================================
+    # RAG → LLM
+    # ========================================================
+
+    print(
+        "[RAG] Sending Sentinel CNN detector "
+        "output to Pinecone..."
+    )
+
+    rag_result = await loop.run_in_executor(
+
+        None,
+
+        lambda:
+            rag.detector_rag_chain(
+
+                query=prompt,
+
+                detector_output=
+                    detector_output,
+
+                model_name=
+                    "gpt-oss:20b",
+
+                k=3
+            )
+    )
+
+    print(
+        "[SAR] RAG + LLM pipeline complete."
+    )
+
+    print("=" * 80)
+
+    return {
+
+        "reply":
+            rag_result.get(
+                "reply",
+                ""
+            ),
+
+        "provider_used":
+            rag_result.get(
+                "provider_used",
+                "Sentinel CNN + RAG + LLM"
+            ),
+
+        "model_used":
+            rag_result.get(
+                "model_used",
+                "gpt-oss:20b"
+            ),
+
+        "annotated_image":
+            None,
+
+        "detection_results":
+            detector_output,
+
+        "image_metadata":
+            [],
+
+        "search_sources":
+            [],
+
+        "rag_sources":
+            rag_result.get(
+                "rag_sources",
+                []
+            )
+    }
+
+
+# ============================================================
+# CHAT
+# ============================================================
+
+@app.post(
+    "/api/chat",
+    response_model=ChatResponse
+)
+async def chat_endpoint(
+    request: ChatRequest
+):
+
+    try:
+
+        images = (
+            request.images
+            or []
+        )
+
+        # ====================================================
+        # CHECK FOR NPY
+        # ====================================================
+
+        npy_path = None
+
+        for image in images:
+
+            if (
+                isinstance(
+                    image,
+                    str
+                )
+                and
+                image.startswith(
+                    "npy://"
+                )
+            ):
+
+                npy_id = image[
+                    len("npy://"):
+                ]
+
+                candidate = os.path.join(
+                    UPLOAD_DIR,
+                    npy_id
+                )
+
+                if os.path.isfile(
+                    candidate
+                ):
+
+                    npy_path = candidate
+
+                    break
+
+        # ====================================================
+        # NPY → SENTINEL CNN → RAG → LLM
+        # ====================================================
+
+        if npy_path is not None:
+
+            print(
+                "\n[SYSTEM] .npy file detected."
+            )
+
+            print(
+                "[SYSTEM] Bypassing normal "
+                "vision_service pipeline."
+            )
+
+            print(
+                "[SYSTEM] .npy → "
+                "Sentinel CNN → RAG → LLM"
+            )
+
+            result = await run_sar_pipeline(
+
+                npy_path=npy_path,
+
+                prompt=request.prompt,
+
+                model_name=request.model
+            )
+
+            return ChatResponse(
+
+                reply=
+                    result["reply"],
+
+                provider_used=
+                    result["provider_used"],
+
+                model_used=
+                    result["model_used"],
+
+                annotated_image=
+                    result["annotated_image"],
+
+                detection_results=
+                    result["detection_results"],
+
+                image_metadata=
+                    result["image_metadata"],
+
+                search_sources=
+                    result["search_sources"],
+
+                rag_sources=
+                    result["rag_sources"]
+            )
+
+        # ====================================================
+        # NORMAL IMAGE → EXISTING OPTICAL / YOLO PIPELINE
+        # ====================================================
+
+        print(
+            "[SYSTEM] Normal image pipeline."
+        )
+
+        result = (
+            await vision_service
+            .generate_response(
+
+                prompt=request.prompt,
+
+                images=images,
+
+                history=
+                    request.history
+                    or [],
+
+                provider=
+                    request.provider
+                    or
+                    "auto",
+
+                model=
+                    request.model
+                    or
+                    "gpt-oss:20b",
+
+                api_key=
+                    request.apiKey,
+
+                ollama_base_url=
+                    request.ollamaBaseUrl,
+
+                tavily_key=
+                    request.tavilyApiKey,
+
+                use_web_search=
+                    request.useWebSearch
+                    or
+                    False,
+
+                use_rag=
+                    (
+                        request.useRag
+                        if
+                        request.useRag
+                        is not None
+                        else
+                        True
+                    ),
+
+                system_prompt=
+                    request.systemPrompt,
+
+                conf_threshold=
+                    (
+                        request.confThreshold
+                        if
+                        request.confThreshold
+                        is not None
+                        else
+                        0.20
+                    ),
+
+                use_detection=
+                    (
+                        request.useDetection
+                        if
+                        request.useDetection
+                        is not None
+                        else
+                        True
+                    )
             )
         )
-        return res
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/chat", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest):
-    """Main multimodal chat, real-time YOLO object detection, and Pinecone RAG endpoint."""
-    try:
-        result = await vision_service.generate_response(
-            prompt=request.prompt,
-            images=request.images or [],
-            history=request.history or [],
-            provider=request.provider or "auto",
-            model=request.model or "gpt-oss:20b",
-            api_key=request.apiKey,
-            ollama_base_url=request.ollamaBaseUrl,
-            tavily_key=request.tavilyApiKey,
-            use_web_search=request.useWebSearch or False,
-            use_rag=request.useRag if request.useRag is not None else True,
-            system_prompt=request.systemPrompt,
-            conf_threshold=request.confThreshold if request.confThreshold is not None else 0.20,
-            use_detection=request.useDetection if request.useDetection is not None else True
-        )
         return ChatResponse(
-            reply=result.get("reply", ""),
-            provider_used=result.get("provider_used", "VisionOrbit Engine"),
-            model_used=result.get("model_used", "VisionOrbit Core"),
-            annotated_image=result.get("annotated_image"),
-            detection_results=result.get("detection_results"),
-            image_metadata=result.get("image_metadata", []),
-            search_sources=result.get("search_sources", []),
-            rag_sources=result.get("rag_sources", [])
+
+            reply=
+                result.get(
+                    "reply",
+                    ""
+                ),
+
+            provider_used=
+                result.get(
+                    "provider_used",
+                    "VisionOrbit Engine"
+                ),
+
+            model_used=
+                result.get(
+                    "model_used",
+                    "VisionOrbit Core"
+                ),
+
+            annotated_image=
+                result.get(
+                    "annotated_image"
+                ),
+
+            detection_results=
+                result.get(
+                    "detection_results"
+                ),
+
+            image_metadata=
+                result.get(
+                    "image_metadata",
+                    []
+                ),
+
+            search_sources=
+                result.get(
+                    "search_sources",
+                    []
+                ),
+
+            rag_sources=
+                result.get(
+                    "rag_sources",
+                    []
+                )
         )
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+        print(
+            f"[CHAT ERROR] {e}"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+# ============================================================
+# UPLOAD
+# ============================================================
 
 @app.post("/api/upload")
-async def upload_image(file: UploadFile = File(...)):
-    """Upload an image file (supports TIFF, PNG, JPEG, WEBP) and return web-compatible data URL."""
+async def upload_file(
+    file: UploadFile = File(...)
+):
+
     try:
+
+        filename = (
+            file.filename
+            or
+            "uploaded_file"
+        )
+
+        filename_lower = (
+            filename.lower()
+        )
+
         contents = await file.read()
-        filename_lower = (file.filename or "").lower()
-        
-        # If TIFF/GeoTIFF, convert to displayable RGB JPEG for browser preview
-        if filename_lower.endswith(('.tif', '.tiff')) or file.content_type in ["image/tiff", "image/tif"]:
-            img_rgb, fmt, w, h = detection_service.decode_image_data(contents)
-            data_url = detection_service.encode_image_to_data_url(img_rgb)
-            mime_type = "image/jpeg"
-            metadata = {
-                "format": "TIFF (Converted for Preview)",
-                "width": w,
-                "height": h,
-                "aspect_ratio": f"{round(w/h, 2)}:1" if h > 0 else "1:1",
-                "size_kb": round(len(contents)/1024, 2),
-                "is_valid": True
+
+        # ====================================================
+        # NPY
+        # ====================================================
+
+        if filename_lower.endswith(
+            ".npy"
+        ):
+
+            file_id = (
+                f"{uuid.uuid4().hex}.npy"
+            )
+
+            save_path = os.path.join(
+                UPLOAD_DIR,
+                file_id
+            )
+
+            with open(
+                save_path,
+                "wb"
+            ) as f:
+
+                f.write(
+                    contents
+                )
+
+            # Validate NumPy file
+            try:
+
+                arr = np.load(
+                    save_path,
+                    allow_pickle=False
+                )
+
+                shape = list(
+                    arr.shape
+                )
+
+                dtype = str(
+                    arr.dtype
+                )
+
+            except Exception as e:
+
+                try:
+                    os.remove(
+                        save_path
+                    )
+                except Exception:
+                    pass
+
+                raise HTTPException(
+
+                    status_code=400,
+
+                    detail=
+                        f"Invalid .npy file: {e}"
+                )
+
+            print(
+                f"[UPLOAD] SAR NPY saved: "
+                f"{save_path}"
+            )
+
+            return {
+
+                "filename":
+                    filename,
+
+                "file_id":
+                    file_id,
+
+                "file_type":
+                    "npy",
+
+                "pipeline":
+                    "sar",
+
+                "npy_reference":
+                    f"npy://{file_id}",
+
+                "shape":
+                    shape,
+
+                "dtype":
+                    dtype,
+
+                "size_kb":
+                    round(
+                        len(contents) / 1024,
+                        2
+                    ),
+
+                "message":
+                    "SAR .npy file uploaded successfully."
             }
+
+        # ====================================================
+        # TIFF
+        # ====================================================
+
+        if (
+            filename_lower.endswith(
+                (".tif", ".tiff")
+            )
+            or
+            file.content_type
+            in [
+                "image/tiff",
+                "image/tif"
+            ]
+        ):
+
+            img_rgb, fmt, w, h = (
+                detection_service
+                .decode_image_data(
+                    contents
+                )
+            )
+
+            data_url = (
+                detection_service
+                .encode_image_to_data_url(
+                    img_rgb
+                )
+            )
+
+            mime_type = (
+                "image/jpeg"
+            )
+
+            metadata = {
+
+                "format":
+                    "TIFF (Converted for Preview)",
+
+                "width":
+                    w,
+
+                "height":
+                    h,
+
+                "aspect_ratio":
+                    (
+                        f"{round(w / h, 2)}:1"
+                        if h > 0
+                        else
+                        "1:1"
+                    ),
+
+                "size_kb":
+                    round(
+                        len(contents) / 1024,
+                        2
+                    ),
+
+                "is_valid":
+                    True
+            }
+
+        # ====================================================
+        # NORMAL IMAGE
+        # ====================================================
+
         else:
-            mime_type = file.content_type or "image/png"
-            b64 = base64.b64encode(contents).decode("utf-8")
-            data_url = f"data:{mime_type};base64,{b64}"
-            metadata = vision_service.parse_image_info(data_url)
+
+            mime_type = (
+                file.content_type
+                or
+                "image/png"
+            )
+
+            b64 = (
+                base64.b64encode(
+                    contents
+                ).decode(
+                    "utf-8"
+                )
+            )
+
+            data_url = (
+                f"data:{mime_type};base64,{b64}"
+            )
+
+            metadata = (
+                vision_service
+                .parse_image_info(
+                    data_url
+                )
+            )
 
         return {
-            "filename": file.filename,
-            "data_url": data_url,
-            "mime_type": mime_type,
-            "metadata": metadata
+
+            "filename":
+                filename,
+
+            "data_url":
+                data_url,
+
+            "mime_type":
+                mime_type,
+
+            "metadata":
+                metadata,
+
+            "file_type":
+                "image",
+
+            "pipeline":
+                "optical"
         }
+
+    except HTTPException:
+
+        raise
+
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to process image: {str(e)}")
+
+        raise HTTPException(
+
+            status_code=400,
+
+            detail=
+                f"Failed to process file: {str(e)}"
+        )
 
 
-# Mount static files at /static
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# ============================================================
+# MAIN
+# ============================================================
 
 def main():
-    port = int(os.getenv("PORT", 8000))
-    print(f"🚀 Starting VisionOrbit server with Pinecone RAG (rag.py) at http://localhost:{port}")
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
+    port = int(
+        os.getenv(
+            "PORT",
+            8000
+        )
+    )
+
+    print(
+        f"""
+🚀 VisionOrbit
+
+Server:
+http://localhost:{port}
+
+Pipelines:
+
+  IMAGE
+  └── Optical Detection / YOLO
+      └── RAG
+          └── LLM
+
+  .NPY
+  └── Sentinel CNN
+      └── Segmentation
+          └── RAG
+              └── LLM
+"""
+    )
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=port,
+        reload=True
+    )
+
 
 if __name__ == "__main__":
+
     main()

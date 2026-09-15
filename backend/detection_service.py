@@ -8,7 +8,7 @@ from PIL import Image
 from typing import Dict, Any, List, Optional, Tuple, Union
 
 # Ensure objectDetection directory is in Python path
-OBJECT_DETECTION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "objectDetection"))
+OBJECT_DETECTION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "SAR"))
 if OBJECT_DETECTION_DIR not in sys.path:
     sys.path.insert(0, OBJECT_DETECTION_DIR)
 
