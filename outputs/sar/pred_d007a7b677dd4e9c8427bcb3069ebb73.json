@@ -1,0 +1,145 @@
+{
+  "source_image": "/Users/akarshjaiswal/Desktop/VisionOrbit/uploads/d007a7b677dd4e9c8427bcb3069ebb73.npy",
+  "filename": "d007a7b677dd4e9c8427bcb3069ebb73.npy",
+  "image_dimensions": {
+    "width": 256,
+    "height": 256,
+    "channels": 3
+  },
+  "georeferencing": {
+    "is_georeferenced": false,
+    "crs": null,
+    "bounds": null
+  },
+  "detection_count": 3,
+  "reference_point": null,
+  "distance_measurement_note": "Distances represent 2D geographic surface geodesic distance on Earth's ellipsoid (WGS84), distinct from 3D sensor-to-object altitude.",
+  "detections": [
+    {
+      "id": 1,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.215,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          177.3,
+          193.1
+        ],
+        "width_px": 3.9,
+        "height_px": 2.4,
+        "angle_degrees": -124.88,
+        "bbox_xywh_px": [
+          175.2,
+          190.8,
+          4.2,
+          4.6
+        ],
+        "polygon_corners_px": [
+          [
+            177.4,
+            195.4
+          ],
+          [
+            179.4,
+            194.0
+          ],
+          [
+            177.1,
+            190.8
+          ],
+          [
+            175.2,
+            192.2
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 2,
+      "class_id": 0,
+      "class_name": "Small Car",
+      "confidence": 0.2063,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          199.2,
+          215.6
+        ],
+        "width_px": 4.2,
+        "height_px": 2.7,
+        "angle_degrees": -101.9,
+        "bbox_xywh_px": [
+          197.5,
+          213.3,
+          3.5,
+          4.7
+        ],
+        "polygon_corners_px": [
+          [
+            198.3,
+            218.0
+          ],
+          [
+            201.0,
+            217.4
+          ],
+          [
+            200.1,
+            213.3
+          ],
+          [
+            197.5,
+            213.9
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    },
+    {
+      "id": 3,
+      "class_id": 1,
+      "class_name": "Van",
+      "confidence": 0.2055,
+      "latitude": null,
+      "longitude": null,
+      "obb": {
+        "center_px": [
+          66.8,
+          182.1
+        ],
+        "width_px": 3.9,
+        "height_px": 2.4,
+        "angle_degrees": -103.42,
+        "bbox_xywh_px": [
+          65.1,
+          179.9,
+          3.3,
+          4.4
+        ],
+        "polygon_corners_px": [
+          [
+            66.0,
+            184.2
+          ],
+          [
+            68.4,
+            183.7
+          ],
+          [
+            67.5,
+            179.9
+          ],
+          [
+            65.1,
+            180.4
+          ]
+        ],
+        "polygon_corners_latlon": null
+      }
+    }
+  ]
+}

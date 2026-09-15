@@ -1,113 +1,132 @@
 import os
-from typing import List, Dict, Any, Tuple, Optional
-from dotenv import load_dotenv
+import json
+from typing import Optional, Dict, Any, Tuple, List
 
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaEmbeddings, ChatOllama
-# pyrefly: ignore [missing-import]
 from langchain_pinecone import PineconeVectorStore
 
-load_dotenv()
+from pinecone import Pinecone
+
+
+# ============================================================
+# CONFIG
+# ============================================================
 
 MODEL = "gpt-oss:20b"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
 
-# Initialize embeddings and LLM
-embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
-llm = ChatOllama(model=MODEL)
-
-_vectorstore = None
-_retriever = None
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 
 
-def get_vectorstore():
-    """Lazy initialize and return Pinecone VectorStore."""
-    global _vectorstore
-    if _vectorstore is None:
-        index_name = os.environ.get("INDEX_NAME", "")
-        if index_name:
-            _vectorstore = PineconeVectorStore(
-                index_name=index_name,
-                embedding=embeddings
-            )
-    return _vectorstore
+
+# ============================================================
+# EMBEDDINGS
+# ============================================================
+
+embeddings = OllamaEmbeddings(
+    model=EMBEDDING_MODEL
+)
 
 
-def get_retriever(k: int = 3):
-    """Get Pinecone retriever with specified k top documents."""
-    vectorstore = get_vectorstore()
-    if vectorstore is None:
-        return None
-    return vectorstore.as_retriever(search_kwargs={"k": k})
+# ============================================================
+# DEFAULT LLM
+# ============================================================
+
+llm = ChatOllama(
+    model=MODEL
+)
 
 
-# Global default retriever for backwards compatibility
-try:
-    if os.environ.get("INDEX_NAME"):
+# ============================================================
+# PINECONE
+# ============================================================
+
+pc = None
+index = None
+vectorstore = None
+retriver = None
+
+
+if PINECONE_API_KEY and PINECONE_INDEX:
+
+    try:
+
+        pc = Pinecone(
+            api_key=PINECONE_API_KEY
+        )
+
+        index = pc.Index(
+            PINECONE_INDEX
+        )
+
         vectorstore = PineconeVectorStore(
-            index_name=os.environ["INDEX_NAME"],
+            index=index,
             embedding=embeddings
         )
-        retriver = vectorstore.as_retriever(search_kwargs={"k": 3})
-    else:
-        vectorstore = None
-        retriver = None
-except Exception as e:
-    print(f"[RAG] Warning initializing vectorstore: {e}")
-    vectorstore = None
-    retriver = None
 
-prompt_template = ChatPromptTemplate.from_template("""
-You are an expert AI assistant specializing in satellite remote sensing, Synthetic Aperture Radar (SAR), and earth observation.
-Answer the user's question thoroughly and accurately based ONLY on the provided context from the knowledge base.
+        retriver = vectorstore.as_retriever(
+            search_kwargs={
+                "k": 3
+            }
+        )
 
-Guidelines:
-- Structure your answer clearly with Markdown headings, bullet points, and numbered lists where helpful.
-- Highlight key terminology in **bold**.
-- Explain technical mechanisms clearly (e.g. wavelength, polarization, penetration, active microwave vs passive optical).
-- If the context contains specific formulas, applications, or examples, include them.
-- If the context does not contain enough information to answer fully, state what is known from the context and what is missing.
+        print(
+            "[RAG] Pinecone initialized successfully."
+        )
 
-Context:
-{context}
+    except Exception as e:
 
-Question: {query}
+        print(
+            f"[RAG] Pinecone initialization failed: {e}"
+        )
 
-Detailed Answer:
-""")
+else:
+
+    print(
+        "[RAG] Pinecone environment variables not configured."
+    )
 
 
-def format_doc(docs) -> str:
-    """Format retrieved documents into a single string."""
-    return "\n\n".join(doc.page_content for doc in docs)
+# ============================================================
+# RETRIEVER
+# ============================================================
+
+def get_retriever(k: int = 3):
+
+    global vectorstore
+    global retriver
+
+    if vectorstore is None:
+        return retriver
+
+    try:
+
+        return vectorstore.as_retriever(
+            search_kwargs={
+                "k": k
+            }
+        )
+
+    except Exception as e:
+
+        print(
+            f"[RAG] Failed to create retriever: {e}"
+        )
+
+        return retriver
 
 
-def extract_sources(docs) -> List[Dict[str, Any]]:
-    """Extract structured source metadata and snippets from documents."""
-    sources = []
-    for i, doc in enumerate(docs):
-        source_path = doc.metadata.get("source", "Knowledge Base Document")
-        filename = os.path.basename(source_path)
-        page = doc.metadata.get("page", 0)
-        snippet = doc.page_content[:250].strip() + ("..." if len(doc.page_content) > 250 else "")
-        
-        sources.append({
-            "id": i + 1,
-            "filename": filename,
-            "source_path": source_path,
-            "page": page + 1 if isinstance(page, int) else page,
-            "snippet": snippet,
-            "content": doc.page_content
-        })
-    return sources
-
+# ============================================================
+# BASIC RETRIEVAL CHAIN
+# ============================================================
 
 def retrieve_documents(query: str, k: int = 3) -> Tuple[str, List[Dict[str, Any]]]:
     """Retrieve relevant documents and formatted sources from Pinecone."""
     r = get_retriever(k=k)
     if r is None:
         return "", []
-    
+
     try:
         docs = r.invoke(query)
         context = format_doc(docs)
@@ -118,105 +137,509 @@ def retrieve_documents(query: str, k: int = 3) -> Tuple[str, List[Dict[str, Any]
         return "", []
 
 
-def retrival_chain(query: str, model_name: Optional[str] = None) -> str:
-    """Core retrieval chain returning the final string output."""
-    r = get_retriever(k=3) or retriver
-    if r is None:
-        return "Pinecone index is not configured or available."
+def retrival_chain(
+    query: str,
+    model_name: Optional[str] = None
+):
 
-    # Step 1: Retrieve relevant documents
-    docs = r.invoke(query)
-    print(f"Retrieved {len(docs)} documents")
+    target_model = model_name or MODEL
 
-    # Step 2: Format documents into context
-    context = format_doc(docs)
+    # --------------------------------------------------------
+    # Normalize frontend Ollama model names
+    #
+    # Frontend may send:
+    #     ollama:gpt-oss:20b
+    #
+    # ChatOllama expects:
+    #     gpt-oss:20b
+    # --------------------------------------------------------
 
-    # Step 3: Create prompt
-    message = prompt_template.format_messages(
-        context=context,
-        query=query
+    if target_model.startswith("ollama:"):
+
+        target_model = target_model[
+            len("ollama:"):
+        ]
+
+    print(
+        f"[RAG] Using model: {target_model}"
     )
 
-    # Step 4: Ask the LLM
-    target_llm = ChatOllama(model=model_name) if model_name else llm
-    response = target_llm.invoke(message)
+    r = retriver
 
-    print("\nAnswer:")
-    print(response.content)
+    if r is None:
+
+        target_llm = ChatOllama(
+            model=target_model
+        )
+
+        response = target_llm.invoke(
+            query
+        )
+
+        return response.content
+
+    docs = r.invoke(
+        query
+    )
+
+    context = "\n\n".join(
+        doc.page_content
+        for doc in docs
+    )
+
+    message = f"""
+Use the following retrieved knowledge to answer the question.
+
+Retrieved knowledge:
+{context}
+
+Question:
+{query}
+
+Answer using only information supported by the retrieved knowledge
+and the question. Do not invent metadata or facts.
+"""
+
+    target_llm = ChatOllama(
+        model=target_model
+    )
+
+    response = target_llm.invoke(
+        message
+    )
 
     return response.content
 
 
+# ============================================================
+# RETRIEVAL WITH SOURCES
+# ============================================================
+
 def retrival_chain_with_sources(
-    query: str, 
-    model_name: Optional[str] = None, 
+    query: str,
+    model_name: Optional[str] = None,
     k: int = 3
 ) -> Dict[str, Any]:
-    """Full retrieval chain returning both the answer and source citations for the UI."""
+
+    r = get_retriever(
+        k=k
+    ) or retriver
+
     target_model = model_name or MODEL
-    r = get_retriever(k=k) or retriver
-    
-    if r is None:
-        try:
-            fallback_llm = ChatOllama(model=target_model)
-            response = fallback_llm.invoke(query)
-            return {
-                "reply": response.content,
-                "provider_used": f"Ollama Local ({target_model})",
-                "model_used": target_model,
-                "rag_sources": [],
-                "context": ""
-            }
-        except Exception as e:
-            return {
-                "reply": f"⚠️ Could not generate response: {str(e)}",
-                "provider_used": "RAG Error Handler",
-                "model_used": target_model,
-                "rag_sources": [],
-                "context": ""
-            }
 
-    # Step 1: Retrieve relevant documents
-    docs = r.invoke(query)
-    print(f"[RAG] Retrieved {len(docs)} documents for query: '{query[:40]}...'")
+    # --------------------------------------------------------
+    # Normalize Ollama model identifier
+    # --------------------------------------------------------
 
-    # Step 2: Format context and extract sources
-    context = format_doc(docs)
-    sources = extract_sources(docs)
+    if target_model.startswith("ollama:"):
 
-    # Step 3: Create prompt
-    message = prompt_template.format_messages(
-        context=context,
-        query=query
+        target_model = target_model[
+            len("ollama:"):
+        ]
+
+    print(
+        f"[RAG] Using model: {target_model}"
     )
 
-    # Step 4: Ask the LLM
+    # --------------------------------------------------------
+    # No retriever available
+    # --------------------------------------------------------
+
+    if r is None:
+
+        try:
+
+            fallback_llm = ChatOllama(
+                model=target_model
+            )
+
+            response = fallback_llm.invoke(
+                query
+            )
+
+            return {
+                "reply": response.content,
+                "provider_used":
+                    f"Ollama ({target_model})",
+                "model_used":
+                    target_model,
+                "rag_sources": [],
+                "context": ""
+            }
+
+        except Exception as e:
+
+            return {
+                "reply":
+                    f"LLM generation failed: {str(e)}",
+                "provider_used":
+                    "Ollama",
+                "model_used":
+                    target_model,
+                "rag_sources": [],
+                "context": ""
+            }
+
+    # --------------------------------------------------------
+    # Retrieve documents
+    # --------------------------------------------------------
+
     try:
-        target_llm = ChatOllama(model=target_model) if model_name else llm
-        response = target_llm.invoke(message)
-        reply_content = response.content
 
-        return {
-            "reply": reply_content,
-            "provider_used": f"Pinecone RAG + Ollama ({target_model})",
-            "model_used": target_model,
-            "rag_sources": sources,
-            "context": context
-        }
+        docs = r.invoke(
+            query
+        )
+
     except Exception as e:
-        print(f"[RAG] LLM generation error: {e}")
+
+        print(
+            f"[RAG] Retrieval failed: {e}"
+        )
+
+        docs = []
+
+    # --------------------------------------------------------
+    # Build context
+    # --------------------------------------------------------
+
+    context_parts = []
+
+    sources = []
+
+    for doc in docs:
+
+        context_parts.append(
+            doc.page_content
+        )
+
+        metadata = getattr(
+            doc,
+            "metadata",
+            {}
+        )
+
+        sources.append(
+            metadata
+        )
+
+    context = "\n\n".join(
+        context_parts
+    )
+
+    # --------------------------------------------------------
+    # LLM prompt
+    # --------------------------------------------------------
+
+    message = f"""
+You are an AI assistant analyzing satellite imagery.
+
+Use the retrieved knowledge below to help answer the user's question.
+
+Retrieved knowledge:
+{context}
+
+User question:
+{query}
+
+Rules:
+- Separate observations from retrieved knowledge.
+- Do not invent satellite metadata.
+- Do not invent sensor, date, CRS, GSD, or spectral-band information.
+- If something cannot be determined, explicitly say so.
+- Give a concise but useful answer.
+"""
+
+    # --------------------------------------------------------
+    # LLM
+    # --------------------------------------------------------
+
+    try:
+
+        target_llm = ChatOllama(
+            model=target_model
+        )
+
+        response = target_llm.invoke(
+            message
+        )
+
         return {
-            "reply": f"⚠️ Pinecone retrieval succeeded ({len(sources)} documents), but Ollama generation encountered an error: {str(e)}",
-            "provider_used": "RAG Error Handler",
-            "model_used": target_model,
-            "rag_sources": sources,
-            "context": context
+            "reply":
+                response.content,
+            "provider_used":
+                f"Ollama ({target_model})",
+            "model_used":
+                target_model,
+            "rag_sources":
+                sources,
+            "context":
+                context
+        }
+
+    except Exception as e:
+
+        return {
+            "reply":
+                f"LLM generation failed: {str(e)}",
+            "provider_used":
+                "RAG",
+            "model_used":
+                target_model,
+            "rag_sources":
+                sources,
+            "context":
+                context
         }
 
 
-if __name__ == "__main__":
-    print("Retrieving ...")
+# ============================================================
+# SAR DETECTOR + RAG + LLM
+# ============================================================
 
-    query = "What is SAR imagery, and how is it different from optical satellite imagery?"
+def detector_rag_chain(
+    query: str,
+    detector_output: dict,
+    model_name: Optional[str] = None,
+    k: int = 3
+) -> Dict[str, Any]:
 
-    retrival_chain(query)
+    print(
+        "\n[RAG] Starting detector → RAG → LLM pipeline..."
+    )
+
+    # ========================================================
+    # MODEL NORMALIZATION
+    # ========================================================
+
+    target_model = model_name or MODEL
+
+    # Frontend can send:
+    #
+    #     ollama:gpt-oss:20b
+    #
+    # but ChatOllama needs:
+    #
+    #     gpt-oss:20b
+    #
+    if target_model.startswith("ollama:"):
+
+        target_model = target_model[
+            len("ollama:"):
+        ]
+
+    print(
+        f"[RAG] model_name received: {model_name!r}"
+    )
+
+    print(
+        f"[RAG] target_model: {target_model!r}"
+    )
+
+    # ========================================================
+    # DETECTOR JSON
+    # ========================================================
+
+    detector_json = json.dumps(
+        detector_output,
+        indent=2,
+        default=str
+    )
+
+    print(
+        "[RAG] Detector output prepared."
+    )
+
+    # ========================================================
+    # BUILD RETRIEVAL QUERY
+    # ========================================================
+
+    retrieval_query = f"""
+Satellite image analysis.
+
+User question:
+{query}
+
+Detector output:
+{detector_json}
+
+Retrieve knowledge relevant to interpreting these detections,
+satellite imagery, object detection results, SAR imagery,
+and possible scene characteristics.
+"""
+
+    # ========================================================
+    # RETRIEVE DOCUMENTS
+    # ========================================================
+
+    r = get_retriever(
+        k=k
+    ) or retriver
+
+    docs = []
+
+    if r is not None:
+
+        try:
+
+            docs = r.invoke(
+                retrieval_query
+            )
+
+            print(
+                f"[RAG] Retrieved {len(docs)} documents."
+            )
+
+        except Exception as e:
+
+            print(
+                f"[RAG] Retrieval failed: {e}"
+            )
+
+    else:
+
+        print(
+            "[RAG] No Pinecone retriever available."
+        )
+
+    # ========================================================
+    # BUILD RAG CONTEXT
+    # ========================================================
+
+    context_parts = []
+
+    sources = []
+
+    for doc in docs:
+
+        page_content = getattr(
+            doc,
+            "page_content",
+            ""
+        )
+
+        if page_content:
+
+            context_parts.append(
+                page_content
+            )
+
+        metadata = getattr(
+            doc,
+            "metadata",
+            {}
+        )
+
+        sources.append(
+            metadata
+        )
+
+    context = "\n\n---\n\n".join(
+        context_parts
+    )
+
+    # ========================================================
+    # LLM PROMPT
+    # ========================================================
+
+    llm_prompt = f"""
+You are VisionOrbit, an AI system for satellite-image analysis.
+
+Analyze the provided detector output together with the retrieved
+RAG knowledge and answer the user's question.
+
+IMPORTANT:
+1. Clearly distinguish what is directly supported by the detector.
+2. Distinguish detector results from general knowledge retrieved
+   from RAG.
+3. Do not invent metadata.
+4. Do not assume the satellite, sensor, acquisition date, CRS,
+   GSD, spectral bands, geographic location, or resolution unless
+   explicitly provided.
+5. If something cannot be determined from the available data,
+   say that it cannot be determined.
+6. Do not treat a detector class as proof of a specific real-world
+   object if the detector output does not establish that.
+7. Mention uncertainty when appropriate.
+8. Keep the answer useful and reasonably concise.
+
+============================================================
+USER QUESTION
+============================================================
+
+{query}
+
+============================================================
+SAR DETECTOR OUTPUT
+============================================================
+
+{detector_json}
+
+============================================================
+RETRIEVED RAG KNOWLEDGE
+============================================================
+
+{context}
+
+============================================================
+ANSWER
+============================================================
+"""
+
+    # ========================================================
+    # CALL OLLAMA
+    # ========================================================
+
+    try:
+
+        print(
+            f"[RAG] Calling Ollama model: {target_model}"
+        )
+
+        target_llm = ChatOllama(
+            model=target_model
+        )
+
+        response = target_llm.invoke(
+            llm_prompt
+        )
+
+        print(
+            "[RAG] LLM generation successful."
+        )
+
+        return {
+            "reply":
+                response.content,
+            "provider_used":
+                f"SAR Detection + Pinecone RAG + Ollama ({target_model})",
+            "model_used":
+                target_model,
+            "rag_sources":
+                sources,
+            "context":
+                context,
+            "detector_output":
+                detector_output
+        }
+
+    except Exception as e:
+
+        print(
+            f"[RAG ERROR] LLM generation failed: {e}"
+        )
+
+        return {
+            "reply":
+                "Detector inference and RAG succeeded, "
+                f"but LLM generation failed: {str(e)}",
+            "provider_used":
+                "SAR Detection + RAG",
+            "model_used":
+                target_model,
+            "rag_sources":
+                sources,
+            "context":
+                context,
+            "detector_output":
+                detector_output
+        }

@@ -1,0 +1,18 @@
+{
+  "source_image": "uploads/bfb19c2a6dbd4c83b95007fcd6b01502.npy",
+  "filename": "bfb19c2a6dbd4c83b95007fcd6b01502.npy",
+  "image_dimensions": {
+    "width": 256,
+    "height": 7,
+    "channels": 3
+  },
+  "georeferencing": {
+    "is_georeferenced": false,
+    "crs": null,
+    "bounds": null
+  },
+  "detection_count": 0,
+  "reference_point": null,
+  "distance_measurement_note": "Distances represent 2D geographic surface geodesic distance on Earth's ellipsoid (WGS84), distinct from 3D sensor-to-object altitude.",
+  "detections": []
+}

@@ -226,3 +226,5 @@ objectDetection/tmp/
 # Local test images
 *.tif
 *.tiff
+SAR/models/best_model.pth
+SAR/models/best_model.pth
