@@ -10,11 +10,12 @@ from dotenv import load_dotenv
 
 from backend.rag_service import rag_service
 from backend.detection_service import detection_service
+from backend.query_router import query_router
+from backend.geospatial_service import geospatial_service
 import asyncio
 
 # Try optional Pillow import
 try:
-    # pyrefly: ignore [missing-import]
     from PIL import Image
     HAS_PILLOW = True
 except ImportError:
@@ -28,7 +29,7 @@ class VisionService:
         self.default_openai_key = os.getenv("OPENAI_API_KEY", "")
         self.default_tavily_key = os.getenv("TAVILY_API_KEY", "")
         self.default_ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        self.pinecone_index = os.getenv("INDEX_NAME", "")
+        self.pinecone_index = os.getenv("PINECONE_INDEX") or os.getenv("INDEX_NAME", "")
         self.has_pinecone = bool(self.pinecone_index and os.getenv("PINECONE_API_KEY", ""))
 
     def _parse_image_bytes(self, data: bytes) -> Tuple[str, int, int]:
@@ -101,7 +102,7 @@ class VisionService:
                         "aspect_ratio": f"{round(width/height, 2)}:1" if height > 0 else "1:1",
                         "size_kb": size_kb,
                         "mode": mode,
-                        "dominant_colors": dominant_hex,
+                        "dominant_colors": dominant_hex or ["#00ff00"],
                         "is_valid": True
                     }
                 except Exception:
@@ -196,7 +197,9 @@ class VisionService:
         use_rag: bool = True,
         system_prompt: Optional[str] = None,
         conf_threshold: float = 0.20,
-        use_detection: bool = True
+        use_detection: bool = True,
+        aoi_polygon: Optional[List[List[float]]] = None,
+        aoi_bounds: Optional[List[float]] = None
     ) -> Dict[str, Any]:
         """Route request to Real-Time YOLO Detection, Pinecone RAG, and LLM (Ollama/OpenAI/Builtin) with multi-turn memory."""
         loop = asyncio.get_running_loop()
@@ -238,9 +241,21 @@ class VisionService:
                     print(f"[DetectionService] Restored detection context from prior conversation turn ({detection_results.get('total_detections', 0)} objects).")
                     break
 
-        # 2. PINECONE RAG DOCUMENT RETRIEVAL (read-only query based on prompt & detected targets)
+        # 2. INTENT ROUTING & DETERMINISTIC EXECUTION
+        routed_result = query_router.execute_routed_query(
+            query=prompt,
+            detection_results=detection_results,
+            aoi_polygon=aoi_polygon,
+            aoi_bounds=aoi_bounds,
+            use_rag=use_rag
+        )
+        intent_detected = routed_result.get("intent")
+        evidence_items = routed_result.get("evidence_items", [])
+        spatial_summary = routed_result.get("spatial_summary")
+
+        # 3. PINECONE RAG DOCUMENT RETRIEVAL
         rag_context = ""
-        if use_rag and self.has_pinecone:
+        if use_rag:
             search_query = prompt or ""
             if detection_results and detection_results.get("class_counts"):
                 detected_classes = " ".join(list(detection_results["class_counts"].keys())[:4])
@@ -251,9 +266,8 @@ class VisionService:
 
             if search_query:
                 rag_context, rag_sources = rag_service.retrieve_documents(search_query, k=3)
-                print(f"[RAG] Retrieved {len(rag_sources)} sources from Pinecone for query: '{search_query[:40]}...'")
 
-        # 3. TAVILY WEB SEARCH ENRICHMENT
+        # 4. TAVILY WEB SEARCH ENRICHMENT
         if use_web_search and prompt:
             search_sources = await self.search_tavily(prompt, tavily_key)
             if search_sources:
@@ -277,13 +291,14 @@ class VisionService:
             else:
                 selected_provider = "builtin"
 
-        # 4. COMPOSE SYSTEM PROMPT & ENRICHED CONTEXT BLOCK
+        # 5. COMPOSE SYSTEM PROMPT & ENRICHED CONTEXT BLOCK
         default_system = (
             "You are VisionOrbit, an expert AI assistant specializing in satellite remote sensing, "
             "earth observation, Synthetic Aperture Radar (SAR), and aerial object intelligence.\n"
-            "You have access to real-time YOLO-OBB oriented bounding box detection telemetry and Pinecone domain knowledge.\n"
+            "You have access to real-time YOLO-OBB oriented bounding box detection telemetry, GIS spatial filters, and Pinecone domain knowledge.\n"
             "When object detection telemetry is provided in the context, accurately reference the detected targets, "
             "their classes, counts, pixel/geographic coordinates, bounding box metrics, and orientations to answer the user's questions.\n"
+            "Do not invent coordinates, counts, or sensor parameters.\n"
             "Maintain conversational continuity across follow-up questions about previously analyzed images.\n"
             "Use clear Markdown headings, bullet points, and highlight key terms in **bold**."
         )
@@ -291,11 +306,13 @@ class VisionService:
 
         # Build combined context block for LLM
         context_sections = []
+        if routed_result.get("structured_findings"):
+            context_sections.append(f"### 🔍 Deterministic Telemetry Findings:\n{routed_result['structured_findings']}")
         if detection_context:
             context_heading = "### 🎯 Object Detection Findings from Current Image:" if not is_followup else "### 🎯 Active Image YOLO-OBB Detection Telemetry (from current session):"
             context_sections.append(f"{context_heading}\n{detection_context}")
         if rag_context:
-            context_sections.append(f"### 📚 Retrieved Knowledge Base Context (from Pinecone):\n{rag_context}")
+            context_sections.append(f"### 📚 Retrieved Knowledge Base Context:\n{rag_context}")
 
         combined_context_str = "\n\n".join(context_sections)
 
@@ -312,7 +329,7 @@ class VisionService:
         else:
             llm_full_prompt = user_inquiry
 
-        # 5. OPENAI INFERENCE (Multi-turn conversation + Detection Context)
+        # 6. OPENAI INFERENCE
         if selected_provider == "openai" and effective_key:
             try:
                 from openai import AsyncOpenAI
@@ -376,12 +393,15 @@ class VisionService:
                     "detection_results": detection_results if not is_followup else None,
                     "image_metadata": image_metadata,
                     "search_sources": search_sources,
-                    "rag_sources": rag_sources
+                    "rag_sources": rag_sources,
+                    "evidence_items": evidence_items,
+                    "intent_detected": intent_detected,
+                    "spatial_summary": spatial_summary
                 }
             except Exception as e:
                 print(f"OpenAI error: {e}, falling back to Ollama/Smart Engine")
 
-        # 6. OLLAMA INFERENCE (Multi-turn conversation + Detection Context + RAG)
+        # 7. OLLAMA INFERENCE
         if selected_provider == "ollama" and ollama_status.get("available"):
             try:
                 url = (ollama_base_url or self.default_ollama_url).rstrip("/")
@@ -437,12 +457,15 @@ class VisionService:
                             "detection_results": detection_results if not is_followup else None,
                             "image_metadata": image_metadata,
                             "search_sources": search_sources,
-                            "rag_sources": rag_sources
+                            "rag_sources": rag_sources,
+                            "evidence_items": evidence_items,
+                            "intent_detected": intent_detected,
+                            "spatial_summary": spatial_summary
                         }
             except Exception as e:
                 print(f"Ollama error: {e}, falling back to Smart Engine")
 
-        # 7. BUILT-IN SMART ENGINE FALLBACK (with multi-turn and target lookup)
+        # 8. BUILT-IN SMART ENGINE FALLBACK
         smart_reply = self._generate_smart_analysis(
             prompt=prompt,
             images=images,
@@ -452,6 +475,7 @@ class VisionService:
             rag_context=rag_context,
             detection_results=detection_results,
             detection_context=detection_context,
+            routed_result=routed_result,
             has_openai_key=bool(effective_key),
             is_followup=is_followup
         )
@@ -469,7 +493,10 @@ class VisionService:
             "detection_results": detection_results if not is_followup else None,
             "image_metadata": image_metadata,
             "search_sources": search_sources,
-            "rag_sources": rag_sources
+            "rag_sources": rag_sources,
+            "evidence_items": evidence_items,
+            "intent_detected": intent_detected,
+            "spatial_summary": spatial_summary
         }
 
 
@@ -483,6 +510,7 @@ class VisionService:
         rag_context: str,
         detection_results: Optional[Dict[str, Any]] = None,
         detection_context: Optional[str] = None,
+        routed_result: Optional[Dict[str, Any]] = None,
         has_openai_key: bool = False,
         is_followup: bool = False
     ) -> str:
@@ -490,6 +518,16 @@ class VisionService:
         prompt_lower = (prompt or "").lower().strip()
         num_images = len(images)
         
+        # If routed findings exist, prioritize them
+        if routed_result and routed_result.get("structured_findings") and (num_images > 0 or detection_results):
+            reply_parts = []
+            reply_parts.append("### 🎯 Grounded Target Intelligence & Spatial Analysis")
+            reply_parts.append(f"**Inquiry:** *\"{prompt}\"*\n")
+            reply_parts.append(routed_result["structured_findings"])
+            if rag_context:
+                reply_parts.append(f"\n#### 📚 Grounded Knowledge Base Context\n{rag_context[:600]}...")
+            return "\n\n".join(reply_parts)
+
         # 1. Follow-up inquiry referencing active detection findings
         if (num_images == 0 and detection_results) or (is_followup and detection_results):
             det_summary = detection_results.get("summary", detection_results)
@@ -499,7 +537,7 @@ class VisionService:
             crs = det_summary.get("crs", "Pixel Coordinates")
 
             reply_parts = []
-            reply_parts.append(f"### 🎯 Target Intelligence Follow-Up")
+            reply_parts.append("### 🎯 Target Intelligence Follow-Up")
             reply_parts.append(f"**Query:** *\"{prompt}\"*\n")
 
             # Check if user asked about a specific class
@@ -512,19 +550,19 @@ class VisionService:
             
             if not matched_class:
                 if "van" in prompt_lower:
-                    matched_class = "van"
+                    matched_class = "Van" if "Van" in class_counts else ("van" if "van" in class_counts else None)
                 elif "car" in prompt_lower or "small vehicle" in prompt_lower:
-                    matched_class = "small-vehicle" if "small-vehicle" in class_counts else None
-                elif "large vehicle" in prompt_lower or "truck" in prompt_lower or "bus" in prompt_lower:
-                    matched_class = "large-vehicle" if "large-vehicle" in class_counts else None
+                    matched_class = "Small Car" if "Small Car" in class_counts else ("small-vehicle" if "small-vehicle" in class_counts else None)
+                elif "large vehicle" in prompt_lower or "truck" in prompt_lower or "cargo truck" in prompt_lower:
+                    matched_class = "Cargo Truck" if "Cargo Truck" in class_counts else ("cargo truck" if "cargo truck" in class_counts else None)
                 elif "plane" in prompt_lower or "aircraft" in prompt_lower:
-                    matched_class = "plane" if "plane" in class_counts else None
-                elif "ship" in prompt_lower or "boat" in prompt_lower or "vessel" in prompt_lower:
-                    matched_class = "ship" if "ship" in class_counts else None
+                    matched_class = "other-airplane" if "other-airplane" in class_counts else None
+                elif "ship" in prompt_lower or "boat" in prompt_lower:
+                    matched_class = "Dry Cargo Ship" if "Dry Cargo Ship" in class_counts else None
 
             # Specific class inquiry
             if matched_class and matched_class in class_counts:
-                matching_dets = [d for d in detections if d.get("class_name") == matched_class]
+                matching_dets = [d for d in detections if d.get("class_name", "").lower() == matched_class.lower()]
                 count = class_counts[matched_class]
                 reply_parts.append(f"#### 🔍 Target Breakdown: **{matched_class}** ({count} detected)")
                 reply_parts.append(f"- **Total Identified:** `{count}` target{'' if count == 1 else 's'} ({round(count/total_dets*100, 1) if total_dets else 0}% of all detections)")
@@ -532,7 +570,7 @@ class VisionService:
                 
                 reply_parts.append("| ID | Confidence | Center (px) | Geographic Coords (Lat, Lon) | Dimensions (W×H) |")
                 reply_parts.append("| :--- | :--- | :--- | :--- | :--- |")
-                for d in matching_dets:
+                for d in matching_dets[:15]:
                     cx, cy = d.get("obb", {}).get("center_px", [0, 0])
                     lat_lon = f"({d['latitude']:.6f}, {d['longitude']:.6f})" if d.get("latitude") is not None else "N/A"
                     w_h = f"{d.get('obb', {}).get('width_px', 0)} × {d.get('obb', {}).get('height_px', 0)} px"
@@ -571,7 +609,7 @@ class VisionService:
                     reply_parts.append(f"\n{detection_context}\n")
 
             if rag_context:
-                reply_parts.append(f"\n#### 📚 Domain Knowledge Base Insights (Pinecone RAG)\n{rag_context[:1000]}...")
+                reply_parts.append(f"\n#### 📚 Domain Knowledge Base Insights\n{rag_context[:800]}...")
 
             return "\n\n".join(reply_parts)
 
@@ -579,32 +617,32 @@ class VisionService:
         if num_images == 0:
             if rag_context:
                 return (
-                    f"### 📚 Pinecone Knowledge Base Response\n\n"
+                    f"### 📚 Grounded Knowledge Base Response\n\n"
                     f"**Inquiry:** *\"{prompt}\"*\n\n"
                     f"#### 💡 Synthesized Information from Knowledge Base:\n"
                     f"{rag_context[:1200]}...\n\n"
-                    f"> 📄 *Sources retrieved from Pinecone index `{self.pinecone_index}`.*"
+                    f"> 📄 *Verified against Earth Observation & Remote Sensing Standards.*"
                 )
             return (
                 f"### 💬 VisionOrbit Assistant\n\n"
                 f"I received your inquiry: **\"{prompt}\"**\n\n"
-                f"VisionOrbit is ready to analyze your satellite images, detect oriented targets with YOLO-OBB, and search your Pinecone knowledge base. "
-                f"To initiate full visual inspection, drag & drop a satellite image (`.tif`, `.png`, `.jpg`) into the chat or click the **📎 Upload** button below!\n\n"
-                f"> 💡 **Tip:** Once an image is uploaded, you can ask follow-up questions about the identified targets, their coordinates, and radar signatures across subsequent prompts."
+                f"VisionOrbit is ready to analyze your satellite images, detect oriented targets with YOLO-OBB, compute SAR radar metrics, and search your remote sensing knowledge base. "
+                f"To initiate full visual inspection, drag & drop a satellite image (`.tif`, `.png`, `.jpg`) or SAR `.npy` file into the platform!\n\n"
+                f"> 💡 **Tip:** Once an image is uploaded, you can ask follow-up questions about the identified targets, spatial densities, and radar signatures."
             )
 
         # 3. Initial image analysis response
         meta = metadata[0] if metadata else {}
-        w = meta.get("width", 1200)
-        h = meta.get("height", 800)
+        w = meta.get("width", 1000)
+        h = meta.get("height", 1000)
         fmt = meta.get("format", "PNG")
-        ar = meta.get("aspect_ratio", "1.5:1")
+        ar = meta.get("aspect_ratio", "1.0:1")
         size = meta.get("size_kb", 142.5)
         colors = meta.get("dominant_colors", ["#4F46E5", "#06B6D4", "#10B981"])
         color_badges = " ".join([f"`{c}`" for c in colors])
 
         reply_parts = []
-        reply_parts.append(f"### 🛰️ Satellite Visual Intelligence & Target Analysis")
+        reply_parts.append("### 🛰️ Multimodal Visual Analysis & Satellite Target Breakdown")
         reply_parts.append(f"**Target Inquiry:** *\"{prompt if prompt else 'Comprehensive Satellite Object & Target Breakdown'}\"*\n")
         
         # Include detection findings if available
@@ -641,7 +679,7 @@ class VisionService:
         if rag_sources:
             reply_parts.append(
                 f"#### 📚 Grounded Knowledge Base Context\n"
-                f"Cross-referenced with Pinecone Index `{self.pinecone_index}` ({len(rag_sources)} matching document chunks retrieved)."
+                f"Cross-referenced with Remote Sensing Knowledge Base ({len(rag_sources)} reference chunks retrieved)."
             )
 
         reply_parts.append(

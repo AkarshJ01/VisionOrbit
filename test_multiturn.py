@@ -8,6 +8,8 @@ async def run_multiturn_test():
 
     test_image_path = os.path.expanduser("~/Desktop/1011.tif")
     if not os.path.exists(test_image_path):
+        test_image_path = os.path.abspath("data/raw/images/1.tif")
+    if not os.path.exists(test_image_path):
         print(f"⚠️ Test image not found at {test_image_path}")
         return
 

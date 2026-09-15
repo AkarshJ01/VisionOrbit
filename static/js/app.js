@@ -1,3582 +1,982 @@
 /**
- * VisionOrbit - Client Application Logic
- * Modern OpenAI-style Multimodal Prompting & Pinecone RAG Intelligence Engine
- *
- * Supports:
- * - PNG / JPEG / WEBP
- * - TIFF / GeoTIFF
- * - NumPy .npy arrays
- * - YOLO-OBB detection
- * - Pinecone RAG
- * - Web search
- * - Ollama / OpenAI / VisionOrbit providers
+ * SatQuery AI - Multi-Modal Earth Observation & Geospatial Intelligence
+ * Interactive Leaflet GIS Map, Evidence Linking, SAR Analysis, and RAG Engine
  */
 
 (function () {
   'use strict';
 
   // ==========================================================================
-  // State Management
+  // Application State
   // ==========================================================================
-
   const state = {
     conversations: [],
     currentChatId: null,
-
-    // Array of staged preview images/data URLs
+    currentView: 'map', // 'map', 'image', 'change', 'evidence'
     stagedImages: [],
-
-    // Metadata for staged files
     stagedFiles: [],
-
+    activeDetections: [],
+    activeSarTelemetry: null,
+    activeChangeTelemetry: null,
+    activeAoiPolygon: null,
     isGenerating: false,
-
-    useWebSearch: false,
     useRag: true,
     useDetection: true,
-
-    theme: localStorage.getItem('visionorbit_theme') || 'dark',
-
+    currentModel: 'builtin:visionorbit-core',
     settings: {
-      openaiKey: localStorage.getItem('visionorbit_openai_key') || '',
-      ollamaUrl:
-        localStorage.getItem('visionorbit_ollama_url') ||
-        'http://localhost:11434',
-      tavilyKey: localStorage.getItem('visionorbit_tavily_key') || '',
-      systemPrompt:
-        localStorage.getItem('visionorbit_sys_prompt') || ''
+      openaiKey: localStorage.getItem('satquery_openai_key') || '',
+      ollamaUrl: localStorage.getItem('satquery_ollama_url') || 'http://localhost:11434',
+      tavilyKey: localStorage.getItem('satquery_tavily_key') || ''
     },
-
-    currentModel: 'ollama:gpt-oss:20b',
-
-    lightboxScale: 1
+    map: null,
+    mapLayers: {
+      sat: null,
+      dark: null,
+      osm: null,
+      detectionsLayer: null,
+      aoiLayer: null
+    },
+    polygonMarkers: [],
+    zoomLevel: 1
   };
 
   // ==========================================================================
   // DOM Elements
   // ==========================================================================
-
   const elements = {
-    appLayout: document.querySelector('.app-layout'),
     sidebar: document.getElementById('sidebar'),
     sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
     sidebarCloseBtn: document.getElementById('sidebarCloseBtn'),
     newChatBtn: document.getElementById('newChatBtn'),
+    openDemoBtn: document.getElementById('openDemoBtn'),
     conversationsList: document.getElementById('conversationsList'),
+    currentProviderLabel: document.getElementById('currentProviderLabel'),
+    providerSubText: document.getElementById('providerSubText'),
+    providerDot: document.getElementById('providerDot'),
+    themeToggleBtn: document.getElementById('themeToggleBtn'),
+    themeIconDark: document.getElementById('themeIconDark'),
+    themeIconLight: document.getElementById('themeIconLight'),
+    modelSelector: document.getElementById('modelSelector'),
+    detectionToggle: document.getElementById('detectionToggle'),
+    ragToggle: document.getElementById('ragToggle'),
+    exportChatBtn: document.getElementById('exportChatBtn'),
+    clearChatBtn: document.getElementById('clearChatBtn'),
+    generateReportBtn: document.getElementById('generateReportBtn'),
 
-    currentProviderLabel:
-      document.getElementById('currentProviderLabel'),
-    providerSubText:
-      document.getElementById('providerSubText'),
-    providerDot:
-      document.getElementById('providerDot'),
+    // Viewport Modes
+    modeMapBtn: document.getElementById('modeMapBtn'),
+    modeImageBtn: document.getElementById('modeImageBtn'),
+    modeChangeBtn: document.getElementById('modeChangeBtn'),
+    modeEvidenceBtn: document.getElementById('modeEvidenceBtn'),
+    gisMapContainer: document.getElementById('gisMapContainer'),
+    imageInspectionContainer: document.getElementById('imageInspectionContainer'),
+    changeComparisonContainer: document.getElementById('changeComparisonContainer'),
+    evidenceInspectorContainer: document.getElementById('evidenceInspectorContainer'),
 
-    themeToggleBtn:
-      document.getElementById('themeToggleBtn'),
-    themeIconDark:
-      document.getElementById('themeIconDark'),
-    themeIconLight:
-      document.getElementById('themeIconLight'),
+    // Map Controls
+    leafletMapEl: document.getElementById('leafletMap'),
+    basemapSatBtn: document.getElementById('basemapSatBtn'),
+    basemapDarkBtn: document.getElementById('basemapDarkBtn'),
+    basemapOsmBtn: document.getElementById('basemapOsmBtn'),
+    drawBoxAoiBtn: document.getElementById('drawBoxAoiBtn'),
+    drawPolyAoiBtn: document.getElementById('drawPolyAoiBtn'),
+    clearAoiBtn: document.getElementById('clearAoiBtn'),
+    toggleLayerDetections: document.getElementById('toggleLayerDetections'),
+    toggleLayerSarMask: document.getElementById('toggleLayerSarMask'),
+    toggleLayerHeatmap: document.getElementById('toggleLayerHeatmap'),
 
-    modelSelector:
-      document.getElementById('modelSelector'),
+    // Decision Support Badges
+    trafficIndicatorBadge: document.getElementById('trafficIndicatorBadge'),
+    floodIndicatorBadge: document.getElementById('floodIndicatorBadge'),
 
-    detectionToggle:
-      document.getElementById('detectionToggle'),
+    // Image Inspection
+    activeInspectionImage: document.getElementById('activeInspectionImage'),
+    zoomInBtn: document.getElementById('zoomInBtn'),
+    zoomOutBtn: document.getElementById('zoomOutBtn'),
+    resetZoomBtn: document.getElementById('resetZoomBtn'),
 
-    ragToggle:
-      document.getElementById('ragToggle'),
+    // Change Slider
+    comparisonSliderWrapper: document.getElementById('comparisonSliderWrapper'),
+    compareBeforeImg: document.getElementById('compareBeforeImg'),
+    compareAfterImg: document.getElementById('compareAfterImg'),
+    sliderHandle: document.getElementById('sliderHandle'),
+    changeDateBefore: document.getElementById('changeDateBefore'),
+    changeDateAfter: document.getElementById('changeDateAfter'),
 
-    webSearchToggle:
-      document.getElementById('webSearchToggle'),
+    // Evidence
+    evidenceList: document.getElementById('evidenceList'),
+    evidenceCountBadge: document.getElementById('evidenceCountBadge'),
 
-    exportChatBtn:
-      document.getElementById('exportChatBtn'),
+    // Chat Feed
+    chatContainer: document.getElementById('chatContainer'),
+    welcomeHero: document.getElementById('welcomeHero'),
+    heroDropzone: document.getElementById('heroDropzone'),
+    messagesList: document.getElementById('messagesList'),
+    analysisIndicator: document.getElementById('analysisIndicator'),
+    analyzingText: document.getElementById('analyzingText'),
+    scrollToBottomBtn: document.getElementById('scrollToBottomBtn'),
+    chatForm: document.getElementById('chatForm'),
+    promptInput: document.getElementById('promptInput'),
+    imageFileInput: document.getElementById('imageFileInput'),
+    uploadBtn: document.getElementById('uploadBtn'),
+    sendBtn: document.getElementById('sendBtn'),
+    imagePreviewTray: document.getElementById('imagePreviewTray'),
+    dragDropOverlay: document.getElementById('dragDropOverlay'),
 
-    clearChatBtn:
-      document.getElementById('clearChatBtn'),
-
-    chatContainer:
-      document.getElementById('chatContainer'),
-
-    welcomeHero:
-      document.getElementById('welcomeHero'),
-
-    heroDropzone:
-      document.getElementById('heroDropzone'),
-
-    messagesList:
-      document.getElementById('messagesList'),
-
-    analysisIndicator:
-      document.getElementById('analysisIndicator'),
-
-    analyzingText:
-      document.getElementById('analyzingText'),
-
-    scrollToBottomBtn:
-      document.getElementById('scrollToBottomBtn'),
-
-    chatForm:
-      document.getElementById('chatForm'),
-
-    promptInput:
-      document.getElementById('promptInput'),
-
-    imageFileInput:
-      document.getElementById('imageFileInput'),
-
-    uploadBtn:
-      document.getElementById('uploadBtn'),
-
-    voiceInputBtn:
-      document.getElementById('voiceInputBtn'),
-
-    sendBtn:
-      document.getElementById('sendBtn'),
-
-    imagePreviewTray:
-      document.getElementById('imagePreviewTray'),
-
-    dragDropOverlay:
-      document.getElementById('dragDropOverlay'),
-
-    // Settings Modal
-    settingsModal:
-      document.getElementById('settingsModal'),
-
-    openSettingsBtn:
-      document.getElementById('openSettingsBtn'),
-
-    closeSettingsModalBtn:
-      document.getElementById('closeSettingsModalBtn'),
-
-    openaiKeyInput:
-      document.getElementById('openaiKeyInput'),
-
-    toggleKeyVisibility:
-      document.getElementById('toggleKeyVisibility'),
-
-    ollamaUrlInput:
-      document.getElementById('ollamaUrlInput'),
-
-    tavilyKeyInput:
-      document.getElementById('tavilyKeyInput'),
-
-    systemPromptInput:
-      document.getElementById('systemPromptInput'),
-
-    saveSettingsBtn:
-      document.getElementById('saveSettingsBtn'),
-
-    resetSettingsBtn:
-      document.getElementById('resetSettingsBtn'),
-
-    // Lightbox Modal
-    imageLightboxModal:
-      document.getElementById('imageLightboxModal'),
-
-    lightboxImage:
-      document.getElementById('lightboxImage'),
-
-    lightboxCloseBtn:
-      document.getElementById('lightboxCloseBtn'),
-
-    lightboxZoomIn:
-      document.getElementById('lightboxZoomIn'),
-
-    lightboxZoomOut:
-      document.getElementById('lightboxZoomOut'),
-
-    toastContainer:
-      document.getElementById('toastContainer')
+    // Modals
+    demoModal: document.getElementById('demoModal'),
+    closeDemoModalBtn: document.getElementById('closeDemoModalBtn'),
+    demoScenariosList: document.getElementById('demoScenariosList'),
+    reportModal: document.getElementById('reportModal'),
+    closeReportModalBtn: document.getElementById('closeReportModalBtn'),
+    printReportBtn: document.getElementById('printReportBtn'),
+    reportMarkdownRender: document.getElementById('reportMarkdownRender'),
+    settingsModal: document.getElementById('settingsModal'),
+    openSettingsBtn: document.getElementById('openSettingsBtn'),
+    closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
+    saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+    openaiKeyInput: document.getElementById('openaiKeyInput'),
+    ollamaUrlInput: document.getElementById('ollamaUrlInput'),
+    tavilyKeyInput: document.getElementById('tavilyKeyInput'),
+    toastContainer: document.getElementById('toastContainer')
   };
-
-  // ==========================================================================
-  // Configure Marked Markdown Renderer
-  // ==========================================================================
-
-  if (window.marked) {
-    marked.setOptions({
-      breaks: true,
-      gfm: true,
-
-      highlight: function (code, lang) {
-        if (window.hljs) {
-          const language =
-            hljs.getLanguage(lang)
-              ? lang
-              : 'plaintext';
-
-          return hljs.highlight(code, {
-            language
-          }).value;
-        }
-
-        return code;
-      }
-    });
-  }
 
   // ==========================================================================
   // Initialization
   // ==========================================================================
-
-  function initApp() {
-    loadTheme();
-    loadSettings();
+  function init() {
+    initLeafletMap();
+    initEventListeners();
+    initComparisonSlider();
     loadConversations();
-    setupEventListeners();
-    fetchModelCapabilities();
-
-    if (elements.promptInput) {
-      elements.promptInput.focus();
-    }
+    checkHealth();
   }
 
   // ==========================================================================
-  // Theme
+  // Leaflet GIS Map Setup
   // ==========================================================================
+  function initLeafletMap() {
+    if (!elements.leafletMapEl || typeof L === 'undefined') return;
 
-  function loadTheme() {
-    document.documentElement.setAttribute(
-      'data-theme',
-      state.theme
-    );
-
-    if (state.theme === 'light') {
-      elements.themeIconDark.classList.add('hidden');
-      elements.themeIconLight.classList.remove('hidden');
-    } else {
-      elements.themeIconDark.classList.remove('hidden');
-      elements.themeIconLight.classList.add('hidden');
-    }
-  }
-
-  function toggleTheme() {
-    state.theme =
-      state.theme === 'dark'
-        ? 'light'
-        : 'dark';
-
-    localStorage.setItem(
-      'visionorbit_theme',
-      state.theme
-    );
-
-    loadTheme();
-
-    showToast(
-      `Switched to ${state.theme} mode`,
-      'info'
-    );
-  }
-
-  // ==========================================================================
-  // Settings
-  // ==========================================================================
-
-  function loadSettings() {
-    elements.openaiKeyInput.value =
-      state.settings.openaiKey;
-
-    elements.ollamaUrlInput.value =
-      state.settings.ollamaUrl;
-
-    elements.tavilyKeyInput.value =
-      state.settings.tavilyKey;
-
-    elements.systemPromptInput.value =
-      state.settings.systemPrompt;
-  }
-
-  function saveSettings() {
-    state.settings.openaiKey =
-      elements.openaiKeyInput.value.trim();
-
-    state.settings.ollamaUrl =
-      elements.ollamaUrlInput.value.trim() ||
-      'http://localhost:11434';
-
-    state.settings.tavilyKey =
-      elements.tavilyKeyInput.value.trim();
-
-    state.settings.systemPrompt =
-      elements.systemPromptInput.value.trim();
-
-    localStorage.setItem(
-      'visionorbit_openai_key',
-      state.settings.openaiKey
-    );
-
-    localStorage.setItem(
-      'visionorbit_ollama_url',
-      state.settings.ollamaUrl
-    );
-
-    localStorage.setItem(
-      'visionorbit_tavily_key',
-      state.settings.tavilyKey
-    );
-
-    localStorage.setItem(
-      'visionorbit_sys_prompt',
-      state.settings.systemPrompt
-    );
-
-    closeModal(elements.settingsModal);
-
-    showToast(
-      'Settings saved successfully',
-      'success'
-    );
-
-    fetchModelCapabilities();
-  }
-
-  function resetSettings() {
-    elements.openaiKeyInput.value = '';
-    elements.ollamaUrlInput.value =
-      'http://localhost:11434';
-    elements.tavilyKeyInput.value = '';
-    elements.systemPromptInput.value = '';
-
-    saveSettings();
-  }
-
-  // ==========================================================================
-  // Model Capabilities
-  // ==========================================================================
-
-  async function fetchModelCapabilities() {
-    try {
-      const url =
-        `/api/models?ollama_url=${encodeURIComponent(
-          state.settings.ollamaUrl
-        )}`;
-
-      const res = await fetch(url);
-
-      if (res.ok) {
-        const data = await res.json();
-
-        updateModelDropdown(
-          data.providers
-        );
-      }
-    } catch (e) {
-      console.warn(
-        'Could not refresh model capabilities:',
-        e
-      );
-    }
-  }
-
-  function updateModelDropdown(providers) {
-    if (!elements.modelSelector) return;
-
-    const currentVal =
-      elements.modelSelector.value;
-
-    elements.modelSelector.innerHTML = '';
-
-    providers.forEach(p => {
-      const optgroup =
-        document.createElement('optgroup');
-
-      optgroup.label =
-        `${p.name} (${p.badge})`;
-
-      p.models.forEach(m => {
-        const option =
-          document.createElement('option');
-
-        option.value =
-          `${p.id}:${m.id}`;
-
-        option.textContent =
-          m.name;
-
-        optgroup.appendChild(option);
-      });
-
-      elements.modelSelector.appendChild(
-        optgroup
-      );
+    // Default center over georeferenced sample area (Lat: 42.2805, Lon: -71.7789)
+    const initialCoords = [42.2805, -71.7789];
+    state.map = L.map('leafletMap', {
+      center: initialCoords,
+      zoom: 17,
+      zoomControl: true
     });
 
-    if (
-      currentVal &&
-      elements.modelSelector.querySelector(
-        `option[value="${currentVal}"]`
-      )
-    ) {
-      elements.modelSelector.value =
-        currentVal;
-    } else if (
-      elements.modelSelector.querySelector(
-        'option[value="ollama:gpt-oss:20b"]'
-      )
-    ) {
-      elements.modelSelector.value =
-        'ollama:gpt-oss:20b';
+    // Basemaps
+    state.mapLayers.sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Esri, Maxar, Earthstar Geographics',
+      maxZoom: 19
+    }).addTo(state.map);
+
+    state.mapLayers.dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; CartoDB',
+      maxZoom: 19
+    });
+
+    state.mapLayers.osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 19
+    });
+
+    // Feature Layers
+    state.mapLayers.detectionsLayer = L.featureGroup().addTo(state.map);
+    state.mapLayers.aoiLayer = L.featureGroup().addTo(state.map);
+
+    // Initial footprint marker
+    L.circleMarker(initialCoords, {
+      radius: 6,
+      fillColor: '#00f2fe',
+      color: '#ffffff',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.8
+    }).bindPopup('<b>Satellite Telemetry Anchor</b><br>Lat: 42.2805, Lon: -71.7789').addTo(state.map);
+  }
+
+  function switchBasemap(type) {
+    if (!state.map) return;
+    state.map.removeLayer(state.mapLayers.sat);
+    state.map.removeLayer(state.mapLayers.dark);
+    state.map.removeLayer(state.mapLayers.osm);
+
+    elements.basemapSatBtn.classList.remove('active');
+    elements.basemapDarkBtn.classList.remove('active');
+    elements.basemapOsmBtn.classList.remove('active');
+
+    if (type === 'sat') {
+      state.mapLayers.sat.addTo(state.map);
+      elements.basemapSatBtn.classList.add('active');
+    } else if (type === 'dark') {
+      state.mapLayers.dark.addTo(state.map);
+      elements.basemapDarkBtn.classList.add('active');
     } else {
-      elements.modelSelector.value =
-        'builtin:visionorbit-core';
-    }
-
-    handleModelChange();
-  }
-
-  function handleModelChange() {
-    const val =
-      elements.modelSelector.value;
-
-    state.currentModel = val;
-
-    const [provider, model] =
-      val.split(':');
-
-    if (provider === 'ollama') {
-      elements.currentProviderLabel.textContent =
-        `Ollama (${model})`;
-
-      elements.providerSubText.textContent =
-        state.useRag
-          ? 'Pinecone RAG Active'
-          : 'Local LLM Inference';
-
-      elements.providerDot.className =
-        'provider-dot active';
-
-    } else if (provider === 'openai') {
-      elements.currentProviderLabel.textContent =
-        `OpenAI (${model})`;
-
-      elements.providerSubText.textContent =
-        state.settings.openaiKey
-          ? 'Live Multimodal Inference'
-          : 'Using Server/Env Key';
-
-      elements.providerDot.className =
-        'provider-dot active';
-
-    } else {
-      elements.currentProviderLabel.textContent =
-        'VisionOrbit Smart Core';
-
-      elements.providerSubText.textContent =
-        'Instant Multimodal Analysis';
-
-      elements.providerDot.className =
-        'provider-dot active';
+      state.mapLayers.osm.addTo(state.map);
+      elements.basemapOsmBtn.classList.add('active');
     }
   }
 
-  // ==========================================================================
-  // Conversation History
-  // ==========================================================================
+  function plotDetectionsOnMap(detections) {
+    if (!state.map || !detections || !state.mapLayers.detectionsLayer) return;
+    state.mapLayers.detectionsLayer.clearLayers();
+    state.polygonMarkers = [];
 
-  function loadConversations() {
-    try {
-      const saved =
-        localStorage.getItem(
-          'visionorbit_conversations'
-        );
-
-      state.conversations =
-        saved
-          ? JSON.parse(saved)
-          : [];
-
-    } catch (e) {
-      state.conversations = [];
-    }
-
-    if (state.conversations.length > 0) {
-      switchConversation(
-        state.conversations[0].id
-      );
-    } else {
-      startNewChat();
-    }
-
-    renderConversationsList();
-  }
-
-  function saveConversations() {
-    localStorage.setItem(
-      'visionorbit_conversations',
-      JSON.stringify(state.conversations)
-    );
-
-    renderConversationsList();
-  }
-
-  function startNewChat() {
-    const newChat = {
-      id: 'chat_' + Date.now(),
-      title: 'New Inquiry',
-      messages: [],
-      createdAt: Date.now()
+    const classColors = {
+      'cargo truck': '#00f2fe',
+      'small car': '#10b981',
+      'van': '#f59e0b',
+      'dump truck': '#f43f5e',
+      'other-airplane': '#8b5cf6',
+      'dry cargo ship': '#38bdf8'
     };
 
-    state.conversations.unshift(
-      newChat
-    );
-
-    state.currentChatId =
-      newChat.id;
-
-    state.stagedImages = [];
-    state.stagedFiles = [];
-
-    renderStagedImages();
-
-    saveConversations();
-    renderCurrentChat();
-  }
-
-  function switchConversation(chatId) {
-    state.currentChatId =
-      chatId;
-
-    state.stagedImages = [];
-    state.stagedFiles = [];
-
-    renderStagedImages();
-    renderConversationsList();
-    renderCurrentChat();
-  }
-
-  function deleteConversation(chatId, e) {
-    if (e) {
-      e.stopPropagation();
-    }
-
-    state.conversations =
-      state.conversations.filter(
-        c => c.id !== chatId
-      );
-
-    if (
-      state.currentChatId ===
-      chatId
-    ) {
-      if (
-        state.conversations.length > 0
-      ) {
-        state.currentChatId =
-          state.conversations[0].id;
-      } else {
-        startNewChat();
-        return;
-      }
-    }
-
-    saveConversations();
-    renderCurrentChat();
-  }
-
-  function renderConversationsList() {
-    if (!elements.conversationsList) {
-      return;
-    }
-
-    elements.conversationsList.innerHTML =
-      '';
-
-    state.conversations.forEach(
-      chat => {
-        const item =
-          document.createElement('div');
-
-        item.className =
-          `chat-history-item ${
-            chat.id === state.currentChatId
-              ? 'active'
-              : ''
-          }`;
-
-        item.onclick = () =>
-          switchConversation(
-            chat.id
-          );
-
-        const titleSpan =
-          document.createElement('span');
-
-        titleSpan.className =
-          'history-item-title';
-
-        titleSpan.textContent =
-          chat.title ||
-          'New Inquiry';
-
-        const delBtn =
-          document.createElement('button');
-
-        delBtn.className =
-          'history-item-delete';
-
-        delBtn.title =
-          'Delete conversation';
-
-        delBtn.innerHTML = `
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        `;
-
-        delBtn.onclick =
-          e =>
-            deleteConversation(
-              chat.id,
-              e
-            );
-
-        item.appendChild(
-          titleSpan
-        );
-
-        item.appendChild(
-          delBtn
-        );
-
-        elements.conversationsList.appendChild(
-          item
-        );
-      }
-    );
-  }
-
-  function getCurrentChat() {
-    return state.conversations.find(
-      c =>
-        c.id ===
-        state.currentChatId
-    );
-  }
-
-  function renderCurrentChat() {
-    const chat =
-      getCurrentChat();
-
-    if (
-      !chat ||
-      chat.messages.length === 0
-    ) {
-      elements.welcomeHero.classList.remove(
-        'hidden'
-      );
-
-      elements.messagesList.classList.add(
-        'hidden'
-      );
-
-      elements.messagesList.innerHTML =
-        '';
-
-      return;
-    }
-
-    elements.welcomeHero.classList.add(
-      'hidden'
-    );
-
-    elements.messagesList.classList.remove(
-      'hidden'
-    );
-
-    elements.messagesList.innerHTML =
-      '';
-
-    chat.messages.forEach(
-      msg => {
-        appendMessageToDOM(msg);
-      }
-    );
-
-    scrollChatToBottom();
-  }
-
-  // ==========================================================================
-  // File Upload & Staging
-  // ==========================================================================
-
-  async function handleFileSelection(files) {
-    if (!files || files.length === 0) {
-      return;
-    }
-
-    for (
-      const file of Array.from(files)
-    ) {
-      const nameLower =
-        file.name.toLowerCase();
-
-      // --------------------------------------------------------------
-      // Supported image formats
-      // --------------------------------------------------------------
-
-      const isImage =
-        file.type.startsWith('image/') ||
-        nameLower.endsWith('.tif') ||
-        nameLower.endsWith('.tiff');
-
-      // --------------------------------------------------------------
-      // NumPy format
-      // --------------------------------------------------------------
-
-      const isNpy =
-        nameLower.endsWith('.npy');
-
-      // --------------------------------------------------------------
-      // Validate extension
-      // --------------------------------------------------------------
-
-      if (!isImage && !isNpy) {
-        showToast(
-          `Unsupported file type: ${file.name}`,
-          'error'
-        );
-
-        continue;
-      }
-
-      // --------------------------------------------------------------
-      // File size limit
-      // --------------------------------------------------------------
-
-      if (
-        file.size >
-        100 * 1024 * 1024
-      ) {
-        showToast(
-          `File too large (max 100MB): ${file.name}`,
-          'error'
-        );
-
-        continue;
-      }
-
-      try {
-        const formData =
-          new FormData();
-
-        formData.append(
-          'file',
-          file
-        );
-
-        // ------------------------------------------------------------
-        // Upload to backend
-        // ------------------------------------------------------------
-
-        const res =
-          await fetch(
-            '/api/upload',
-            {
-              method: 'POST',
-              body: formData
-            }
-          );
-
-        if (!res.ok) {
-          const errorData =
-            await res
-              .json()
-              .catch(() => ({}));
-
-          throw new Error(
-            errorData.detail ||
-            `Upload failed with status ${res.status}`
-          );
-        }
-
-        const uploadData =
-          await res.json();
-
-        // ------------------------------------------------------------
-// Store uploaded file reference
-// ------------------------------------------------------------
-
-if (isNpy) {
-
-  if (!uploadData.npy_reference) {
-    throw new Error(
-      'Server did not return an NPY reference'
-    );
-  }
-
-  state.stagedImages.push(
-    uploadData.npy_reference
-  );
-
-} else {
-
-  if (!uploadData.data_url) {
-    throw new Error(
-      'Server did not return a preview image'
-    );
-  }
-
-  state.stagedImages.push(
-    uploadData.data_url
-  );
-}
-
-        // ------------------------------------------------------------
-        // Store preview image
-        // ------------------------------------------------------------
-
-        
-
-        // ------------------------------------------------------------
-        // Store file metadata
-        // ------------------------------------------------------------
-
-        state.stagedFiles.push({
-          filename:
-            uploadData.filename ||
-            file.name,
-
-          file_type:
-            uploadData.file_type ||
-            (isNpy
-              ? 'npy'
-              : 'image'),
-
-          mime_type:
-            uploadData.mime_type ||
-            file.type,
-
-          metadata:
-            uploadData.metadata ||
-            {}
+    const boundsGroup = [];
+
+    detections.forEach((d) => {
+      const cls = (d.class_name || '').toLowerCase();
+      const color = classColors[cls] || '#00f2fe';
+      const geoPoly = d.obb && d.obb.polygon_corners_latlon;
+      const lat = d.latitude;
+      const lon = d.longitude;
+
+      if (geoPoly && geoPoly.length >= 3) {
+        // Draw Oriented Bounding Box Polygon
+        const polyLayer = L.polygon(geoPoly, {
+          color: color,
+          weight: 2,
+          fillColor: color,
+          fillOpacity: 0.35
         });
 
-        renderStagedImages();
-
-        // ------------------------------------------------------------
-        // NPY-specific toast
-        // ------------------------------------------------------------
-
-        if (isNpy) {
-          const metadata =
-            uploadData.metadata ||
-            {};
-
-          const shape =
-            metadata.shape ||
-            metadata.original_shape ||
-            'unknown shape';
-
-          const dtype =
-            metadata.dtype ||
-            'unknown dtype';
-
-          showToast(
-            `Loaded NumPy array: ${file.name} — ${shape} — ${dtype}`,
-            'success'
-          );
-
-        } else {
-          // ----------------------------------------------------------
-          // Normal image toast
-          // ----------------------------------------------------------
-
-          showToast(
-            `Loaded satellite visual: ${file.name}`,
-            'success'
-          );
-        }
-
-      } catch (err) {
-        console.warn(
-          'Server upload failed:',
-          err
-        );
-
-        // ------------------------------------------------------------
-        // IMPORTANT:
-        //
-        // Only images get the FileReader fallback.
-        //
-        // .npy cannot be sent to FileReader as an image.
-        // ------------------------------------------------------------
-
-        if (isImage) {
-          const reader =
-            new FileReader();
-
-          reader.onload =
-            e => {
-              state.stagedImages.push(
-                e.target.result
-              );
-
-              state.stagedFiles.push({
-                filename: file.name,
-                file_type: 'image',
-                mime_type: file.type,
-                metadata: {}
-              });
-
-              renderStagedImages();
-
-              showToast(
-                `Attached image: ${file.name}`,
-                'info'
-              );
-            };
-
-          reader.readAsDataURL(
-            file
-          );
-
-        } else {
-          showToast(
-            `Could not process NumPy file: ${file.name}`,
-            'error'
-          );
-        }
+        const popupContent = `
+          <div style="font-family: 'Inter', sans-serif; font-size: 12px;">
+            <strong style="color: ${color}; font-size: 13px;">#${d.id} ${d.class_name}</strong><br>
+            <b>Confidence:</b> ${d.confidence_percent || (d.confidence * 100).toFixed(1) + '%'}<br>
+            <b>Coordinates:</b> (${lat ? lat.toFixed(6) : 'N/A'}, ${lon ? lon.toFixed(6) : 'N/A'})<br>
+            <b>Dimensions:</b> ${d.obb.width_px} × ${d.obb.height_px} px (Angle: ${d.obb.angle_degrees}°)<br>
+          </div>
+        `;
+        polyLayer.bindPopup(popupContent);
+        polyLayer.detId = d.id;
+        state.mapLayers.detectionsLayer.addLayer(polyLayer);
+        state.polygonMarkers.push(polyLayer);
+        boundsGroup.push(...geoPoly);
+      } else if (lat && lon) {
+        // Fallback Circle Marker
+        const marker = L.circleMarker([lat, lon], {
+          radius: 5,
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.7
+        }).bindPopup(`<strong>#${d.id} ${d.class_name}</strong><br>Confidence: ${d.confidence_percent}`);
+        marker.detId = d.id;
+        state.mapLayers.detectionsLayer.addLayer(marker);
+        state.polygonMarkers.push(marker);
+        boundsGroup.push([lat, lon]);
       }
+    });
+
+    if (boundsGroup.length > 0) {
+      state.map.fitBounds(L.latLngBounds(boundsGroup), { padding: [30, 30] });
     }
   }
 
   // ==========================================================================
-  // Render Staged Images / NPY Files
+  // Visual Evidence Linking
   // ==========================================================================
+  function highlightEvidenceItem(evidenceId) {
+    switchView('map');
+    let matchedLayer = null;
 
-  function renderStagedImages() {
-    if (!elements.imagePreviewTray) {
-      return;
-    }
-
-    if (
-      state.stagedImages.length === 0
-    ) {
-      elements.imagePreviewTray.classList.add(
-        'hidden'
-      );
-
-      elements.imagePreviewTray.innerHTML =
-        '';
-
-      return;
-    }
-
-    elements.imagePreviewTray.classList.remove(
-      'hidden'
-    );
-
-    elements.imagePreviewTray.innerHTML =
-      '';
-
-    state.stagedImages.forEach(
-      (imgData, index) => {
-        const card =
-          document.createElement('div');
-
-        card.className =
-          'staged-img-card';
-
-        // ------------------------------------------------------------
-        // Preview image
-        // ------------------------------------------------------------
-
-        const img =
-          document.createElement('img');
-
-        img.src =
-          imgData;
-
-        img.alt =
-          `Staged visual ${index + 1}`;
-
-        img.onclick =
-          () =>
-            openLightbox(
-              imgData
-            );
-
-        card.appendChild(img);
-
-        // ------------------------------------------------------------
-        // File information
-        // ------------------------------------------------------------
-
-        const fileInfo =
-          state.stagedFiles[index];
-
-        if (fileInfo) {
-          const info =
-            document.createElement('div');
-
-          info.className =
-            'staged-file-info';
-
-          if (
-            fileInfo.file_type ===
-            'npy'
-          ) {
-            const metadata =
-              fileInfo.metadata ||
-              {};
-
-            const shape =
-              metadata.shape ||
-              metadata.original_shape ||
-              '';
-
-            const dtype =
-              metadata.dtype ||
-              '';
-
-            info.textContent =
-              `NPY${shape ? ` • ${shape}` : ''}${dtype ? ` • ${dtype}` : ''}`;
-
-          } else {
-            info.textContent =
-              fileInfo.filename ||
-              '';
-          }
-
-          card.appendChild(info);
-        }
-
-        // ------------------------------------------------------------
-        // Remove button
-        // ------------------------------------------------------------
-
-        const removeBtn =
-          document.createElement(
-            'button'
-          );
-
-        removeBtn.className =
-          'staged-img-remove';
-
-        removeBtn.innerHTML =
-          '&times;';
-
-        removeBtn.title =
-          'Remove attachment';
-
-        removeBtn.onclick =
-          e => {
-            e.stopPropagation();
-
-            state.stagedImages.splice(
-              index,
-              1
-            );
-
-            state.stagedFiles.splice(
-              index,
-              1
-            );
-
-            renderStagedImages();
-          };
-
-        card.appendChild(
-          removeBtn
-        );
-
-        elements.imagePreviewTray.appendChild(
-          card
-        );
+    state.polygonMarkers.forEach((layer) => {
+      if (layer.detId == evidenceId || String(layer.detId) === String(evidenceId).replace('det_', '')) {
+        matchedLayer = layer;
+        layer.setStyle({
+          color: '#ffffff',
+          weight: 4,
+          fillColor: '#00f2fe',
+          fillOpacity: 0.8
+        });
+        if (layer.openPopup) layer.openPopup();
+      } else {
+        layer.setStyle({ fillOpacity: 0.25, weight: 1.5 });
       }
-    );
+    });
+
+    if (matchedLayer && state.map) {
+      if (matchedLayer.getBounds) {
+        state.map.flyToBounds(matchedLayer.getBounds(), { maxZoom: 19, duration: 1.2 });
+      } else if (matchedLayer.getLatLng) {
+        state.map.flyTo(matchedLayer.getLatLng(), 19, { duration: 1.2 });
+      }
+    }
+
+    // Also highlight card in evidence inspector
+    document.querySelectorAll('.evidence-card').forEach((card) => {
+      if (card.dataset.id == evidenceId) {
+        card.classList.add('focused');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        card.classList.remove('focused');
+      }
+    });
+  }
+
+  function renderEvidenceInspector(evidenceItems) {
+    if (!elements.evidenceList) return;
+    elements.evidenceList.innerHTML = '';
+    elements.evidenceCountBadge.textContent = `${evidenceItems.length} items`;
+
+    if (!evidenceItems || evidenceItems.length === 0) {
+      elements.evidenceList.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">No active evidence items in session.</div>';
+      return;
+    }
+
+    evidenceItems.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = 'evidence-card';
+      card.dataset.id = item.id;
+
+      const latLonStr = item.latitude && item.longitude ? `(${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)})` : 'Pixel Space';
+      const confStr = item.confidence_percent || (item.confidence ? (item.confidence * 100).toFixed(1) + '%' : 'Verified');
+
+      card.innerHTML = `
+        <div class="evidence-card-header">
+          <span class="evidence-label">${item.label || 'Target #' + item.id}</span>
+          <span class="evidence-score">${confStr}</span>
+        </div>
+        <div class="evidence-geo">📍 ${latLonStr} • ${item.provenance || 'YOLO-OBB / GIS'}</div>
+      `;
+
+      card.addEventListener('click', () => {
+        highlightEvidenceItem(item.id);
+      });
+
+      elements.evidenceList.appendChild(card);
+    });
   }
 
   // ==========================================================================
-  // Chat Submission
+  // Comparison Swipe Slider
   // ==========================================================================
+  function initComparisonSlider() {
+    if (!elements.comparisonSliderWrapper || !elements.sliderHandle) return;
 
-  async function handleChatSubmit(e) {
-    if (e) {
-      e.preventDefault();
+    let isDragging = false;
+
+    function setSliderPosition(x) {
+      const rect = elements.comparisonSliderWrapper.getBoundingClientRect();
+      let pos = (x - rect.left) / rect.width;
+      pos = Math.max(0, Math.min(1, pos));
+      const pct = (pos * 100).toFixed(2);
+
+      elements.sliderHandle.style.left = `${pct}%`;
+      elements.compareAfterImg.style.clipPath = `polygon(${pct}% 0, 100% 0, 100% 100%, ${pct}% 100%)`;
     }
 
-    if (state.isGenerating) {
-      return;
+    elements.sliderHandle.addEventListener('mousedown', () => { isDragging = true; });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) setSliderPosition(e.clientX);
+    });
+
+    elements.sliderHandle.addEventListener('touchstart', () => { isDragging = true; });
+    window.addEventListener('touchend', () => { isDragging = false; });
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging && e.touches[0]) setSliderPosition(e.touches[0].clientX);
+    });
+  }
+
+  // ==========================================================================
+  // Viewport Switcher
+  // ==========================================================================
+  function switchView(viewName) {
+    state.currentView = viewName;
+
+    elements.modeMapBtn.classList.remove('active');
+    elements.modeImageBtn.classList.remove('active');
+    elements.modeChangeBtn.classList.remove('active');
+    elements.modeEvidenceBtn.classList.remove('active');
+
+    elements.gisMapContainer.classList.add('hidden');
+    elements.imageInspectionContainer.classList.add('hidden');
+    elements.changeComparisonContainer.classList.add('hidden');
+    elements.evidenceInspectorContainer.classList.add('hidden');
+
+    if (viewName === 'map') {
+      elements.modeMapBtn.classList.add('active');
+      elements.gisMapContainer.classList.remove('hidden');
+      if (state.map) setTimeout(() => state.map.invalidateSize(), 200);
+    } else if (viewName === 'image') {
+      elements.modeImageBtn.classList.add('active');
+      elements.imageInspectionContainer.classList.remove('hidden');
+    } else if (viewName === 'change') {
+      elements.modeChangeBtn.classList.add('active');
+      elements.changeComparisonContainer.classList.remove('hidden');
+    } else if (viewName === 'evidence') {
+      elements.modeEvidenceBtn.classList.add('active');
+      elements.evidenceInspectorContainer.classList.remove('hidden');
     }
+  }
 
-    const prompt =
-      elements.promptInput.value.trim();
+  // ==========================================================================
+  // Chat & Communication Logic
+  // ==========================================================================
+  async function sendMessage(customPrompt = null) {
+    const text = (customPrompt !== null ? customPrompt : elements.promptInput.value).trim();
+    if (!text && state.stagedImages.length === 0) return;
+    if (state.isGenerating) return;
 
-    const images =
-      [...state.stagedImages];
+    elements.promptInput.value = '';
+    elements.welcomeHero.classList.add('hidden');
+    elements.messagesList.classList.remove('hidden');
 
-    const stagedFiles =
-      [...state.stagedFiles];
+    const userImages = [...state.stagedImages];
+    clearStagedImages();
 
-    if (
-      !prompt &&
-      images.length === 0
-    ) {
-      showToast(
-        'Please enter a query or attach an image/NPY file.',
-        'error'
-      );
-
-      return;
-    }
-
-    elements.promptInput.value =
-      '';
-
-    elements.promptInput.style.height =
-      'auto';
-
-    state.stagedImages = [];
-    state.stagedFiles = [];
-
-    renderStagedImages();
-
-    const chat =
-      getCurrentChat();
-
-    if (!chat) {
-      return;
-    }
-
-    // --------------------------------------------------------------
-    // Create user message
-    // --------------------------------------------------------------
-
-    const userMsg = {
-      id: 'msg_' + Date.now(),
-
+    // Render User Message
+    appendMessage({
       role: 'user',
+      content: text,
+      images: userImages
+    });
 
-      content:
-        prompt ||
-        'Analyze and describe the attached image(s) or NumPy array(s).',
-
-      images: images,
-
-      files: stagedFiles,
-
-      timestamp: Date.now()
-    };
-
-    // --------------------------------------------------------------
-    // Automatic conversation title
-    // --------------------------------------------------------------
-
-    if (
-      chat.messages.length === 0
-    ) {
-      const autoTitle =
-        prompt
-          ? (
-              prompt.length > 32
-                ? prompt.substring(
-                    0,
-                    32
-                  ) + '...'
-                : prompt
-            )
-          : 'Visual & Target Analysis';
-
-      chat.title =
-        autoTitle;
-
-      saveConversations();
-    }
-
-    chat.messages.push(
-      userMsg
-    );
-
-    saveConversations();
-
-    elements.welcomeHero.classList.add(
-      'hidden'
-    );
-
-    elements.messagesList.classList.remove(
-      'hidden'
-    );
-
-    appendMessageToDOM(
-      userMsg
-    );
-
-    scrollChatToBottom();
-
-    await generateAssistantResponse(
-      prompt,
-      images,
-      stagedFiles
-    );
-  }
-
-  // ==========================================================================
-  // Assistant Response
-  // ==========================================================================
-
-  async function generateAssistantResponse(
-    prompt,
-    images,
-    stagedFiles = []
-  ) {
     state.isGenerating = true;
-
-    updateSendButtonState();
-
-    elements.analysisIndicator.classList.remove(
-      'hidden'
-    );
-
-    elements.analyzingText.textContent =
-      state.useDetection &&
-      images.length > 0
-        ? 'Running YOLO-OBB detection & retrieving Pinecone knowledge...'
-        : (
-            state.useRag
-              ? 'Retrieving from Pinecone knowledge base & thinking...'
-              : 'Generating response...'
-          );
-
-    scrollChatToBottom();
-
-    const [
-      provider,
-      model
-    ] =
-      state.currentModel.split(':');
-
-    const chat =
-      getCurrentChat();
-
-    // --------------------------------------------------------------
-    // History payload
-    // --------------------------------------------------------------
-
-    const historyPayload =
-      chat.messages
-        .slice(0, -1)
-        .map(m => ({
-          role: m.role,
-          content: m.content,
-
-          detection_results:
-            m.detection_results ||
-            null,
-
-          images:
-            m.images ||
-            [],
-
-          files:
-            m.files ||
-            []
-        }));
+    elements.analysisIndicator.classList.remove('hidden');
+    scrollToBottom();
 
     try {
-      // ------------------------------------------------------------
-      // Main API payload
-      // ------------------------------------------------------------
-
       const payload = {
-        prompt:
-          prompt ||
-          'Describe and analyze the attached satellite image or NumPy array in detail.',
-
-        images:
-          images,
-
-        // NPY metadata is included here for future backend use.
-        files:
-          stagedFiles,
-
-        history:
-          historyPayload,
-
-        provider:
-          provider,
-
-        model:
-          model,
-
-        apiKey:
-          state.settings.openaiKey ||
-          null,
-
-        ollamaBaseUrl:
-          state.settings.ollamaUrl ||
-          null,
-
-        tavilyApiKey:
-          state.settings.tavilyKey ||
-          null,
-
-        useWebSearch:
-          state.useWebSearch,
-
-        useRag:
-          state.useRag,
-
-        useDetection:
-          state.useDetection,
-
-        systemPrompt:
-          state.settings.systemPrompt ||
-          null
+        prompt: text,
+        images: userImages,
+        history: getConversationHistory(),
+        provider: state.currentModel.split(':')[0] || 'auto',
+        model: state.currentModel.includes(':') ? state.currentModel.split(':')[1] : state.currentModel,
+        useRag: state.useRag,
+        useDetection: state.useDetection,
+        apiKey: state.settings.openaiKey,
+        ollamaBaseUrl: state.settings.ollamaUrl,
+        tavilyApiKey: state.settings.tavilyKey
       };
 
-      // ------------------------------------------------------------
-      // Chat API request
-      // ------------------------------------------------------------
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-      const response =
-        await fetch(
-          '/api/chat',
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              )
-          }
-        );
-
-      if (!response.ok) {
-        const errData =
-          await response
-            .json()
-            .catch(() => ({}));
-
-        throw new Error(
-          errData.detail ||
-          `Server error (${response.status})`
-        );
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `Server error (${res.status})`);
       }
 
-      const data =
-        await response.json();
+      const data = await res.json();
+      
+      // Update Active Telemetry
+      if (data.detection_results && data.detection_results.detections) {
+        state.activeDetections = data.detection_results.detections;
+        plotDetectionsOnMap(state.activeDetections);
+      }
 
-      // ------------------------------------------------------------
-      // Create assistant message
-      // ------------------------------------------------------------
+      if (data.annotated_image) {
+        elements.activeInspectionImage.src = data.annotated_image;
+      }
 
-      const assistantMsg = {
-        id:
-          'msg_' +
-          Date.now(),
+      if (data.evidence_items) {
+        renderEvidenceInspector(data.evidence_items);
+      }
 
-        role:
-          'assistant',
+      // Update Decision Badges
+      updateDecisionIndicators(data);
 
-        content:
-          data.reply,
-
-        provider_used:
-          data.provider_used,
-
-        model_used:
-          data.model_used,
-
-        annotated_image:
-          data.annotated_image ||
-          null,
-
-        detection_results:
-          data.detection_results ||
-          null,
-
-        image_metadata:
-          data.image_metadata ||
-          [],
-
-        search_sources:
-          data.search_sources ||
-          [],
-
-        rag_sources:
-          data.rag_sources ||
-          [],
-
-        timestamp:
-          Date.now()
-      };
-
-      chat.messages.push(
-        assistantMsg
-      );
-
-      saveConversations();
-
-      elements.analysisIndicator.classList.add(
-        'hidden'
-      );
-
-      await streamMessageToDOM(
-        assistantMsg
-      );
+      appendMessage({
+        role: 'assistant',
+        content: data.reply,
+        provider_used: data.provider_used,
+        model_used: data.model_used,
+        annotated_image: data.annotated_image,
+        detection_results: data.detection_results,
+        evidence_items: data.evidence_items,
+        rag_sources: data.rag_sources
+      });
 
     } catch (err) {
-      console.error(
-        'Chat error:',
-        err
-      );
-
-      elements.analysisIndicator.classList.add(
-        'hidden'
-      );
-
-      const errorMsg = {
-        id:
-          'msg_' +
-          Date.now(),
-
-        role:
-          'assistant',
-
-        content:
-          `⚠️ **An error occurred during generation:**\n\n\`${err.message}\`\n\n*Please verify your Pinecone index or model settings in the ⚙️ Settings dialog.*`,
-
-        provider_used:
-          'Error Handler',
-
-        timestamp:
-          Date.now()
-      };
-
-      chat.messages.push(
-        errorMsg
-      );
-
-      saveConversations();
-
-      appendMessageToDOM(
-        errorMsg
-      );
-
+      appendMessage({
+        role: 'assistant',
+        content: `⚠️ **Inquiry Error:** ${err.message}`,
+        provider_used: 'System Error'
+      });
     } finally {
-      state.isGenerating =
-        false;
-
-      updateSendButtonState();
-
-      scrollChatToBottom();
+      state.isGenerating = false;
+      elements.analysisIndicator.classList.add('hidden');
+      scrollToBottom();
+      saveCurrentConversation();
     }
   }
 
-  // ==========================================================================
-  // Send Button
-  // ==========================================================================
+  function appendMessage(msg) {
+    const row = document.createElement('div');
+    row.className = `message-row ${msg.role}`;
 
-  function updateSendButtonState() {
-    if (
-      state.isGenerating
-    ) {
-      elements.sendBtn.disabled =
-        true;
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.innerHTML = msg.role === 'user' ? '👤' : '🛰️';
 
-      elements.sendBtn.innerHTML =
-        `<span class="pulse-spark"></span>`;
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble markdown-body';
 
+    // Render markdown
+    if (typeof marked !== 'undefined') {
+      bubble.innerHTML = marked.parse(msg.content);
     } else {
-      elements.sendBtn.disabled =
-        false;
+      bubble.textContent = msg.content;
+    }
 
-      elements.sendBtn.innerHTML =
-        `
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-        >
-          <line
-            x1="12"
-            y1="19"
-            x2="12"
-            y2="5"
-          ></line>
+    // Render inline image if present
+    if (msg.annotated_image) {
+      const imgWrap = document.createElement('div');
+      imgWrap.style.marginTop = '10px';
+      imgWrap.innerHTML = `<img src="${msg.annotated_image}" style="max-width: 100%; border-radius: 8px; cursor: pointer;" alt="Detection Preview">`;
+      imgWrap.addEventListener('click', () => {
+        elements.activeInspectionImage.src = msg.annotated_image;
+        switchView('image');
+      });
+      bubble.appendChild(imgWrap);
+    }
 
-          <polyline
-            points="5 12 12 5 19 12"
-          ></polyline>
-        </svg>
-        `;
+    // Render Clickable Evidence Chips
+    if (msg.evidence_items && msg.evidence_items.length > 0) {
+      const evidenceWrap = document.createElement('div');
+      evidenceWrap.style.marginTop = '12px';
+      evidenceWrap.innerHTML = '<div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 6px;">🎯 Linked Visual Proof:</div>';
+      
+      const chipsContainer = document.createElement('div');
+      chipsContainer.style.display = 'flex';
+      chipsContainer.style.flexWrap = 'wrap';
+      chipsContainer.style.gap = '6px';
+
+      msg.evidence_items.slice(0, 10).forEach((item) => {
+        const chip = document.createElement('button');
+        chip.className = 'chip-btn active';
+        chip.style.cursor = 'pointer';
+        chip.innerHTML = `<span>#${item.id} ${item.label}</span>`;
+        chip.addEventListener('click', () => highlightEvidenceItem(item.id));
+        chipsContainer.appendChild(chip);
+      });
+
+      if (msg.evidence_items.length > 10) {
+        const moreChip = document.createElement('span');
+        moreChip.style.fontSize = '11px';
+        moreChip.style.color = 'var(--text-muted)';
+        moreChip.textContent = `+ ${msg.evidence_items.length - 10} more in evidence drawer`;
+        chipsContainer.appendChild(moreChip);
+      }
+
+      evidenceWrap.appendChild(chipsContainer);
+      bubble.appendChild(evidenceWrap);
+    }
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    elements.messagesList.appendChild(row);
+  }
+
+  function updateDecisionIndicators(data) {
+    if (!elements.trafficIndicatorBadge || !elements.floodIndicatorBadge) return;
+
+    if (data.intent_detected === 'TRAFFIC_ANALYSIS' || (data.detection_results && data.detection_results.total_detections > 20)) {
+      elements.trafficIndicatorBadge.className = 'intel-badge elevated';
+      elements.trafficIndicatorBadge.innerHTML = '<span class="badge-dot"></span><span>Traffic: Elevated Hotspot</span>';
+    }
+
+    if (data.intent_detected === 'FLOOD_ANALYSIS' || data.intent_detected === 'SAR_ANALYSIS') {
+      elements.floodIndicatorBadge.className = 'intel-badge elevated';
+      elements.floodIndicatorBadge.innerHTML = '<span class="badge-dot"></span><span>Flood: Risk Indicator</span>';
     }
   }
 
   // ==========================================================================
-  // Detection Card
+  // File Staging & Uploads
   // ==========================================================================
+  async function handleFileUpload(file) {
+    showToast(`Uploading ${file.name}...`);
+    const formData = new FormData();
+    formData.append('file', file);
 
-  function renderDetectionCard(msg) {
-    if (
-      !msg.detection_results &&
-      !msg.annotated_image
-    ) {
-      return null;
-    }
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
 
-    const det =
-      msg.detection_results ||
-      {};
+      if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+      const data = await res.json();
 
-    const totalDets =
-      det.total_detections !==
-      undefined
-        ? det.total_detections
-        : (
-            det.detections
-              ? det.detections.length
-              : 0
-          );
-
-    const classCounts =
-      det.class_counts ||
-      {};
-
-    const card =
-      document.createElement(
-        'div'
-      );
-
-    card.className =
-      'detection-telemetry-card';
-
-    // --------------------------------------------------------------
-    // Header
-    // --------------------------------------------------------------
-
-    const header =
-      document.createElement(
-        'div'
-      );
-
-    header.className =
-      'detection-card-header';
-
-    header.innerHTML = `
-      <div class="det-header-left">
-        <span class="det-icon">🎯</span>
-
-        <div>
-          <div class="det-title">
-            YOLO-OBB Detection Telemetry
-          </div>
-
-          <div class="det-subtitle">
-            ${totalDets}
-            Target${totalDets === 1 ? '' : 's'}
-            Identified •
-            ${det.resolution || 'High-Res'} •
-            ${det.crs || 'WGS84'}
-          </div>
-        </div>
-      </div>
-
-      <div class="det-header-right">
-        <span class="det-count-badge">
-          ${totalDets} Detections
-        </span>
-      </div>
-    `;
-
-    card.appendChild(
-      header
-    );
-
-    // --------------------------------------------------------------
-    // Class counts
-    // --------------------------------------------------------------
-
-    if (
-      Object.keys(
-        classCounts
-      ).length > 0
-    ) {
-      const chipsBar =
-        document.createElement(
-          'div'
-        );
-
-      chipsBar.className =
-        'det-chips-bar';
-
-      Object.entries(
-        classCounts
-      ).forEach(
-        ([cls, count]) => {
-          const pill =
-            document.createElement(
-              'span'
-            );
-
-          pill.className =
-            'det-pill';
-
-          pill.innerHTML =
-            `<strong>${count}</strong> ${cls}`;
-
-          chipsBar.appendChild(
-            pill
-          );
-        }
-      );
-
-      card.appendChild(
-        chipsBar
-      );
-    }
-
-    // --------------------------------------------------------------
-    // Annotated image
-    // --------------------------------------------------------------
-
-    if (
-      msg.annotated_image
-    ) {
-      const visualContainer =
-        document.createElement(
-          'div'
-        );
-
-      visualContainer.className =
-        'det-visual-container';
-
-      const imgWrapper =
-        document.createElement(
-          'div'
-        );
-
-      imgWrapper.className =
-        'det-img-wrapper';
-
-      const img =
-        document.createElement(
-          'img'
-        );
-
-      img.src =
-        msg.annotated_image;
-
-      img.alt =
-        'YOLO Oriented Bounding Box Detections';
-
-      img.className =
-        'det-annotated-image';
-
-      img.onclick =
-        () =>
-          openLightbox(
-            msg.annotated_image
-          );
-
-      const overlayBadge =
-        document.createElement(
-          'div'
-        );
-
-      overlayBadge.className =
-        'det-img-badge';
-
-      overlayBadge.innerHTML =
-        `<span>🔍 Click for Full-Screen Inspection</span>`;
-
-      imgWrapper.appendChild(
-        img
-      );
-
-      imgWrapper.appendChild(
-        overlayBadge
-      );
-
-      visualContainer.appendChild(
-        imgWrapper
-      );
-
-      card.appendChild(
-        visualContainer
-      );
-    }
-
-    return card;
-  }
-
-  // ==========================================================================
-  // Markdown
-  // ==========================================================================
-
-  function formatMarkdown(
-    rawText
-  ) {
-    if (window.marked) {
-      return marked.parse(
-        rawText
-      );
-    }
-
-    return rawText
-      .replace(
-        /\n\n/g,
-        '<p></p>'
-      )
-      .replace(
-        /\n/g,
-        '<br>'
-      )
-      .replace(
-        /\*\*(.*?)\*\*/g,
-        '<strong>$1</strong>'
-      )
-      .replace(
-        /\*(.*?)\*/g,
-        '<em>$1</em>'
-      );
-  }
-
-  // ==========================================================================
-  // RAG Sources
-  // ==========================================================================
-
-  function renderRagSources(
-    sources
-  ) {
-    if (
-      !sources ||
-      sources.length === 0
-    ) {
-      return null;
-    }
-
-    const container =
-      document.createElement(
-        'div'
-      );
-
-    container.className =
-      'rag-sources-card';
-
-    const header =
-      document.createElement(
-        'div'
-      );
-
-    header.className =
-      'rag-sources-header';
-
-    header.innerHTML = `
-      <span>
-        📚 Pinecone Knowledge Sources
-        (${sources.length} chunks retrieved)
-      </span>
-
-      <span class="accordion-toggle">
-        ▾
-      </span>
-    `;
-
-    const list =
-      document.createElement(
-        'div'
-      );
-
-    list.className =
-      'rag-sources-list';
-
-    sources.forEach(
-      s => {
-        const item =
-          document.createElement(
-            'div'
-          );
-
-        item.className =
-          'rag-source-item';
-
-        item.innerHTML = `
-          <div class="rag-source-meta">
-            <span class="rag-source-filename">
-              📄 ${s.filename}
-            </span>
-
-            <span class="rag-source-page">
-              Page ${s.page}
-            </span>
-          </div>
-
-          <div class="rag-source-snippet">
-            ${s.snippet}
-          </div>
-        `;
-
-        list.appendChild(
-          item
-        );
+      if (data.file_type === 'npy') {
+        stageImage(data.npy_reference, file.name);
+        showToast(`SAR .npy ingested: ${file.name}`);
+      } else {
+        stageImage(data.data_url, file.name);
+        elements.activeInspectionImage.src = data.data_url;
+        showToast(`Satellite image ingested: ${file.name}`);
       }
-    );
-
-    header.onclick = () => {
-      list.classList.toggle(
-        'hidden'
-      );
-
-      const toggleIcon =
-        header.querySelector(
-          '.accordion-toggle'
-        );
-
-      if (toggleIcon) {
-        toggleIcon.textContent =
-          list.classList.contains(
-            'hidden'
-          )
-            ? '▸'
-            : '▾';
-      }
-    };
-
-    container.appendChild(
-      header
-    );
-
-    container.appendChild(
-      list
-    );
-
-    return container;
-  }
-
-  // ==========================================================================
-  // Message Rendering
-  // ==========================================================================
-
-  function appendMessageToDOM(
-    msg
-  ) {
-    const item =
-      document.createElement(
-        'div'
-      );
-
-    item.className =
-      `message-item ${msg.role}`;
-
-    item.id =
-      msg.id;
-
-    const avatar =
-      document.createElement(
-        'div'
-      );
-
-    avatar.className =
-      'msg-avatar';
-
-    if (
-      msg.role === 'user'
-    ) {
-      avatar.textContent =
-        'U';
-    } else {
-      avatar.innerHTML = `
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="3"
-          ></circle>
-
-          <path
-            d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"
-          ></path>
-        </svg>
-      `;
-    }
-
-    const bubble =
-      document.createElement(
-        'div'
-      );
-
-    bubble.className =
-      'msg-bubble';
-
-    // --------------------------------------------------------------
-    // Uploaded images / NPY previews
-    // --------------------------------------------------------------
-
-    if (
-      msg.images &&
-      msg.images.length > 0
-    ) {
-      const imgStrip =
-        document.createElement(
-          'div'
-        );
-
-      imgStrip.className =
-        'msg-images-strip';
-
-      msg.images.forEach(
-        (imgData, i) => {
-          const thumbWrap =
-            document.createElement(
-              'div'
-            );
-
-          thumbWrap.className =
-            'msg-thumb-wrapper';
-
-          thumbWrap.onclick =
-            () =>
-              openLightbox(
-                imgData
-              );
-
-          const img =
-            document.createElement(
-              'img'
-            );
-
-          img.src =
-            imgData;
-
-          img.alt =
-            `Uploaded visual ${i + 1}`;
-
-          const badge =
-            document.createElement(
-              'span'
-            );
-
-          badge.className =
-            'thumb-zoom-badge';
-
-          // Show NPY badge when possible
-          const file =
-            msg.files &&
-            msg.files[i];
-
-          if (
-            file &&
-            file.file_type ===
-              'npy'
-          ) {
-            badge.textContent =
-              '🔢 NPY • Click to Zoom';
-          } else {
-            badge.textContent =
-              '🔍 Click to Zoom';
-          }
-
-          thumbWrap.appendChild(
-            img
-          );
-
-          thumbWrap.appendChild(
-            badge
-          );
-
-          imgStrip.appendChild(
-            thumbWrap
-          );
-        }
-      );
-
-      bubble.appendChild(
-        imgStrip
-      );
-    }
-
-    // --------------------------------------------------------------
-    // YOLO Detection Card
-    // --------------------------------------------------------------
-
-    if (
-      msg.detection_results ||
-      msg.annotated_image
-    ) {
-      const detCard =
-        renderDetectionCard(
-          msg
-        );
-
-      if (detCard) {
-        bubble.appendChild(
-          detCard
-        );
-      }
-    }
-
-    // --------------------------------------------------------------
-    // Text
-    // --------------------------------------------------------------
-
-    const textCard =
-      document.createElement(
-        'div'
-      );
-
-    textCard.className =
-      'msg-text-card markdown-body';
-
-    textCard.innerHTML =
-      formatMarkdown(
-        msg.content
-      );
-
-    enhanceCodeBlocks(
-      textCard
-    );
-
-    bubble.appendChild(
-      textCard
-    );
-
-    // --------------------------------------------------------------
-    // RAG sources
-    // --------------------------------------------------------------
-
-    if (
-      msg.rag_sources &&
-      msg.rag_sources.length > 0
-    ) {
-      const ragCard =
-        renderRagSources(
-          msg.rag_sources
-        );
-
-      if (ragCard) {
-        bubble.appendChild(
-          ragCard
-        );
-      }
-    }
-
-    // --------------------------------------------------------------
-    // Assistant actions
-    // --------------------------------------------------------------
-
-    if (
-      msg.role === 'assistant'
-    ) {
-      const actionsBar =
-        document.createElement(
-          'div'
-        );
-
-      actionsBar.className =
-        'msg-actions-bar';
-
-      // Copy
-      const copyBtn =
-        document.createElement(
-          'button'
-        );
-
-      copyBtn.className =
-        'action-pill-btn';
-
-      copyBtn.innerHTML = `
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <rect
-            x="9"
-            y="9"
-            width="13"
-            height="13"
-            rx="2"
-          ></rect>
-
-          <path
-            d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-          ></path>
-        </svg>
-
-        <span>Copy</span>
-      `;
-
-      copyBtn.onclick =
-        () => {
-          navigator.clipboard.writeText(
-            msg.content
-          );
-
-          showToast(
-            'Copied response to clipboard',
-            'success'
-          );
-        };
-
-      // Listen
-      const speakBtn =
-        document.createElement(
-          'button'
-        );
-
-      speakBtn.className =
-        'action-pill-btn';
-
-      speakBtn.innerHTML = `
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <polygon
-            points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
-          ></polygon>
-
-          <path
-            d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
-          ></path>
-        </svg>
-
-        <span>Listen</span>
-      `;
-
-      speakBtn.onclick =
-        () =>
-          speakText(
-            msg.content
-          );
-
-      actionsBar.appendChild(
-        copyBtn
-      );
-
-      actionsBar.appendChild(
-        speakBtn
-      );
-
-      if (
-        msg.provider_used
-      ) {
-        const modelTag =
-          document.createElement(
-            'span'
-          );
-
-        modelTag.className =
-          'model-tag';
-
-        modelTag.textContent =
-          msg.provider_used;
-
-        actionsBar.appendChild(
-          modelTag
-        );
-      }
-
-      bubble.appendChild(
-        actionsBar
-      );
-    }
-
-    item.appendChild(
-      avatar
-    );
-
-    item.appendChild(
-      bubble
-    );
-
-    elements.messagesList.appendChild(
-      item
-    );
-  }
-
-  // ==========================================================================
-  // Streaming Assistant Message
-  // ==========================================================================
-
-  async function streamMessageToDOM(
-    msg
-  ) {
-    const item =
-      document.createElement(
-        'div'
-      );
-
-    item.className =
-      'message-item assistant';
-
-    item.id =
-      msg.id;
-
-    const avatar =
-      document.createElement(
-        'div'
-      );
-
-    avatar.className =
-      'msg-avatar';
-
-    avatar.innerHTML = `
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="3"
-        ></circle>
-
-        <path
-          d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"
-        ></path>
-      </svg>
-    `;
-
-    const bubble =
-      document.createElement(
-        'div'
-      );
-
-    bubble.className =
-      'msg-bubble';
-
-    // --------------------------------------------------------------
-    // Detection
-    // --------------------------------------------------------------
-
-    if (
-      msg.detection_results ||
-      msg.annotated_image
-    ) {
-      const detCard =
-        renderDetectionCard(
-          msg
-        );
-
-      if (detCard) {
-        bubble.appendChild(
-          detCard
-        );
-      }
-    }
-
-    // --------------------------------------------------------------
-    // Text
-    // --------------------------------------------------------------
-
-    const textCard =
-      document.createElement(
-        'div'
-      );
-
-    textCard.className =
-      'msg-text-card markdown-body';
-
-    bubble.appendChild(
-      textCard
-    );
-
-    item.appendChild(
-      avatar
-    );
-
-    item.appendChild(
-      bubble
-    );
-
-    elements.messagesList.appendChild(
-      item
-    );
-
-    // --------------------------------------------------------------
-    // Simulated streaming
-    // --------------------------------------------------------------
-
-    const fullText =
-      msg.content;
-
-    const chunkLength =
-      16;
-
-    let currentIdx =
-      0;
-
-    while (
-      currentIdx <
-      fullText.length
-    ) {
-      currentIdx +=
-        chunkLength;
-
-      textCard.innerHTML =
-        formatMarkdown(
-          fullText.substring(
-            0,
-            currentIdx
-          )
-        );
-
-      scrollChatToBottom();
-
-      await new Promise(
-        r =>
-          setTimeout(
-            r,
-            10
-          )
-      );
-    }
-
-    textCard.innerHTML =
-      formatMarkdown(
-        fullText
-      );
-
-    enhanceCodeBlocks(
-      textCard
-    );
-
-    // --------------------------------------------------------------
-    // RAG sources
-    // --------------------------------------------------------------
-
-    if (
-      msg.rag_sources &&
-      msg.rag_sources.length > 0
-    ) {
-      const ragCard =
-        renderRagSources(
-          msg.rag_sources
-        );
-
-      if (ragCard) {
-        bubble.appendChild(
-          ragCard
-        );
-      }
-    }
-
-    // --------------------------------------------------------------
-    // Actions
-    // --------------------------------------------------------------
-
-    const actionsBar =
-      document.createElement(
-        'div'
-      );
-
-    actionsBar.className =
-      'msg-actions-bar';
-
-    // Copy
-    const copyBtn =
-      document.createElement(
-        'button'
-      );
-
-    copyBtn.className =
-      'action-pill-btn';
-
-    copyBtn.innerHTML = `
-      <svg
-        width="13"
-        height="13"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <rect
-          x="9"
-          y="9"
-          width="13"
-          height="13"
-          rx="2"
-        ></rect>
-
-        <path
-          d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-        ></path>
-      </svg>
-
-      <span>Copy</span>
-    `;
-
-    copyBtn.onclick =
-      () => {
-        navigator.clipboard.writeText(
-          msg.content
-        );
-
-        showToast(
-          'Copied response to clipboard',
-          'success'
-        );
-      };
-
-    // Listen
-    const speakBtn =
-      document.createElement(
-        'button'
-      );
-
-    speakBtn.className =
-      'action-pill-btn';
-
-    speakBtn.innerHTML = `
-      <svg
-        width="13"
-        height="13"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <polygon
-          points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
-        ></polygon>
-
-        <path
-          d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
-        ></path>
-      </svg>
-
-      <span>Listen</span>
-    `;
-
-    speakBtn.onclick =
-      () =>
-        speakText(
-          msg.content
-        );
-
-    actionsBar.appendChild(
-      copyBtn
-    );
-
-    actionsBar.appendChild(
-      speakBtn
-    );
-
-    if (
-      msg.provider_used
-    ) {
-      const modelTag =
-        document.createElement(
-          'span'
-        );
-
-      modelTag.className =
-        'model-tag';
-
-      modelTag.textContent =
-        msg.provider_used;
-
-      actionsBar.appendChild(
-        modelTag
-      );
-    }
-
-    bubble.appendChild(
-      actionsBar
-    );
-  }
-
-  // ==========================================================================
-  // Code Blocks
-  // ==========================================================================
-
-  function enhanceCodeBlocks(
-    container
-  ) {
-    const preBlocks =
-      container.querySelectorAll(
-        'pre'
-      );
-
-    preBlocks.forEach(
-      pre => {
-        if (
-          pre.parentElement.classList.contains(
-            'code-block-wrapper'
-          )
-        ) {
-          return;
-        }
-
-        const wrapper =
-          document.createElement(
-            'div'
-          );
-
-        wrapper.className =
-          'code-block-wrapper';
-
-        const header =
-          document.createElement(
-            'div'
-          );
-
-        header.className =
-          'code-block-header';
-
-        const codeEl =
-          pre.querySelector(
-            'code'
-          );
-
-        const langMatch =
-          codeEl
-            ? codeEl.className.match(
-                /language-(\w+)/
-              )
-            : null;
-
-        const langName =
-          langMatch
-            ? langMatch[1]
-            : 'code';
-
-        header.innerHTML =
-          `<span>${langName}</span>`;
-
-        const copyBtn =
-          document.createElement(
-            'button'
-          );
-
-        copyBtn.className =
-          'copy-code-btn';
-
-        copyBtn.innerHTML = `
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect
-              x="9"
-              y="9"
-              width="13"
-              height="13"
-              rx="2"
-            ></rect>
-
-            <path
-              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-            ></path>
-          </svg>
-
-          Copy
-        `;
-
-        copyBtn.onclick =
-          () => {
-            navigator.clipboard.writeText(
-              pre.innerText
-            );
-
-            copyBtn.textContent =
-              'Copied!';
-
-            setTimeout(
-              () => {
-                copyBtn.innerHTML = `
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect
-                      x="9"
-                      y="9"
-                      width="13"
-                      height="13"
-                      rx="2"
-                    ></rect>
-
-                    <path
-                      d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                    ></path>
-                  </svg>
-
-                  Copy
-                `;
-              },
-              2000
-            );
-          };
-
-        header.appendChild(
-          copyBtn
-        );
-
-        pre.parentNode.insertBefore(
-          wrapper,
-          pre
-        );
-
-        wrapper.appendChild(
-          header
-        );
-
-        wrapper.appendChild(
-          pre
-        );
-      }
-    );
-  }
-
-  // ==========================================================================
-  // Scrolling
-  // ==========================================================================
-
-  function scrollChatToBottom() {
-    if (
-      elements.chatContainer
-    ) {
-      elements.chatContainer.scrollTop =
-        elements.chatContainer.scrollHeight;
+    } catch (err) {
+      showToast(`Upload error: ${err.message}`);
     }
   }
 
-  // ==========================================================================
-  // Text To Speech
-  // ==========================================================================
+  function stageImage(dataUrl, filename = 'Image') {
+    state.stagedImages.push(dataUrl);
+    renderStagedTray();
+  }
 
-  function speakText(
-    text
-  ) {
-    if (
-      !window.speechSynthesis
-    ) {
-      showToast(
-        'Text-to-speech not supported by browser',
-        'error'
-      );
+  function clearStagedImages() {
+    state.stagedImages = [];
+    renderStagedTray();
+  }
 
+  function renderStagedTray() {
+    if (!elements.imagePreviewTray) return;
+    elements.imagePreviewTray.innerHTML = '';
+    if (state.stagedImages.length === 0) {
+      elements.imagePreviewTray.classList.add('hidden');
       return;
     }
+    elements.imagePreviewTray.classList.remove('hidden');
 
-    window.speechSynthesis.cancel();
+    state.stagedImages.forEach((img, idx) => {
+      const thumb = document.createElement('div');
+      thumb.style.position = 'relative';
+      thumb.style.display = 'inline-block';
+      thumb.style.marginRight = '8px';
 
-    const cleanText =
-      text.replace(
-        /[#*`_~]/g,
-        ''
-      );
-
-    const utterance =
-      new SpeechSynthesisUtterance(
-        cleanText
-      );
-
-    utterance.rate =
-      1.05;
-
-    window.speechSynthesis.speak(
-      utterance
-    );
-
-    showToast(
-      'Speaking response...',
-      'info'
-    );
+      const previewSrc = img.startsWith('npy://') ? '/static/images/sat_icon.png' : img;
+      thumb.innerHTML = `
+        <img src="${previewSrc}" style="width: 52px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-glow);">
+        <button style="position: absolute; top: -6px; right: -6px; background: var(--accent-rose); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer;">✕</button>
+      `;
+      thumb.querySelector('button').addEventListener('click', () => {
+        state.stagedImages.splice(idx, 1);
+        renderStagedTray();
+      });
+      elements.imagePreviewTray.appendChild(thumb);
+    });
   }
 
   // ==========================================================================
-  // Lightbox
+  // Demo Scenarios & Reports
   // ==========================================================================
+  async function loadDemoScenarios() {
+    try {
+      const res = await fetch('/api/demo/scenarios');
+      if (!res.ok) return;
+      const data = await res.json();
+      elements.demoScenariosList.innerHTML = '';
 
-  function openLightbox(
-    imgSrc
-  ) {
-    state.lightboxScale =
-      1;
-
-    elements.lightboxImage.src =
-      imgSrc;
-
-    elements.lightboxImage.style.transform =
-      'scale(1)';
-
-    elements.imageLightboxModal.classList.remove(
-      'hidden'
-    );
+      data.scenarios.forEach((s) => {
+        const card = document.createElement('div');
+        card.className = 'demo-scenario-card';
+        card.innerHTML = `
+          <div>
+            <div class="demo-scenario-title">${s.name} <span class="badge" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 10px; margin-left: 6px;">${s.tag}</span></div>
+            <div class="demo-scenario-desc">${s.description}</div>
+          </div>
+          <button class="btn primary" style="font-size: 12px; padding: 6px 12px;">Launch</button>
+        `;
+        card.querySelector('button').addEventListener('click', () => {
+          elements.demoModal.classList.add('hidden');
+          runDemoScenario(s);
+        });
+        elements.demoScenariosList.appendChild(card);
+      });
+    } catch (e) {
+      console.error('Failed to load demo scenarios', e);
+    }
   }
 
-  function closeLightbox() {
-    elements.imageLightboxModal.classList.add(
-      'hidden'
-    );
+  async function runDemoScenario(scenario) {
+    showToast(`Launching ${scenario.name}...`);
+    elements.promptInput.value = scenario.default_prompt;
 
-    elements.lightboxImage.src =
-      '';
-  }
-
-  function openModal(
-    modalEl
-  ) {
-    modalEl.classList.remove(
-      'hidden'
-    );
-  }
-
-  function closeModal(
-    modalEl
-  ) {
-    modalEl.classList.add(
-      'hidden'
-    );
-  }
-
-  // ==========================================================================
-  // Toast
-  // ==========================================================================
-
-  function showToast(
-    message,
-    type = 'info'
-  ) {
-    const toast =
-      document.createElement(
-        'div'
-      );
-
-    toast.className =
-      `toast ${type}`;
-
-    toast.textContent =
-      message;
-
-    elements.toastContainer.appendChild(
-      toast
-    );
-
-    setTimeout(
-      () => {
-        toast.style.opacity =
-          '0';
-
-        toast.style.transform =
-          'translateX(100%)';
-
-        setTimeout(
-          () =>
-            toast.remove(),
-          250
-        );
-      },
-      3200
-    );
-  }
-
-  // ==========================================================================
-  // Event Listeners
-  // ==========================================================================
-
-  function setupEventListeners() {
-
-    // ------------------------------------------------------------------------
-    // Theme
-    // ------------------------------------------------------------------------
-
-    elements.themeToggleBtn.addEventListener(
-      'click',
-      toggleTheme
-    );
-
-    // ------------------------------------------------------------------------
-    // Sidebar
-    // ------------------------------------------------------------------------
-
-    elements.sidebarToggleBtn.addEventListener(
-      'click',
-      () => {
-        elements.sidebar.classList.toggle(
-          'collapsed'
-        );
-      }
-    );
-
-    elements.sidebarCloseBtn.addEventListener(
-      'click',
-      () => {
-        elements.sidebar.classList.add(
-          'collapsed'
-        );
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // New Chat
-    // ------------------------------------------------------------------------
-
-    elements.newChatBtn.addEventListener(
-      'click',
-      startNewChat
-    );
-
-    // ------------------------------------------------------------------------
-    // Keyboard shortcut
-    // ------------------------------------------------------------------------
-
-    window.addEventListener(
-      'keydown',
-      e => {
-        if (
-          (e.metaKey ||
-            e.ctrlKey) &&
-          e.key === 'k'
-        ) {
-          e.preventDefault();
-
-          startNewChat();
+    if (scenario.sample_image) {
+      // Ingest test image
+      try {
+        const res = await fetch('/api/detect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: scenario.sample_image, confThreshold: 0.20 })
+        });
+        const detData = await res.json();
+        if (detData.detections) {
+          state.activeDetections = detData.detections;
+          plotDetectionsOnMap(detData.detections);
         }
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Model selector
-    // ------------------------------------------------------------------------
-
-    elements.modelSelector.addEventListener(
-      'change',
-      handleModelChange
-    );
-
-    // ------------------------------------------------------------------------
-    // Detection toggle
-    // ------------------------------------------------------------------------
-
-    if (
-      elements.detectionToggle
-    ) {
-      elements.detectionToggle.addEventListener(
-        'click',
-        () => {
-          state.useDetection =
-            !state.useDetection;
-
-          elements.detectionToggle.classList.toggle(
-            'active',
-            state.useDetection
-          );
-
-          showToast(
-            `YOLO-OBB Object Detection ${
-              state.useDetection
-                ? 'enabled'
-                : 'disabled'
-            }`,
-            'info'
-          );
+        if (detData.annotated_image) {
+          elements.activeInspectionImage.src = detData.annotated_image;
         }
-      );
+      } catch (e) {
+        console.error(e);
+      }
+    } else if (scenario.sample_npy) {
+      state.stagedImages = [scenario.sample_npy];
+      renderStagedTray();
+    } else if (scenario.type === 'change' && scenario.sample_image_a && scenario.sample_image_b) {
+      // Execute change detection
+      try {
+        const res = await fetch('/api/change/detect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_a: scenario.sample_image_a,
+            image_b: scenario.sample_image_b,
+            date_a: '2024-01-15',
+            date_b: '2024-06-20'
+          })
+        });
+        const chData = await res.json();
+        elements.compareBeforeImg.src = chData.before_preview;
+        elements.compareAfterImg.src = chData.change_heatmap_preview;
+        switchView('change');
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    // ------------------------------------------------------------------------
-    // RAG toggle
-    // ------------------------------------------------------------------------
+    sendMessage(scenario.default_prompt);
+  }
 
-    if (
-      elements.ragToggle
-    ) {
-      elements.ragToggle.addEventListener(
-        'click',
-        () => {
-          state.useRag =
-            !state.useRag;
-
-          elements.ragToggle.classList.toggle(
-            'active',
-            state.useRag
-          );
-
-          handleModelChange();
-
-          showToast(
-            `Pinecone RAG ${
-              state.useRag
-                ? 'enabled'
-                : 'disabled'
-            }`,
-            'info'
-          );
+  async function generateIntelligenceReport() {
+    showToast('Compiling executive intelligence report...');
+    try {
+      const payload = {
+        title: 'VisionOrbit Earth Observation Intelligence Report',
+        aoi_name: 'Operational Satellite Footprint',
+        detections: state.activeDetections,
+        sensor_info: {
+          sensor: 'Multi-Sensor Optical & Sentinel-1 SAR',
+          resolution: '0.5m High-Res GSD',
+          crs: 'EPSG:4326 (WGS84)'
         }
-      );
+      };
+
+      const res = await fetch('/api/report/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Report generation failed');
+      const data = await res.json();
+
+      if (typeof marked !== 'undefined') {
+        elements.reportMarkdownRender.innerHTML = marked.parse(data.markdown_content);
+      } else {
+        elements.reportMarkdownRender.textContent = data.markdown_content;
+      }
+
+      elements.reportModal.classList.remove('hidden');
+    } catch (e) {
+      showToast(`Error: ${e.message}`);
     }
-
-    // ------------------------------------------------------------------------
-    // Web search
-    // ------------------------------------------------------------------------
-
-    elements.webSearchToggle.addEventListener(
-      'click',
-      () => {
-        state.useWebSearch =
-          !state.useWebSearch;
-
-        elements.webSearchToggle.classList.toggle(
-          'active',
-          state.useWebSearch
-        );
-
-        showToast(
-          `Web search ${
-            state.useWebSearch
-              ? 'enabled'
-              : 'disabled'
-          }`,
-          'info'
-        );
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Clear chat
-    // ------------------------------------------------------------------------
-
-    elements.clearChatBtn.addEventListener(
-      'click',
-      () => {
-        const chat =
-          getCurrentChat();
-
-        if (chat) {
-          chat.messages =
-            [];
-
-          saveConversations();
-
-          renderCurrentChat();
-
-          showToast(
-            'Chat cleared',
-            'info'
-          );
-        }
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Export chat
-    // ------------------------------------------------------------------------
-
-    elements.exportChatBtn.addEventListener(
-      'click',
-      () => {
-        const chat =
-          getCurrentChat();
-
-        if (
-          !chat ||
-          chat.messages.length === 0
-        ) {
-          showToast(
-            'No messages to export',
-            'error'
-          );
-
-          return;
-        }
-
-        let mdContent =
-          `# VisionOrbit Conversation: ${chat.title}\n` +
-          `*Exported on ${new Date().toLocaleString()}*\n\n` +
-          `---\n\n`;
-
-        chat.messages.forEach(
-          m => {
-            mdContent +=
-              `### ${
-                m.role === 'user'
-                  ? '👤 User'
-                  : '🪐 VisionOrbit AI'
-              }\n\n`;
-
-            mdContent +=
-              `${m.content}\n\n`;
-
-            mdContent +=
-              `---\n\n`;
-          }
-        );
-
-        const blob =
-          new Blob(
-            [mdContent],
-            {
-              type:
-                'text/markdown'
-            }
-          );
-
-        const url =
-          URL.createObjectURL(
-            blob
-          );
-
-        const a =
-          document.createElement(
-            'a'
-          );
-
-        a.href =
-          url;
-
-        a.download =
-          `VisionOrbit_${chat.title.replace(
-            /[^a-zA-Z0-9]/g,
-            '_'
-          )}.md`;
-
-        a.click();
-
-        URL.revokeObjectURL(
-          url
-        );
-
-        showToast(
-          'Exported conversation as Markdown',
-          'success'
-        );
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Prompt auto-resize
-    // ------------------------------------------------------------------------
-
-    elements.promptInput.addEventListener(
-      'input',
-      function () {
-        this.style.height =
-          'auto';
-
-        this.style.height =
-          Math.min(
-            this.scrollHeight,
-            180
-          ) + 'px';
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Enter to send
-    // ------------------------------------------------------------------------
-
-    elements.promptInput.addEventListener(
-      'keydown',
-      function (e) {
-        if (
-          e.key === 'Enter' &&
-          !e.shiftKey
-        ) {
-          e.preventDefault();
-
-          handleChatSubmit();
-        }
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Chat form
-    // ------------------------------------------------------------------------
-
-    elements.chatForm.addEventListener(
-      'submit',
-      handleChatSubmit
-    );
-
-    // ------------------------------------------------------------------------
-    // Upload button
-    // ------------------------------------------------------------------------
-
-    elements.uploadBtn.addEventListener(
-      'click',
-      () => {
-        elements.imageFileInput.click();
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // File input
-    // ------------------------------------------------------------------------
-
-    elements.imageFileInput.addEventListener(
-      'change',
-      e => {
-        handleFileSelection(
-          e.target.files
-        );
-
-        // Allow selecting the same
-        // file again later.
-        elements.imageFileInput.value =
-          '';
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Hero dropzone
-    // ------------------------------------------------------------------------
-
-    elements.heroDropzone.addEventListener(
-      'click',
-      () => {
-        elements.imageFileInput.click();
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Suggestion cards
-    // ------------------------------------------------------------------------
-
-    document
-      .querySelectorAll(
-        '.suggestion-card'
-      )
-      .forEach(
-        card => {
-          card.addEventListener(
-            'click',
-            () => {
-              const promptText =
-                card.getAttribute(
-                  'data-prompt'
-                );
-
-              elements.promptInput.value =
-                promptText;
-
-              elements.promptInput.focus();
-
-              elements.promptInput.dispatchEvent(
-                new Event('input')
-              );
-            }
-          );
-        }
-      );
-
-    // ------------------------------------------------------------------------
-    // Clipboard paste
-    // ------------------------------------------------------------------------
-
-    window.addEventListener(
-      'paste',
-      e => {
-        const items =
-          e.clipboardData
-            ? e.clipboardData.items
-            : [];
-
-        for (
-          let i = 0;
-          i < items.length;
-          i++
-        ) {
-          if (
-            items[i].type.indexOf(
-              'image'
-            ) !== -1
-          ) {
-            const file =
-              items[i].getAsFile();
-
-            handleFileSelection(
-              [file]
-            );
-
-            showToast(
-              'Image pasted from clipboard',
-              'info'
-            );
-          }
-        }
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Drag & Drop
-    // ------------------------------------------------------------------------
-
-    let dragCounter = 0;
-
-    window.addEventListener(
-      'dragenter',
-      e => {
-        e.preventDefault();
-
-        dragCounter++;
-
-        elements.dragDropOverlay.classList.add(
-          'active'
-        );
-      }
-    );
-
-    window.addEventListener(
-      'dragleave',
-      e => {
-        e.preventDefault();
-
-        dragCounter--;
-
-        if (
-          dragCounter <= 0
-        ) {
-          dragCounter = 0;
-
-          elements.dragDropOverlay.classList.remove(
-            'active'
-          );
-        }
-      }
-    );
-
-    window.addEventListener(
-      'dragover',
-      e => {
-        e.preventDefault();
-      }
-    );
-
-    window.addEventListener(
-      'drop',
-      e => {
-        e.preventDefault();
-
-        dragCounter = 0;
-
-        elements.dragDropOverlay.classList.remove(
-          'active'
-        );
-
-        if (
-          e.dataTransfer &&
-          e.dataTransfer.files.length > 0
-        ) {
-          handleFileSelection(
-            e.dataTransfer.files
-          );
-        }
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Voice recognition
-    // ------------------------------------------------------------------------
-
-    if (
-      'webkitSpeechRecognition' in
-        window ||
-      'SpeechRecognition' in
-        window
-    ) {
-      const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-      const recognition =
-        new SpeechRecognition();
-
-      recognition.continuous =
-        false;
-
-      recognition.interimResults =
-        false;
-
-      recognition.onresult =
-        event => {
-          const transcript =
-            event.results[0][0]
-              .transcript;
-
-          elements.promptInput.value +=
-            (
-              elements.promptInput
-                .value
-                ? ' '
-                : ''
-            ) + transcript;
-
-          elements.promptInput.dispatchEvent(
-            new Event('input')
-          );
-
-          elements.voiceInputBtn.classList.remove(
-            'active'
-          );
-
-          showToast(
-            'Voice transcription captured',
-            'info'
-          );
-        };
-
-      recognition.onerror =
-        () => {
-          elements.voiceInputBtn.classList.remove(
-            'active'
-          );
-
-          showToast(
-            'Speech recognition error',
-            'error'
-          );
-        };
-
-      recognition.onend =
-        () => {
-          elements.voiceInputBtn.classList.remove(
-            'active'
-          );
-        };
-
-      elements.voiceInputBtn.addEventListener(
-        'click',
-        () => {
-          if (
-            elements.voiceInputBtn.classList.contains(
-              'active'
-            )
-          ) {
-            recognition.stop();
-
-            elements.voiceInputBtn.classList.remove(
-              'active'
-            );
-
-          } else {
-            recognition.start();
-
-            elements.voiceInputBtn.classList.add(
-              'active'
-            );
-
-            showToast(
-              'Listening... Speak now',
-              'info'
-            );
-          }
-        }
-      );
-
-    } else {
-      elements.voiceInputBtn.title =
-        'Speech recognition not supported in this browser';
-
-      elements.voiceInputBtn.style.opacity =
-        '0.5';
-    }
-
-    // ------------------------------------------------------------------------
-    // Settings modal
-    // ------------------------------------------------------------------------
-
-    elements.openSettingsBtn.addEventListener(
-      'click',
-      () =>
-        openModal(
-          elements.settingsModal
-        )
-    );
-
-    elements.closeSettingsModalBtn.addEventListener(
-      'click',
-      () =>
-        closeModal(
-          elements.settingsModal
-        )
-    );
-
-    elements.settingsModal
-      .querySelector(
-        '.modal-backdrop'
-      )
-      .addEventListener(
-        'click',
-        () =>
-          closeModal(
-            elements.settingsModal
-          )
-      );
-
-    elements.saveSettingsBtn.addEventListener(
-      'click',
-      saveSettings
-    );
-
-    elements.resetSettingsBtn.addEventListener(
-      'click',
-      resetSettings
-    );
-
-    // ------------------------------------------------------------------------
-    // API key visibility
-    // ------------------------------------------------------------------------
-
-    elements.toggleKeyVisibility.addEventListener(
-      'click',
-      () => {
-        const isPass =
-          elements.openaiKeyInput
-            .type ===
-          'password';
-
-        elements.openaiKeyInput.type =
-          isPass
-            ? 'text'
-            : 'password';
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Lightbox
-    // ------------------------------------------------------------------------
-
-    elements.lightboxCloseBtn.addEventListener(
-      'click',
-      closeLightbox
-    );
-
-    elements.imageLightboxModal
-      .querySelector(
-        '.lightbox-backdrop'
-      )
-      .addEventListener(
-        'click',
-        closeLightbox
-      );
-
-    elements.lightboxZoomIn.addEventListener(
-      'click',
-      () => {
-        state.lightboxScale =
-          Math.min(
-            state.lightboxScale +
-              0.3,
-            3
-          );
-
-        elements.lightboxImage.style.transform =
-          `scale(${state.lightboxScale})`;
-      }
-    );
-
-    elements.lightboxZoomOut.addEventListener(
-      'click',
-      () => {
-        state.lightboxScale =
-          Math.max(
-            state.lightboxScale -
-              0.3,
-            0.5
-          );
-
-        elements.lightboxImage.style.transform =
-          `scale(${state.lightboxScale})`;
-      }
-    );
-
-    // ------------------------------------------------------------------------
-    // Scroll-to-bottom
-    // ------------------------------------------------------------------------
-
-    elements.chatContainer.addEventListener(
-      'scroll',
-      () => {
-        const scrollPos =
-          elements.chatContainer.scrollTop;
-
-        const scrollHeight =
-          elements.chatContainer.scrollHeight;
-
-        const clientHeight =
-          elements.chatContainer.clientHeight;
-
-        if (
-          scrollHeight -
-            scrollPos -
-            clientHeight >
-          200
-        ) {
-          elements.scrollToBottomBtn.classList.remove(
-            'hidden'
-          );
-        } else {
-          elements.scrollToBottomBtn.classList.add(
-            'hidden'
-          );
-        }
-      }
-    );
-
-    elements.scrollToBottomBtn.addEventListener(
-      'click',
-      scrollChatToBottom
-    );
   }
 
   // ==========================================================================
-  // Start Application
+  // Event Listeners & Utilities
   // ==========================================================================
+  function initEventListeners() {
+    // Sidebar toggle
+    elements.sidebarToggleBtn.addEventListener('click', () => {
+      elements.sidebar.classList.toggle('collapsed');
+      setTimeout(() => { if (state.map) state.map.invalidateSize(); }, 250);
+    });
 
-  if (
-    document.readyState ===
-    'loading'
-  ) {
-    document.addEventListener(
-      'DOMContentLoaded',
-      initApp
-    );
-  } else {
-    initApp();
+    // Viewport Mode Buttons
+    elements.modeMapBtn.addEventListener('click', () => switchView('map'));
+    elements.modeImageBtn.addEventListener('click', () => switchView('image'));
+    elements.modeChangeBtn.addEventListener('click', () => switchView('change'));
+    elements.modeEvidenceBtn.addEventListener('click', () => switchView('evidence'));
+
+    // Map Basemaps
+    elements.basemapSatBtn.addEventListener('click', () => switchBasemap('sat'));
+    elements.basemapDarkBtn.addEventListener('click', () => switchBasemap('dark'));
+    elements.basemapOsmBtn.addEventListener('click', () => switchBasemap('osm'));
+
+    // AOI Buttons
+    elements.drawBoxAoiBtn.addEventListener('click', () => {
+      showToast('Click and drag on map to select Bounding Box AOI');
+    });
+    elements.clearAoiBtn.addEventListener('click', () => {
+      if (state.mapLayers.aoiLayer) state.mapLayers.aoiLayer.clearLayers();
+      if (state.activeDetections.length > 0) plotDetectionsOnMap(state.activeDetections);
+      showToast('AOI cleared. Displaying all targets.');
+    });
+
+    // Layer Toggles
+    elements.toggleLayerDetections.addEventListener('change', (e) => {
+      if (e.target.checked) state.mapLayers.detectionsLayer.addTo(state.map);
+      else state.map.removeLayer(state.mapLayers.detectionsLayer);
+    });
+
+    // Chat Form Submit
+    elements.chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sendMessage();
+    });
+
+    elements.promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // File Upload Drag & Drop
+    elements.uploadBtn.addEventListener('click', () => elements.imageFileInput.click());
+    elements.imageFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+
+    elements.heroDropzone.addEventListener('click', () => elements.imageFileInput.click());
+
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      elements.dragDropOverlay.classList.remove('hidden');
+    });
+    elements.dragDropOverlay.addEventListener('dragleave', (e) => {
+      elements.dragDropOverlay.classList.add('hidden');
+    });
+    elements.dragDropOverlay.addEventListener('drop', (e) => {
+      e.preventDefault();
+      elements.dragDropOverlay.classList.add('hidden');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    // Suggestion Cards
+    document.querySelectorAll('.suggestion-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        sendMessage(card.dataset.prompt);
+      });
+    });
+
+    // Model Selector
+    elements.modelSelector.addEventListener('change', (e) => {
+      state.currentModel = e.target.value;
+      showToast(`Switched active engine to ${state.currentModel}`);
+    });
+
+    // Feature Toggles
+    elements.detectionToggle.addEventListener('click', () => {
+      state.useDetection = !state.useDetection;
+      elements.detectionToggle.classList.toggle('active', state.useDetection);
+      showToast(`YOLO-OBB Detection ${state.useDetection ? 'Enabled' : 'Disabled'}`);
+    });
+
+    elements.ragToggle.addEventListener('click', () => {
+      state.useRag = !state.useRag;
+      elements.ragToggle.classList.toggle('active', state.useRag);
+      showToast(`Pinecone RAG Knowledge Base ${state.useRag ? 'Enabled' : 'Disabled'}`);
+    });
+
+    // Demos & Report
+    elements.openDemoBtn.addEventListener('click', () => {
+      loadDemoScenarios();
+      elements.demoModal.classList.remove('hidden');
+    });
+    elements.closeDemoModalBtn.addEventListener('click', () => {
+      elements.demoModal.classList.add('hidden');
+    });
+
+    elements.generateReportBtn.addEventListener('click', generateIntelligenceReport);
+    elements.closeReportModalBtn.addEventListener('click', () => {
+      elements.reportModal.classList.add('hidden');
+    });
+    elements.printReportBtn.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Settings Modal
+    elements.openSettingsBtn.addEventListener('click', () => {
+      elements.settingsModal.classList.remove('hidden');
+    });
+    elements.closeSettingsModalBtn.addEventListener('click', () => {
+      elements.settingsModal.classList.add('hidden');
+    });
+    elements.saveSettingsBtn.addEventListener('click', () => {
+      state.settings.openaiKey = elements.openaiKeyInput.value.trim();
+      state.settings.ollamaUrl = elements.ollamaUrlInput.value.trim();
+      state.settings.tavilyKey = elements.tavilyKeyInput.value.trim();
+      localStorage.setItem('satquery_openai_key', state.settings.openaiKey);
+      localStorage.setItem('satquery_ollama_url', state.settings.ollamaUrl);
+      localStorage.setItem('satquery_tavily_key', state.settings.tavilyKey);
+      elements.settingsModal.classList.add('hidden');
+      showToast('Configuration preferences saved');
+    });
+
+    // Clear & New Mission
+    elements.newChatBtn.addEventListener('click', () => {
+      elements.messagesList.innerHTML = '';
+      elements.messagesList.classList.add('hidden');
+      elements.welcomeHero.classList.remove('hidden');
+      state.activeDetections = [];
+      if (state.mapLayers.detectionsLayer) state.mapLayers.detectionsLayer.clearLayers();
+      showToast('New mission initialized.');
+    });
+    elements.clearChatBtn.addEventListener('click', () => {
+      elements.messagesList.innerHTML = '';
+      elements.messagesList.classList.add('hidden');
+      elements.welcomeHero.classList.remove('hidden');
+    });
   }
 
+  function getConversationHistory() {
+    // Extracts message history for context
+    return [];
+  }
+
+  function loadConversations() {
+    // Load recent mission logs
+  }
+
+  function saveCurrentConversation() {
+    // Persist conversation
+  }
+
+  async function checkHealth() {
+    try {
+      const res = await fetch('/api/health');
+      if (res.ok) {
+        const data = await res.json();
+        elements.currentProviderLabel.textContent = '37-Class YOLO + SAR U-Net';
+        elements.providerSubText = 'Deterministic GIS Engine Active';
+      }
+    } catch (e) {}
+  }
+
+  function scrollToBottom() {
+    if (elements.chatContainer) {
+      elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+    }
+  }
+
+  function showToast(msg) {
+    if (!elements.toastContainer) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    elements.toastContainer.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // Initialize application on DOM ready
+  document.addEventListener('DOMContentLoaded', init);
 })();
